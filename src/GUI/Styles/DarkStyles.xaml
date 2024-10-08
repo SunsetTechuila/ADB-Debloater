@@ -1,0 +1,20 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <SolidColorBrush x:Key="AccentBrush" Color="PLACEHOLDER" />
+  <SolidColorBrush x:Key="TextBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="InactiveTextBrush" Color="#D0D0D0" />
+  <SolidColorBrush x:Key="DisabledTextBrush" Color="#6E6E6E" />
+  <SolidColorBrush x:Key="BackgroundBrush" Color="#202020" />
+  <SolidColorBrush x:Key="BackgroundElevatedBrush" Color="#FFFFFF" Opacity="0.05" />
+  <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FFFFFF" Opacity="0.065" />
+  <SolidColorBrush x:Key="DisabledButtonBackgroundBrush" Color="#FFFFFF" Opacity="0.04" />
+  <SolidColorBrush x:Key="ActiveButtonBackgroundBrush" Color="#FFFFFF" Opacity="0.085" />
+  <SolidColorBrush x:Key="ControlBorderBrush" Color="#FFFFFF" Opacity="0.08" />
+  <SolidColorBrush x:Key="ScrollBarBackgroundBrush" Color="#A0A0A0" />
+  <SolidColorBrush x:Key="ToolTipBackgroundBrush" Color="#2E2E2E" />
+  <SolidColorBrush x:Key="CheckBoxBorderBrush" Color="#999999" />
+  <SolidColorBrush x:Key="GreenBrush" Color="#6CCB5F" />
+
+</ResourceDictionary>

@@ -1,0 +1,55 @@
+<Window
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  Title="ADB Debloater"
+  WindowStartupLocation="CenterScreen"
+  SizeToContent="WidthAndHeight"
+  MinWidth="450" MinHeight="350"
+  SnapsToDevicePixels="True"
+  FontFamily="Segoe UI Variable,SegoeUI" FontSize="16"
+  Background="{DynamicResource BackgroundBrush}">
+
+  <Border Name="ContentBorder">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="8" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="12" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="12" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <TextBox Name="SearchBox" Grid.Row="0"
+        Height="32" Width="Auto"
+        MaxWidth="600"
+        Margin="130,0,130,0" />
+
+      <CheckBox Name="SelectAllCheckBox" Grid.Row="2">
+        <CheckBox.LayoutTransform>
+          <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
+        </CheckBox.LayoutTransform>
+      </CheckBox>
+
+      <Border Grid.Row="4"
+        Background="{DynamicResource BackgroundElevatedBrush}"
+        Padding="8,0,0,0"
+        Margin="0"
+        BorderBrush="{DynamicResource ControlBorderBrush}"
+        BorderThickness="{DynamicResource ControlBorderThickness}"
+        CornerRadius="{DynamicResource ControlCornerRadius}">
+        <ScrollViewer
+          HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Name="CheckBoxesContainer"
+            Orientation="Vertical"
+            Margin="0,8,0,8" />
+        </ScrollViewer>
+      </Border>
+
+      <Button Name="ActionButton" Grid.Row="6"
+        IsEnabled="False"
+        Padding="8" />
+    </Grid>
+  </Border>
+</Window>

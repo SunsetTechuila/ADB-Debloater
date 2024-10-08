@@ -1,0 +1,10 @@
+root = true
+
+[*]
+tab_width = 2
+indent_style = space
+insert_final_newline = true
+end_of_line = lf
+
+[src/Resources/*.json]
+charset = utf-8-bom

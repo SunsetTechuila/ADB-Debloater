@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "redhat.vscode-xml",
+    "ms-vscode.powershell",
+    "editorconfig.editorconfig",
+    "davidanson.vscode-markdownlint",
+    "tylerleonhardt.vscode-inline-values-powershell",
+    "bierner.markdown-preview-github-styles"
+  ]
+}

@@ -1,0 +1,818 @@
+﻿[
+  {
+    "Name": {
+      "en": "TicHealth",
+      "ru": "Tic здоровье"
+    },
+    "Description": {
+      "en": "General summary of health and activity stats collected by Mobvoi fitness apps.",
+      "ru": "Общая сводка показателей здоровья и активности, собираемых фитнесс-приложениями от Mobvoi."
+    },
+    "Packages": [
+      "com.mobvoi.wear.health.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicCoach",
+      "ru": "Tic упражнение"
+    },
+    "Description": {
+      "en": "Automatically or manually records workouts.\nSimultaneously monitors your body condition during the selected activity.",
+      "ru": "Автоматически или вручную записывает тренировки.\nПараллельно отслеживает состояние организма во время физической активности."
+    },
+    "Packages": [
+      "com.mobvoi.wear.fitness.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicPulse",
+      "ru": "Tic пульс"
+    },
+    "Description": {
+      "en": "Heart rate tracking. Keeps your heart rate monitored throughout the day.",
+      "ru": "Измерение пульса. Мониторинг пульса в течение дня."
+    },
+    "Packages": [
+      "com.mobvoi.wear.heartrate.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicSleep",
+      "ru": "Tic сон"
+    },
+    "Description": {
+      "en": "Auto tracking the duration and quality of sleep.",
+      "ru": "Автоматическое отслеживание продолжительности и качества сна."
+    },
+    "Packages": [
+      "com.mobvoi.wear.sleep.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicOxygen",
+      "ru": "Tic кислород"
+    },
+    "Description": {
+      "en": "Measuring oxygen levels in the blood.",
+      "ru": "Измерение уровня кислорода в крови."
+    },
+    "Packages": [
+      "com.mobvoi.wear.bloodoxygen"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicZen",
+      "ru": "Tic дзен"
+    },
+    "Description": {
+      "en": "Tracking stress level throughout the day.",
+      "ru": "Отслеживание уровня стресса в течение дня."
+    },
+    "Packages": [
+      "com.mobvoi.wear.pressure"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicBreating",
+      "ru": "Tic дыхание"
+    },
+    "Description": {
+      "en": "Breathing exercises with customizable duration.",
+      "ru": "Дыхательные упражнения различной продолжительности."
+    },
+    "Packages": [
+      "com.mobvoi.wear.breath"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicHearing",
+      "ru": "Tic шум"
+    },
+    "Description": {
+      "en": "Ambient noise measurement.",
+      "ru": "Измерение уровня окружающего шума."
+    },
+    "Packages": [
+      "com.mobvoi.ticwear.noisedetect"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicCare"
+    },
+    "Description": {
+      "en": "Family access to health indicators.",
+      "ru": "Семейный доступ к показателям здоровья."
+    },
+    "Packages": [
+      "com.mobvoi.care"
+    ]
+  },
+  {
+    "Name": {
+      "en": "VoiceMemo",
+      "ru": "Tic запись"
+    },
+    "Packages": [
+      "com.mobvoi.wear.recorder"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Calculator",
+      "ru": "Калькулятор"
+    },
+    "Packages": [
+      "com.mobvoi.wear.calculator.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Essential mode"
+    },
+    "Description": {
+      "en": "Emergency Power Saving Mode.\nWhen disabled, «Second Display» and «Off-Wrist Calibration» in Settings will no stop work.",
+      "ru": "Режим экстренного энергосбережения.\nПосле отключения перестанут работать «Второй дисплей» и «Калибровка вне запястья» в Настройках."
+    },
+    "Packages": [
+      "com.mobvoi.wear.mcuservice.aw",
+      "com.mobvoi.wear.overlay.mcuservice"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Mobvoi Privacy",
+      "ru": "Конфиденциальность"
+    },
+    "Description": {
+      "en": "Permissions and data collection settings for Mobvoi apps.\nRequired for the built-in fitness apps from Mobvoi to work correctly.",
+      "ru": "Общие настройки разрешений и сбора данных для приложений от Mobvoi.\nНеобходимо для корректной работы встроенных фитнесс-приложений от Mobvoi."
+    },
+    "Packages": [
+      "com.mobvoi.wear.privacy.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Mobvoi Account (Login)",
+      "ru": "Авторизация в аккаунте Movboi"
+    },
+    "Description": {
+      "en": "Authorization to sync data to the cloud or connect to third-party services (e.g. Google Fit).",
+      "ru": "Авторизация для синхронизации данных с облаком или подключения к сторонним сервисам (например, Google Fit)."
+    },
+    "Packages": [
+      "com.mobvoi.wear.account.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Mobvoi Watchfaces",
+      "ru": "Циферблаты от Mobvoi"
+    },
+    "Packages": [
+      "com.mobvoi.wear.watchface.aw",
+      "com.mobvoi.mwf.magicfaces"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicCompanion",
+      "ru": "TicCompanion"
+    },
+    "Description": {
+      "en": "Used to pair watch with Mobvoi phone app.",
+      "ru": "Соединение часов с мобильным приложением Mobvoi."
+    },
+    "Packages": [
+      "com.mobvoi.companion.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "TicSystem",
+      "ru": "TicSystem"
+    },
+    "Description": {
+      "en": "Permissions and data collection settings for Mobvoi apps.\nIf you are going to use the built-in fitness apps from Mobvoi, you should not disable this app.",
+      "ru": "Отвечает за анимацию при подключении зарядки, пункты «DND Mode» и «Screenshot» в Настройках."
+    },
+    "Packages": [
+      "com.mobvoi.wear.system.aw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Fit (Fit Heart Rate, Fit Goals, Workouts, Fit Breathing)",
+      "ru": "Google Fit (Пульс в Fit, Цели в Fit, Тренировки, Fit Дыхание)"
+    },
+    "Packages": [
+      "com.google.android.apps.fitness"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Flashlight",
+      "ru": "Фонарик"
+    },
+    "Packages": [
+      "com.google.android.clockwork.flashlight"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Pay or Wallet",
+      "ru": "Google Pay или Кошелек"
+    },
+    "Packages": [
+      "com.google.android.apps.walletnfcrel"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Maps",
+      "ru": "Google Карты"
+    },
+    "Packages": [
+      "com.google.android.apps.maps"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Assistant",
+      "ru": "Google Ассистент"
+    },
+    "Description": {
+      "en": "Google Assistant doesn't work on the watches from Mobvoi so this package is useless.",
+      "ru": "Google Ассистент не работает на часах от Mobvoi, что делает этот пакет бесполезным."
+    },
+    "Packages": [
+      "com.google.android.wearable.assistant"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Phone (Dialer) and Contacts",
+      "ru": "Телефон и Контакты"
+    },
+    "Description": {
+      "en": "Voice calls on the watch by broadcasting from your phone.",
+      "ru": "Осуществление голосовых вызовов с часов путём трансляции с телефона."
+    },
+    "Packages": [
+      "com.google.android.apps.wearable.phone"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Handwriting",
+      "ru": "Рукописный ввод"
+    },
+    "Packages": [
+      "com.google.android.apps.handwriting.ime"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Clock (Stopwatch, Timer, Handwashing timer, Alarms)",
+      "ru": "Google Часы (Секундомер, Таймер, Таймер для мытья рук, Будильник)"
+    },
+    "Packages": [
+      "com.google.android.deskclock"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Camera (Aperture)",
+      "ru": "Камера (Aperture)"
+    },
+    "Description": {
+      "en": "Stock camera app in LineageOS.\nIt may not be possible to launch the camera from other applications after disabling this package.",
+      "ru": "Стандартное приложение камеры в LineageOS.\nПосле отключения, запуск камеры из других приложений может стать невозможным."
+    },
+    "Packages": [
+      "org.lineageos.aperture",
+      "org.lineageos.aperture.dev"
+    ]
+  },
+  {
+    "Name": {
+      "en": "(LineageOS) Recorder",
+      "ru": "(LineageOS) Рекордер"
+    },
+    "Packages": [
+      "org.lineageos.recorder"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Built-in Equalizer",
+      "ru": "Встроенный эквалайзер"
+    },
+    "Description": {
+      "en": "AOSP MusicFX or LineageOS AudioFX.",
+      "ru": "AOSP MusicFX или LineageOS AudioFX."
+    },
+    "Packages": [
+      "org.lineageos.audiofx",
+      "com.android.musicfx"
+    ]
+  },
+  {
+    "Name": {
+      "en": "(LineageOS) Music",
+      "ru": "(LineageOS) Музыка"
+    },
+    "Packages": [
+      "org.lineageos.eleven"
+    ]
+  },
+  {
+    "Name": {
+      "en": "(LineageOS) Browser",
+      "ru": "(LineageOS) Браузер"
+    },
+    "Packages": [
+      "org.lineageos.jelly"
+    ]
+  },
+  {
+    "Name": {
+      "en": "(LineageOS) Calendar",
+      "ru": "(LineageOS) Календарь"
+    },
+    "Packages": [
+      "org.lineageos.etar"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Matlog"
+    },
+    "Description": {
+      "en": "Collect and view system logs.",
+      "ru": "Сбор и просмотр системных логов."
+    },
+    "Packages": [
+      "org.omnirom.logcat"
+    ]
+  },
+  {
+    "Name": {
+      "en": "(crDroid) Game Space",
+      "ru": "(crDroid) Игровое пространство / Поиграем?"
+    },
+    "Description": {
+      "en": "Game Mode Options.",
+      "ru": "Параметры игрового режима."
+    },
+    "Packages": [
+      "io.chaldeaprjkt.gamespace"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Calculator",
+      "ru": "Калькулятор"
+    },
+    "Packages": [
+      "com.android.calculator2"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Dialer",
+      "ru": "Телефон"
+    },
+    "Packages": [
+      "com.android.phone"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Messaging",
+      "ru": "Сообщения (SMS/MMS)"
+    },
+    "Packages": [
+      "com.android.messaging"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Contacts",
+      "ru": "Контакты"
+    },
+    "Packages": [
+      "com.android.contacts"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Gallery",
+      "ru": "Галерея"
+    },
+    "Packages": [
+      "com.android.gallery3d"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Live Transcribe & Sound Notifications",
+      "ru": "Прямая расшифровка"
+    },
+    "Packages": [
+      "com.google.audio.hearing.visualization.accessibility.scribe"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Sound Amplifier",
+      "ru": "Усилитель звука"
+    },
+    "Packages": [
+      "com.google.android.accessibility.soundamplifier"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Files",
+      "ru": "Google Файлы"
+    },
+    "Packages": [
+      "com.google.android.apps.nbu.files"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Calendar",
+      "ru": "Google Календарь"
+    },
+    "Packages": [
+      "com.google.android.calendar"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Contacts",
+      "ru": "Google Контакты"
+    },
+    "Packages": [
+      "com.google.android.contacts"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Pixel Wallpapers",
+      "ru": "Обои Google Pixel"
+    },
+    "Packages": [
+      "com.google.android.apps.wallpaper.pixel"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Print service recommendation",
+      "ru": "Рекомендации сервиса печати"
+    },
+    "Description": {
+      "en": "Recommended services section in the print service selection menu.\nOpens Google Play with available print applications.",
+      "ru": "Секция рекомендуемых сервисов в меню выбора сервиса печати.\nОткрывает Google Play с доступными приложениями для печати."
+    },
+    "Packages": [
+      "com.google.android.printservice.recommendation"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Pixel Stand"
+    },
+	"Description": {
+      "en": "Allows you to use the some stand-on modes when the device is on the Pixel Stand.\nFor example: Ambient display photos (Photoframe), DND while on the stand, and the sunrise alarm (Clock mode).",
+      "ru": "Позволяет настроить отображаемый контент, когда устройство стоит на Pixel Stand.\nНапример: Режим фоторамки, Не беспокоить, когда устройство на Pixel Stand и экран с часами."
+    },
+    "Packages": [
+	  "com.google.android.apps.dreamliner",
+      "com.google.android.dreamlinerupdater"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Digital Wellbeing",
+      "ru": "Цифровое благополучие"
+    },
+    "Description": {
+      "en": "Unsafe to delete on the Pixel-like ROMs.",
+      "ru": "Не рекомендуется удалять на Pixel-like прошивках."
+    },
+    "Packages": [
+      "com.google.android.apps.wellbeing"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Emoji Wallpapers",
+      "ru": "Студия эмодзи"
+    },
+    "Packages": [
+	  "com.google.android.apps.emojiwallpaper"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Pixel Tips",
+      "ru": "Советы Pixel"
+    },
+    "Packages": [
+	  "com.google.android.apps.tips"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Gmail"
+    },
+    "Packages": [
+	  "com.google.android.gm"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Pixel Live Wallpapers",
+      "ru": "Живые обои Pixel"
+    },
+    "Packages": [
+	  "com.google.pixel.livewallpaper"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Cinematic Wallpapers",
+      "ru": "Эффекты обоев"
+    },
+    "Packages": [
+	  "com.google.android.wallpaper.effects"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Dialer",
+      "ru": "Google Телефон"
+    },
+    "Packages": [
+	  "com.google.android.dialer"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Calculator",
+      "ru": "Google Калькулятор"
+    },
+    "Packages": [
+	  "com.google.android.calculator"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Sounds",
+      "ru": "Звуки Google"
+    },
+    "Packages": [
+	  "com.google.android.soundpicker"
+    ]
+  },
+  {
+    "Name": {
+      "en": "YouTube"
+    },
+    "Packages": [
+	  "com.google.android.youtube"
+    ]
+  },
+  {
+    "Name": {
+      "en": "YouTube Music"
+    },
+    "Packages": [
+	  "com.google.android.apps.youtube.music"
+    ]
+  },
+  {
+    "Name": {
+      "en": "YouTube Music"
+    },
+    "Packages": [
+	  "com.google.android.apps.youtube.music"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Android Auto"
+    },
+    "Packages": [
+	  "com.google.android.projection.gearhead"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google TV or Google Play Movies",
+      "ru": "Google TV или Google Play Фильмы"
+    },
+    "Packages": [
+	  "com.google.android.videos"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Gboard"
+    },
+    "Description": {
+      "en": "Install any other keyboard before uninstalling.",
+      "ru": "Установите любую другую клавиатуру перед удалением."
+    },
+    "Packages": [
+	  "com.google.android.inputmethod.latin"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Android Accessibility Suite",
+      "ru": "Универсальный доступ"
+    },
+    "Packages": [
+	  "com.google.android.marvin.talkback"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Playground"
+    },
+    "Packages": [
+	  "com.google.vr.apps.ornament"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google News",
+      "ru": "Google Новости"
+    },
+    "Packages": [
+	  "com.google.android.apps.magazines"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google One"
+    },
+    "Packages": [
+	  "com.google.android.apps.subscriptions.red"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Safety or Personal Safety",
+      "ru": "Безопасность или Личная безопасность"
+    },
+    "Packages": [
+	  "com.google.android.apps.safetyhub"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Device Health Services"
+    },
+    "Description": {
+      "en": "May be unsafe to disable on Pixel-like ROMs.",
+      "ru": "Не рекомендуется отключать на Pixel-like прошивках."
+    },
+    "Packages": [
+	  "com.google.android.apps.turbo",
+	  "com.google.android.turboadapter"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Recorder",
+      "ru": "Google Диктофон"
+    },
+    "Packages": [
+	  "com.google.android.apps.recorder"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Messaging",
+      "ru": "Google Сообщения"
+    },
+    "Packages": [
+	  "com.google.android.apps.messaging"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Search App",
+      "ru": "Поиск в Google"
+    },
+    "Description": {
+      "en": "WearOS app is hard-dependent on this package.",
+      "ru": "Является зависимостью приложения WearOS."
+    },
+    "Packages": [
+	  "com.google.android.googlequicksearchbox",
+	  "com.google.android.googlequicksearchbox.nga_resources"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Meet"
+    },
+    "Packages": [
+	  "com.google.android.apps.tachyon"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Chrome"
+    },
+    "Packages": [
+	  "com.android.chrome"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Drive",
+      "ru": "Google Диск"
+    },
+    "Packages": [
+	  "com.google.android.apps.docs"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Docs",
+      "ru": "Google Документы"
+    },
+    "Packages": [
+	  "com.google.android.apps.docs.editors.docs"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Slides",
+      "ru": "Google Презентации"
+    },
+    "Packages": [
+	  "com.google.android.apps.docs.editors.slides"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Sheets",
+      "ru": "Google Таблицы"
+    },
+    "Packages": [
+	  "com.google.android.apps.docs.editors.sheets"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Speech Recognition & Synthesis",
+      "ru": "Распознавание и синтез речи от Google"
+    },
+    "Packages": [
+	  "com.google.android.tts"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google data restore tool",
+      "ru": "Восстановление данных"
+    },
+    "Packages": [
+	  "com.google.android.apps.restore"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Photos",
+      "ru": "Google Фото"
+    },
+    "Packages": [
+	  "com.google.android.apps.photos"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Google Pixel Camera",
+      "ru": "Google Pixel Камера"
+    },
+    "Packages": [
+	  "com.google.android.GoogleCamera"
+    ]
+  }
+]

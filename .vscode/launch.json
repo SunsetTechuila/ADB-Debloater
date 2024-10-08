@@ -1,0 +1,11 @@
+{
+  "configurations": [
+      {
+          "name": "Launch Debloater",
+          "type": "PowerShell",
+          "request": "launch",
+          "script": "${workspaceFolder}/src/Debloater.ps1 -Verbose -NoExit",
+          "args": []
+      }
+  ]
+}
