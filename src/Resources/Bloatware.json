@@ -331,7 +331,8 @@
       "ru": "(LineageOS) Музыка"
     },
     "Packages": [
-      "org.lineageos.eleven"
+      "org.lineageos.eleven",
+      "org.lineageos.twelve"
     ]
   },
   {
@@ -350,6 +351,15 @@
     },
     "Packages": [
       "org.lineageos.etar"
+    ]
+  },
+  {
+    "Name": {
+      "en": "(LineageOS) Gallery",
+      "ru": "(LineageOS) Галерея"
+    },
+    "Packages": [
+      "org.lineageos.glimpse"
     ]
   },
   {
@@ -790,8 +800,8 @@
   },
   {
     "Name": {
-      "en": "Google data restore tool",
-      "ru": "Восстановление данных"
+      "en": "Android Switch",
+      "ru": "Восстановление данных/Android Switch"
     },
     "Packages": [
 	  "com.google.android.apps.restore"
