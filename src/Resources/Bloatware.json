@@ -425,8 +425,8 @@
   },
   {
     "Name": {
-      "en": "Gallery",
-      "ru": "Галерея"
+      "en": "AOSP Gallery",
+      "ru": "AOSP Галерея"
     },
     "Packages": [
       "com.android.gallery3d"
