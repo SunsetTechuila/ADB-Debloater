@@ -40,3 +40,5 @@ Next time you can run the script by double clicking the "start" file in the "ADB
 
 - Windows 10 or higher
 - PowerShell 5.1 or higher
+
+![166300207-7e53ae91-08c3-455e-8d77-edc351dd4023](https://github.com/user-attachments/assets/15e002c2-d4bf-4a0a-9e16-bcc97dce66e0)
