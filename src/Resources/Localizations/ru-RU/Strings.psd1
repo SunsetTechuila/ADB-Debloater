@@ -16,7 +16,7 @@ UninstallApps = Удалить приложения
 DisableApps   = Отключить приложения
 EnableApps    = Включить приложения
 
-EnterIpAddress   = Введите IP-адрес
+EnterIpAddress   = Введите IP-адрес и порт
 EnterPairingCode = Введите шестизначный код сопряжения
 OK               = OK
 Cancel           = Отменить

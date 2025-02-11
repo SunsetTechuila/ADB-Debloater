@@ -16,7 +16,7 @@ UninstallApps = Uninstall apps
 DisableApps   = Disable apps
 EnableApps    = Enable apps
 
-EnterIpAddress   = Enter IP address
+EnterIpAddress   = Enter IP address and port
 EnterPairingCode = Enter six-digit pairing code
 OK               = OK
 Cancel           = Cancel
