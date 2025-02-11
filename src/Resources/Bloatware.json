@@ -479,6 +479,15 @@
   },
   {
     "Name": {
+      "en": "Pixel Weather",
+      "ru": "Погода Pixel"
+    },
+    "Packages": [
+	  "com.google.android.apps.weather"
+    ]
+  },
+  {
+    "Name": {
       "en": "Google Pixel Wallpapers",
       "ru": "Обои Google Pixel"
     },
@@ -528,10 +537,22 @@
   {
     "Name": {
       "en": "Emoji Wallpapers",
-      "ru": "Студия эмодзи"
+      "ru": "Обои из Лаборатории эмодзи"
     },
     "Packages": [
 	  "com.google.android.apps.emojiwallpaper"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Dreams",
+    },
+    "Description": {
+      "en": "Screensaver with Home Controls.",
+      "ru": "Скринсейвер с управлением Умным домом.."
+    },
+    "Packages": [
+      "com.google.assistant.hubui"
     ]
   },
   {
@@ -630,6 +651,18 @@
   },
   {
     "Name": {
+      "en": "Google Pixel Buds"
+    },
+    "Description": {
+      "en": "Set up and control Pixel Buds.",
+      "ru": "Настройка и управление Pixel Buds."
+    },
+    "Packages": [
+	  "com.google.android.apps.wearables.maestro.companion"
+    ]
+  },
+  {
+    "Name": {
       "en": "Google TV or Google Play Movies",
       "ru": "Google TV или Google Play Фильмы"
     },
@@ -651,6 +684,18 @@
   },
   {
     "Name": {
+      "en": "Android System SafetyCore",
+    },
+    "Description": {
+      "en": "Closed-source service with unrestricted network access, automatically installed with a recent update to Google Mobile Services. Google says it's intended to provide «new protections for Google Messages».",
+      "ru": "Сервис с закрытым исходным кодом и неограниченным доступом к сети, автоматически устанавливаемый с недавним обновлением Сервисов Google Play. По заверениям Google, он используется для обеспечения «безопасности в Google Сообщениях»."
+    },
+    "Packages": [
+      "com.google.android.safetycore"
+    ]
+  },
+  {
+    "Name": {
       "en": "Android Accessibility Suite",
       "ru": "Универсальный доступ"
     },
@@ -658,6 +703,22 @@
 	  "com.google.android.marvin.talkback"
     ]
   },
+  {
+    "Name": {
+      "en": "Voice Access",
+    },
+    "Packages": [
+	  "com.google.android.apps.accessibility.voiceaccess"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Switch Access",
+    },
+    "Packages": [
+	  "com.google.android.accessibility.switchaccess"
+    ]
+  },  
   {
     "Name": {
       "en": "Playground"
@@ -681,6 +742,15 @@
     },
     "Packages": [
 	  "com.google.android.apps.subscriptions.red"
+    ]
+  },
+  {
+    "Name": {
+      "en": "VPN by Google",
+      "ru": "VPN от Google"
+    },
+    "Packages": [
+	  "com.google.android.apps.privacy.wildlife"
     ]
   },
   {
