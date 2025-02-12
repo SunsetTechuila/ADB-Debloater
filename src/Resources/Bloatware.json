@@ -549,7 +549,7 @@
     },
     "Description": {
       "en": "Screensaver with Home Controls.",
-      "ru": "Скринсейвер с управлением Умным домом.."
+      "ru": "Скринсейвер с управлением Умным домом."
     },
     "Packages": [
       "com.google.assistant.hubui"
@@ -687,8 +687,8 @@
       "en": "Android System SafetyCore",
     },
     "Description": {
-      "en": "Closed-source service with unrestricted network access, automatically installed with a recent update to Google Mobile Services. Google says it's intended to provide «new protections for Google Messages».",
-      "ru": "Сервис с закрытым исходным кодом и неограниченным доступом к сети, автоматически устанавливаемый с недавним обновлением Сервисов Google Play. По заверениям Google, он используется для обеспечения «безопасности в Google Сообщениях»."
+      "en": "Closed-source service with unrestricted network access.\nGoogle says it's intended to provide «new protections for Google Messages».",
+      "ru": "Сервис с закрытым исходным кодом и неограниченным доступом к сети.\nGoogle уверяет, что он используется для обеспечения «безопасности в Google Сообщениях»."
     },
     "Packages": [
       "com.google.android.safetycore"
