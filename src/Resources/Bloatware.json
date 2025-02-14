@@ -635,14 +635,6 @@
   },
   {
     "Name": {
-      "en": "YouTube Music"
-    },
-    "Packages": [
-	  "com.google.android.apps.youtube.music"
-    ]
-  },
-  {
-    "Name": {
       "en": "Android Auto"
     },
     "Packages": [
