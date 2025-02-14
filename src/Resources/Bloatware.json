@@ -281,6 +281,35 @@
   },
   {
     "Name": {
+      "en": "Thermometer",
+      "ru": "Термометр"
+    },
+    "Packages": [
+      "com.google.android.apps.pixel.health"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Pixel Studio"
+    },
+    "Packages": [
+      "com.google.android.apps.pixel.creativeassistant"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Pixel Screenshots"
+    },
+    "Description": {
+      "en": "AI-powered screenshots manager.",
+      "ru": "Менеджер скриншотов на основе искусственного интеллекта."
+    },
+    "Packages": [
+      "com.google.android.apps.pixel.agent"
+    ]
+  },
+  {
+    "Name": {
       "en": "Google Clock (Stopwatch, Timer, Handwashing timer, Alarms)",
       "ru": "Google Часы (Секундомер, Таймер, Таймер для мытья рук, Будильник)"
     },
@@ -506,6 +535,19 @@
     },
     "Packages": [
       "com.google.android.printservice.recommendation"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Search Engine Selector",
+      "ru": "Выбор поисковой системы"
+    },
+    "Description": {
+      "en": "Change the search engine provider in the Pixel Launcher search bar.\nWorks only in EU.",
+      "ru": "Смена провайдера поисковой системы для панели поиска в Pixel Launcher.\nРаботает только в странах ЕС."
+    },
+    "Packages": [
+      "com.google.android.apps.setupwizard.searchselector"
     ]
   },
   {
