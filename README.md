@@ -23,7 +23,7 @@
 2. Download this repo:
 
    ```powershell
-   iwr 'https://codeload.github.com/SunsetTechuila/ADB-Debloater/zip/refs/heads/master' -useb -out 'ADB-Debloater.zip'; Expand-Archive 'ADB-Debloater.zip'; cd 'ADB-Debloater'
+   iwr 'https://codeload.github.com/SunsetTechuila/ADB-Debloater/zip/refs/heads/master' -useb -out 'ADB-Debloater.zip'; expand-archive 'ADB-Debloater.zip'; cd 'ADB-Debloater'; mv */* ./
    ```
 
 3. Enable debugging on your mobile device<sup>[`ℹ️`](https://developer.android.com/tools/adb#Enabling)</sup>
