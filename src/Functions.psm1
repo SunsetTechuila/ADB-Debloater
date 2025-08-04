@@ -209,11 +209,16 @@ function Uninstall-Packages {
   process {
     foreach ($package in $Packages) {
       try {
-        .$Env:adb -s $DeviceId shell pm uninstall $package
+        try {
+          .$Env:adb -s $DeviceId shell pm uninstall $package
+        }
+        catch { }
+        .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user --user 0 $package && am force-stop $package && pm clear $package"
+        Write-Verbose -Message "Uninstalled $package"
       }
-      catch { }
-      .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user --user 0 $package && am force-stop $package && pm clear $package"
-      Write-Verbose -Message "Uninstalled $package"
+      catch {
+        Write-Verbose -Message "Failed to uninstall $($package): $($PSItem.Exception.Message)"
+      }
     }
   }
 }
@@ -229,11 +234,16 @@ function Disable-Packages {
   process {
     foreach ($package in $Packages) {
       try {
-        .$Env:adb -s $DeviceId shell pm uninstall $package
+        try {
+          .$Env:adb -s $DeviceId shell pm uninstall $package
+        }
+        catch { }
+        .$Env:adb -s $DeviceId shell "pm disable-user --user 0 $package && am force-stop $package && pm clear $package"
+        Write-Verbose -Message "Disabled $package"
       }
-      catch { }
-      .$Env:adb -s $DeviceId shell "pm disable-user --user 0 $package && am force-stop $package && pm clear $package"
-      Write-Verbose -Message "Disabled $package"
+      catch {
+        Write-Verbose -Message "Failed to disable $($package): $($PSItem.Exception.Message)"
+      }
     }
   }
 }
@@ -248,8 +258,13 @@ function Enable-Packages {
   )
   process {
     foreach ($package in $Packages) {
-      .$Env:adb -s $DeviceId shell pm enable --user 0 $package
-      Write-Verbose -Message "Enabled $package"
+      try {
+        .$Env:adb -s $DeviceId shell pm enable --user 0 $package
+        Write-Verbose -Message "Enabled $package"
+      }
+      catch {
+        Write-Verbose -Message "Failed to enable $($package): $($PSItem.Exception.Message)"
+      }
     }
   }
 }
@@ -264,8 +279,13 @@ function Reinstall-Packages {
   )
   process {
     foreach ($package in $Packages) {
-      .$Env:adb -s $DeviceId shell cmd package install-existing --user 0 $package
-      Write-Verbose -Message "Reinstalled $package"
+      try {
+        .$Env:adb -s $DeviceId shell cmd package install-existing --user 0 $package
+        Write-Verbose -Message "Reinstalled $package"
+      }
+      catch {
+        Write-Verbose -Message "Failed to reinstall $($package): $($PSItem.Exception.Message)"
+      }
     }
   }
 }
