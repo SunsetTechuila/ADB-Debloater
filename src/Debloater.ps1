@@ -30,62 +30,64 @@ Import-LocalizedData @Parameters
 Set-PlatformTools
 Start-Adb
 
-$Parameters = @{
-  GetDevices    = ${function:Get-Devices}
-  ConnectDevice = ${function:Connect-DeviceOverWiFi}
-  PairDevice    = ${function:Pair-DeviceOverWiFi}
-}
-$choice = Show-DevicesWindow @Parameters
-if ($choice.Count -eq 0) { return }
-$actionName = $choice.ActionName
-$deviceId = $choice.DeviceId
-
-switch -Exact ($actionName) {
-  'uninstall' {
-    $chosenAction = ${function:Uninstall-Packages}
-    $packages = Get-InstalledPackages -DeviceId $deviceId
+do {
+  $Parameters = @{
+    GetDevices    = ${function:Get-Devices}
+    ConnectDevice = ${function:Connect-DeviceOverWiFi}
+    PairDevice    = ${function:Pair-DeviceOverWiFi}
+  }
+  $choice = Show-DevicesWindow @Parameters
+  if ($choice.Count -eq 0) { 
     break
   }
-  'disable' {
-    $chosenAction = ${function:Disable-Packages}
-    $packages = Get-EnabledPackages -DeviceId $deviceId
-    break
+  $actionName = $choice.ActionName
+  $deviceId = $choice.DeviceId
+
+  switch -Exact ($actionName) {
+    'uninstall' {
+      $chosenAction = ${function:Uninstall-Packages}
+      $packages = Get-InstalledPackages -DeviceId $deviceId
+      break
+    }
+    'disable' {
+      $chosenAction = ${function:Disable-Packages}
+      $packages = Get-EnabledPackages -DeviceId $deviceId
+      break
+    }
+    'enable' {
+      $chosenAction = ${function:Enable-Packages}
+      $packages = Get-DisabledPackages -DeviceId $deviceId
+      break
+    }
+    default {
+      throw "Unknown action: $($actionName)"
+    }
   }
-  'enable' {
-    $chosenAction = ${function:Enable-Packages}
-    $packages = Get-DisabledPackages -DeviceId $deviceId
-    break
+
+  if (-not $packages) {
+    Show-TextAlertWindow -Message $Localization.NoPackagesFound
+    continue
   }
-  Default {
-    throw "Unknown action: $($actionName)"
+
+  $Parameters = @{
+    Packages      = $packages
+    BloatwareList = Get-Content -Path $BloatwareList -Raw | ConvertFrom-Json
   }
-}
+  $appsToProcess = Get-AppsToProcess @Parameters
 
-if (-not $packages) {
-  Show-TextAlertWindow -Message $Localization.NoPackagesFound
-  Stop-Adb
-  return
-}
+  if (-not $appsToProcess) {
+    Show-TextAlertWindow -Message $Localization.NoPackagesFound
+    continue
+  }
 
-$Parameters = @{
-  Packages      = $packages
-  BloatwareList = Get-Content -Path $BloatwareList -Raw | ConvertFrom-Json
-}
-$appsToProcess = Get-AppsToProcess @Parameters
-
-if (-not $appsToProcess) {
-  Show-TextAlertWindow -Message $Localization.NoPackagesFound
-  Stop-Adb
-  return
-}
-
-$Parameters = @{
-  ActionName = $actionName
-  Action     = $chosenAction
-  Apps       = $appsToProcess
-  DeviceId   = $deviceId
-}
-Show-PackagesDialog @Parameters
+  $Parameters = @{
+    ActionName = $actionName
+    Action     = $chosenAction
+    Apps       = $appsToProcess
+    DeviceId   = $deviceId
+  }
+  Show-PackagesDialog @Parameters
+} while ($true)
 
 Stop-Adb
 
