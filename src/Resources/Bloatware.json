@@ -634,6 +634,15 @@
   },
   {
     "Name": {
+      "en": "AI Wallpapers",
+      "ru": "ИИ-обои"
+    },
+    "Packages": [
+	  "com.google.android.apps.aiwallpapers"
+    ]
+  },
+  {
+    "Name": {
       "en": "Google Dialer",
       "ru": "Google Телефон"
     },
@@ -730,11 +739,12 @@
   },
   {
     "Name": {
-      "en": "Android Accessibility Suite",
-      "ru": "Универсальный доступ"
+      "en": "Accessibility Suite (TalkBack)",
+      "ru": "Универсальный доступ (TalkBack)"
     },
     "Packages": [
-	  "com.google.android.marvin.talkback"
+	  "com.google.android.marvin.talkback",
+	  "com.samsung.android.accessibility.talkback"
     ]
   },
   {
@@ -843,7 +853,7 @@
   },
   {
     "Name": {
-      "en": "Google Meet"
+      "en": "Google Duo / Meet"
     },
     "Packages": [
 	  "com.google.android.apps.tachyon"
@@ -854,7 +864,8 @@
       "en": "Chrome"
     },
     "Packages": [
-	  "com.android.chrome"
+	  "com.android.chrome",
+	  "com.sec.android.app.chromecustomizations"
     ]
   },
   {
@@ -927,6 +938,381 @@
     },
     "Packages": [
 	  "com.google.android.GoogleCamera"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Smart suggestions",
+      "ru": "Смарт-рекомендации Samsung"
+	},
+    "Description": {
+      "en": "Android System Intelligence alternative for Samsung apps.\nSuggests useful actions and information through various apps on your Galaxy phone.\nData is stored and processed only on the device.",
+      "ru": "Альтернатива Android System Intelligence для приложений от Samsung.\nПредлагает полезные действия и информацию внутри различных приложений для Galaxy.\nДанные хранятся и обрабатываются только на устройстве."
+    },
+    "Packages": [
+	  "com.samsung.android.smartsuggestions"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Bixby Vision"
+	},
+    "Description": {
+      "en": "Uninstalling this package will not break QR code scanning,\ntext selection and translation in the Camera app and screenshot tool.",
+      "ru": "Удаление этого пакета не сломает сканирование QR-кодов,\nвыбор текста и перевод в приложении Камеры и скриншотере."
+    },
+    "Packages": [
+	  "com.samsung.android.visionintelligence",
+	  "com.samsung.android.bixbyvision.framework"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Bixby activation by button",
+      "ru": "Активация Bixby по кнопке"
+	},
+    "Description": {
+      "en": "Removing this package will disable the Bixby hardware button.\nThis will not affect the Bixby itself.",
+      "ru": "Удаление этого пакета приведет к отключению аппаратной кнопки Bixby.\nЭто не повлияет на работу самой Bixby."
+    },
+    "Packages": [
+	  "com.samsung.android.bixby.agent"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Bixby activation by voice",
+      "ru": "Активация Bixby по голосу"
+    },
+    "Packages": [
+	  "com.samsung.android.bixby.wakeup"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Edge panels",
+      "ru": "Панели Edge / Боковые панели"
+	},
+    "Description": {
+      "en": "Most of the pre-installed panels will be removed.\nThe feature itself is part of the launcher package and cannot be completely removed.",
+      "ru": "Будет удалено большинство предустановленных панелей.\nСама функция относится к пакету лаунчера и удалить её полностью невозможно."
+    },
+    "Packages": [
+	  "com.samsung.android.app.clipboardedge",
+	  "com.samsung.android.app.cocktailbarservice",
+	  "com.samsung.android.app.taskedge",
+	  "com.sec.android.app.quicktool",
+	  "com.samsung.android.service.peoplestripe"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Smart Call"
+    },
+    "Description": {
+      "en": "Identify unknown callers. Powered by Hiya.",
+      "ru": "Идентификация неизвестных абонентов. Работает на основе Hiya."
+    },
+    "Packages": [
+	  "com.samsung.android.smartcallprovider",
+	  "com.hiya.star"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Stickers in Samsung Camera",
+      "ru": "Стикеры в Samsung Камере"
+    },
+    "Packages": [
+	  "com.samsung.android.app.camera.sticker.facearavatar.preload"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Sticker Center"
+    },
+    "Packages": [
+	  "com.samsung.android.stickercenter"
+    ]
+  },
+  {
+    "Name": {
+      "en": "AR Emoji / Galaxy Avatar",
+      "ru": "Сэлфимоджи"
+    },
+    "Packages": [
+	  "com.samsung.android.aremoji",
+	  "com.samsung.android.aremojieditor"
+    ]
+  },
+  {
+    "Name": {
+      "en": "AR Emoji Sticker",
+      "ru": "Стикеры AR Emoji"
+    },
+    "Packages": [
+	  "com.sec.android.mimage.avatarstickers"
+    ]
+  },
+  {
+    "Name": {
+      "en": "AR Doodle",
+      "ru": "AR-зарисовка"
+    },
+    "Packages": [
+	  "com.samsung.android.ardrawing"
+    ]
+  },
+  {
+    "Name": {
+      "en": "OTA updates services",
+      "ru": "Сервисы ОТА-обновлений"
+    },
+   "Description": {
+      "en": "Responsible for checking, receiving, and installing OTA updates.\nDisabling these packages will remove the annoying software update banner.",
+      "ru": "Отвечают за проверку, загрузку и установку OTA-обновлений.\nОтключение этих пакетов уберёт назойливый баннер с предложением обновить ПО."
+    },
+    "Packages": [
+	  "com.wssyncmldm",
+	  "com.sec.android.soagent"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Pass"
+    },
+    "Packages": [
+	  "com.samsung.android.samsungpass",
+	  "com.samsung.android.samsungpassautofill",
+	  "com.samsung.android.authfw"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Wallet / Pay"
+    },
+    "Packages": [
+	  "com.samsung.android.spay",
+	  "com.samsung.android.spayfw",
+	  "com.samsung.android.dkey",
+	  "com.samsung.android.carkey"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Group Sharing"
+    },
+    "Packages": [
+	  "com.samsung.android.mobileservice"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Weather",
+      "ru": "Погода Samsung"
+    },
+    "Packages": [
+	  "com.sec.android.daemonapp"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Keyboard",
+      "ru": "Клавиатура Samsung"
+	},
+    "Description": {
+      "en": "Install any other keyboard before uninstalling.",
+      "ru": "Установите любую другую клавиатуру перед удалением."
+    },
+    "Packages": [
+	  "com.samsung.android.honeyboard"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Microsoft SwiftKey"
+    },
+    "Packages": [
+	  "com.touchtype.swiftkey",
+	  "com.swiftkey.swiftkeyconfigurator"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Dictionary",
+      "ru": "Словарь Samsung"
+    },
+    "Packages": [
+	  "com.diotek.sec.lookup.dictionary"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Chinese online payments services",
+      "ru": "Сервисы онлайн-оплаты для Китая"
+    },
+    "Packages": [
+	  "org.ifaa.aidl.manager",
+	  "com.tencent.soter.soterserver"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung DeX"
+    },
+    "Packages": [
+	  "com.sec.android.app.dexonpc",
+	  "com.sec.android.desktopmode.uiservice",
+	  "com.sec.android.app.desktoplauncher",
+	  "com.sec.android.dexsystemui"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Gallery",
+      "ru": "Галерея Samsung"
+    },
+    "Packages": [
+	  "com.sec.android.gallery3d"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Photo Editor in Samsung Gallery",
+      "ru": "Редактор фото в Галерее Samsung"
+    },
+    "Packages": [
+	  "com.sec.android.mimage.photoretouching"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Stories in Samsung Gallery",
+      "ru": "Истории в Галерее Samsung"
+    },
+    "Packages": [
+	  "com.samsung.storyservice"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Interpreter",
+      "ru": "Переводчик Samsung"
+    },
+   "Description": {
+      "en": "Removing this package won't break the translator in the built-in screenshot tool.",
+      "ru": "Удаление этого пакета не сломает переводчик во встроенном скриншотере."
+    },
+    "Packages": [
+	  "com.samsung.android.app.interpreter"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Game Launcher / Home"
+    },
+    "Packages": [
+	  "com.samsung.android.game.gamehome"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Galaxy Wearable"
+    },
+    "Packages": [
+	  "com.samsung.android.app.watchmanagerstub"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Reminders",
+      "ru": "Напоминания Samsung"
+    },
+    "Packages": [
+	  "com.samsung.android.app.reminder"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Calendar",
+      "ru": "Календарь Samsung"
+    },
+    "Packages": [
+	  "com.samsung.android.calendar"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Galaxy Store"
+    },
+   "Description": {
+      "en": "Required for Samsung Wallet / Pay to work.",
+      "ru": "Необходимо для работы Samsung Wallet / Pay."
+    },
+    "Packages": [
+	  "com.sec.android.app.samsungapps",
+	  "com.sec.android.app.billing"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Meta (Facebook) services",
+      "ru": "Сервисы Meta (Facebook)"
+    },
+    "Packages": [
+	  "com.facebook.appmanager",
+	  "com.facebook.services",
+	  "com.facebook.system",
+	  "com.facebook.katana"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Amazon apps",
+      "ru": "Приложения от Amazon"
+    },
+    "Packages": [
+	  "com.amazon.fv",
+	  "com.amazon.kindle",
+	  "com.amazon.mp3",
+	  "com.amazon.mShop.android",
+	  "com.amazon.venezia"
+    ]
+  },
+  {
+    "Name": {
+      "en": "S Pen features",
+      "ru": "Функции S Pen"
+    },
+    "Packages": [
+	  "com.samsung.android.aircommandmanager"
+    ]
+  },
+  {
+    "Name": {
+      "en": "SmartView"
+    },
+    "Packages": [
+	  "com.samsung.android.smartmirroring"
+    ]
+  }, 
+  {
+    "Name": {
+      "en": "Parental Care",
+      "ru": "Родительский контроль"
+    },
+    "Packages": [
+	  "com.samsung.android.app.parentalcare"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Link to Windows",
+      "ru": "Связь с Windows"
+    },
+    "Packages": [
+	  "com.samsung.android.mdx",
+	  "com.microsoft.appmanager"
     ]
   }
 ]
