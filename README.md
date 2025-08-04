@@ -13,6 +13,7 @@
 ## Features
 
 - Options to: uninstall, disable and enable apps
+- Curated bloatware list from vendors like Google, Samsung, Xiaomi, and others
 - WPF GUI in the WinUI 3 style
 - Localized interface, app names and tooltips
 - Automatic ADB downloading if it is not found in the PATH
