@@ -180,6 +180,23 @@ function Get-DisabledPackages {
   }
 }
 
+function Get-UninstalledPackages {
+  [CmdletBinding()]
+  [OutputType([array])]
+  param(
+    [Parameter(Mandatory)]
+    [string]$DeviceId
+  )
+  process {
+    $allPackages = .$Env:adb -s $DeviceId shell pm list packages --user 0 -u | ForEach-Object -Process {
+      $PSItem.Replace('package:', '')
+    }
+    $installedPackages = Get-InstalledPackages -DeviceId $DeviceId
+
+    $allPackages | Where-Object -FilterScript { $PSItem -notin $installedPackages }
+  }
+}
+
 function Uninstall-Packages {
   [CmdletBinding()]
   param (
@@ -233,6 +250,22 @@ function Enable-Packages {
     foreach ($package in $Packages) {
       .$Env:adb -s $DeviceId shell pm enable --user 0 $package
       Write-Verbose -Message "Enabled $package"
+    }
+  }
+}
+
+function Reinstall-Packages {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory)]
+    [array]$Packages,
+
+    [string]$DeviceId
+  )
+  process {
+    foreach ($package in $Packages) {
+      .$Env:adb -s $DeviceId shell cmd package install-existing --user 0 $package
+      Write-Verbose -Message "Reinstalled $package"
     }
   }
 }

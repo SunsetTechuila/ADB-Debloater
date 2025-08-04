@@ -59,6 +59,11 @@ do {
       $packages = Get-DisabledPackages -DeviceId $deviceId
       break
     }
+    'reinstall' {
+      $chosenAction = ${function:Reinstall-Packages}
+      $packages = Get-UninstalledPackages -DeviceId $deviceId
+      break
+    }
     default {
       throw "Unknown action: $($actionName)"
     }

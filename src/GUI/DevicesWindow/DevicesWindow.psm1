@@ -90,7 +90,7 @@ function Show-DevicesWindow {
       process {
         $isDeviceConnected = $selectedItem.Status -eq 'Connected'
 
-        @($DisableButton, $EnableButton, $UninstallButton) | ForEach-Object -Process {
+        @($UninstallButton, $DisableButton, $EnableButton, $ReinstallButton) | ForEach-Object -Process {
           $PSItem.IsEnabled = $isDeviceConnected
         }
       }
@@ -149,6 +149,10 @@ function Show-DevicesWindow {
     $EnableButton.Content = $Localization.EnableApps
     $EnableButton.Tag = 'enable'
     $EnableButton.Add_Click({ Set-Choice })
+
+    $ReinstallButton.Content = $Localization.ReinstallApps
+    $ReinstallButton.Tag = 'reinstall'
+    $ReinstallButton.Add_Click({ Set-Choice })
 
     $DeviceModelColumn.Header = $Localization.DeviceModel
     $DeviceStatusColumn.Header = $Localization.DeviceStatus

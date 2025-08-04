@@ -94,6 +94,8 @@
           <ColumnDefinition Width="*" />
           <ColumnDefinition Width="8" />
           <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="8" />
+          <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Button Name="UninstallButton"
           Grid.Column="0"
@@ -103,6 +105,9 @@
           IsEnabled="False" />
         <Button Name="EnableButton"
           Grid.Column="4"
+          IsEnabled="False" />
+        <Button Name="ReinstallButton"
+          Grid.Column="6"
           IsEnabled="False" />
       </Grid>
     </Grid>

@@ -15,6 +15,7 @@ DeviceId     = Идентификатор
 UninstallApps = Удалить приложения
 DisableApps   = Отключить приложения
 EnableApps    = Включить приложения
+ReinstallApps = Переустановить приложения
 
 EnterIpAddress   = Введите IP-адрес и порт
 EnterPairingCode = Введите шестизначный код сопряжения
@@ -28,4 +29,5 @@ Search    = Поиск
 Uninstall = Удалить
 Disable   = Отключить
 Enable    = Включить
+Reinstall = Переустановить
 '@

@@ -15,6 +15,7 @@ DeviceStatus = Status
 UninstallApps = Uninstall apps
 DisableApps   = Disable apps
 EnableApps    = Enable apps
+ReinstallApps = Reinstall apps
 
 EnterIpAddress   = Enter IP address and port
 EnterPairingCode = Enter six-digit pairing code
@@ -28,4 +29,5 @@ Search    = Search
 Uninstall = Uninstall
 Disable   = Disable
 Enable    = Enable
+Reinstall = Reinstall
 '@

@@ -12,7 +12,7 @@
 
 ## Features
 
-- Options to: uninstall, disable and enable apps
+- Options to: uninstall, disable, enable and reinstall apps
 - Curated bloatware list from vendors like Google, Samsung, Xiaomi, and others
 - WPF GUI in the WinUI 3 style
 - Localized interface, app names and tooltips

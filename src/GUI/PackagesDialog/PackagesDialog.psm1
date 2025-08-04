@@ -18,7 +18,7 @@ function Show-PackagesDialog {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [ValidateSet('uninstall', 'disable', 'enable')]
+    [ValidateSet('uninstall', 'disable', 'enable', 'reinstall')]
     [string]$ActionName,
 
     [Parameter(Mandatory)]
