@@ -100,11 +100,11 @@ function Show-DevicesWindow {
       [CmdletBinding()]
       param()
       begin {
-        $actionType = $PSItem.Source.Tag
+        $actionName = $PSItem.Source.Tag
       }
       process {
         $choice.DeviceId = $DevicesListView.SelectedItem.Id
-        $choice.ActionType = $actionType
+        $choice.ActionName = $actionName
         $Window.Close()
       }
     }

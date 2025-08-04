@@ -37,10 +37,10 @@ $Parameters = @{
 }
 $choice = Show-DevicesWindow @Parameters
 if ($choice.Count -eq 0) { return }
-$actionType = $choice.ActionType
+$actionName = $choice.ActionName
 $deviceId = $choice.DeviceId
 
-switch -Exact ($actionType) {
+switch -Exact ($actionName) {
   'uninstall' {
     $chosenAction = ${function:Uninstall-Packages}
     $packages = Get-InstalledPackages -DeviceId $deviceId
@@ -57,7 +57,7 @@ switch -Exact ($actionType) {
     break
   }
   Default {
-    throw "Unknown action type: $($actionType)"
+    throw "Unknown action: $($actionName)"
   }
 }
 
@@ -80,7 +80,7 @@ if (-not $appsToProcess) {
 }
 
 $Parameters = @{
-  ActionType = $actionType
+  ActionName = $actionName
   Action     = $chosenAction
   Apps       = $appsToProcess
   DeviceId   = $deviceId

@@ -19,7 +19,7 @@ function Show-PackagesDialog {
   param (
     [Parameter(Mandatory)]
     [ValidateSet('uninstall', 'disable', 'enable')]
-    [string]$ActionType,
+    [string]$ActionName,
 
     [Parameter(Mandatory)]
     [scriptblock]$Action,
@@ -194,7 +194,7 @@ function Show-PackagesDialog {
     }
 
     $SelectAllCheckBox.Content = $Localization.SelectAll
-    $ActionButton.Content = $Localization.$ActionType
+    $ActionButton.Content = $Localization.$ActionName
 
     for ($i = 0; $i -lt $Apps.Count; $i++) {
       $app = $Apps[$i]
