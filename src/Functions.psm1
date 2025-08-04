@@ -188,7 +188,7 @@ function Get-UninstalledPackages {
     [string]$DeviceId
   )
   process {
-    $allPackages = .$Env:adb -s $DeviceId shell pm list packages --user 0 -u | ForEach-Object -Process {
+    $allPackages = .$Env:adb -s $DeviceId shell pm list packages -u | ForEach-Object -Process {
       $PSItem.Replace('package:', '')
     }
     $installedPackages = Get-InstalledPackages -DeviceId $DeviceId
@@ -213,7 +213,7 @@ function Uninstall-Packages {
           .$Env:adb -s $DeviceId shell pm uninstall $package
         }
         catch { }
-        .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user --user 0 $package && am force-stop $package && pm clear $package"
+        .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package && pm clear $package"
         Write-Verbose -Message "Uninstalled $package"
       }
       catch {
@@ -238,7 +238,7 @@ function Disable-Packages {
           .$Env:adb -s $DeviceId shell pm uninstall $package
         }
         catch { }
-        .$Env:adb -s $DeviceId shell "pm disable-user --user 0 $package && am force-stop $package && pm clear $package"
+        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package"
         Write-Verbose -Message "Disabled $package"
       }
       catch {
@@ -259,7 +259,7 @@ function Enable-Packages {
   process {
     foreach ($package in $Packages) {
       try {
-        .$Env:adb -s $DeviceId shell pm enable --user 0 $package
+        .$Env:adb -s $DeviceId shell pm enable $package
         Write-Verbose -Message "Enabled $package"
       }
       catch {
@@ -280,7 +280,7 @@ function Reinstall-Packages {
   process {
     foreach ($package in $Packages) {
       try {
-        .$Env:adb -s $DeviceId shell cmd package install-existing --user 0 $package
+        .$Env:adb -s $DeviceId shell cmd package install-existing $package
         Write-Verbose -Message "Reinstalled $package"
       }
       catch {
