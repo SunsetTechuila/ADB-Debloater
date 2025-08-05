@@ -78,6 +78,8 @@ function Show-DevicesWindow {
               Hint   = $hint
             }
           })
+
+        $DevicesListView.SelectedIndex = 0
       }
     }
 
