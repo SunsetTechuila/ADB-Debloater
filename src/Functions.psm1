@@ -287,7 +287,7 @@ function Reinstall-Packages {
   process {
     foreach ($package in $Packages) {
       try {
-        .$Env:adb -s $DeviceId shell cmd package install-existing $package
+        .$Env:adb -s $DeviceId shell "cmd package install-existing $package && pm enable $package"
         Write-Verbose -Message "Reinstalled $package"
       }
       catch {
