@@ -210,10 +210,13 @@ function Uninstall-Packages {
     foreach ($package in $Packages) {
       try {
         try {
+          # Uninstall system app update, if installed
           .$Env:adb -s $DeviceId shell pm uninstall $package
         }
         catch { }
-        .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package && pm clear $package"
+         # `pm uninstall --user 0` uninstalls the system package for the primary user; when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
+         # `am force-stop' is used to ensure that all app processes are terminated
+        .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package"
         Write-Verbose -Message "Uninstalled $package"
       }
       catch {
@@ -235,10 +238,14 @@ function Disable-Packages {
     foreach ($package in $Packages) {
       try {
         try {
+          # Uninstall system app update, if installed
           .$Env:adb -s $DeviceId shell pm uninstall $package
         }
         catch { }
-        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package"
+        # `pm disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
+        # `am force-stop' is used to ensure that all app processes are terminated
+        # `pm clear` clears all application data
+        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package" 
         Write-Verbose -Message "Disabled $package"
       }
       catch {
