@@ -33,6 +33,7 @@ function Show-TextAlertWindow {
     $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
       Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
     }
+    Set-WindowStyling -Window $Window -HideCloseButton
 
     $OkButton.Content = $Localization.Ok
     $OkButton.Add_Click({ $Window.Close() })
@@ -41,32 +42,6 @@ function Show-TextAlertWindow {
     $Window.Add_KeyDown({
         if ($PSItem.Key -eq 'Enter') { $Window.Close() }
       })
-
-    $shouldSetMicaBackdrop = Test-DwmBackdropApiAvailability
-    $shouldSetImmersiveDarkMode = Test-DwmImmersiveDarkModeApiAvailability
-
-    Set-ContentBorderThickness -Border $ContentBorder
-
-    if ($shouldSetMicaBackdrop) {
-      $Window.Add_Loaded({ Set-MicaBackdrop -Window $Window })
-
-      $Parameters = @{
-        TargetThickness = $ContentBorder.BorderThickness
-        WindowState     = $Window.WindowState
-      }
-      $ContentBorder.BorderThickness = Get-ContentBorderAdjustedThickness @Parameters
-    }
-    else {
-      Set-ContentBorderThickness -Border $ContentBorder
-      if ($shouldSetImmersiveDarkMode) {
-        $Window.Add_Loaded({ Set-ImmersiveDarkMode -Window $Window })
-      }
-    }
-
-    $Window.Add_SourceInitialized({ Hide-CloseButton -Window $Window })
-    $Window.Add_Loaded({ $Window.Activate() })
-
-    Add-ColorStyles -Window $Window
 
     if ($ParentWindow) { $Window.Owner = $ParentWindow }
     $Window.ShowDialog() | Out-Null

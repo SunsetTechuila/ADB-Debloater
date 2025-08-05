@@ -43,6 +43,7 @@ function Show-PackagesDialog {
     $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
       Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
     }
+    Set-WindowStyling -Window $Window -NoTopBar -SetWindowMaxHeight
 
     function Get-CheckBoxes {
       [CmdletBinding()]
@@ -217,34 +218,8 @@ function Show-PackagesDialog {
     $SelectAllCheckBox.Add_Click({ OnSelectAllClick })
     $ActionButton.Add_Click({ OnActionButtonClick })
 
-    $shouldSetMicaBackdrop = Test-DwmBackdropApiAvailability
-    $shouldSetImmersiveDarkMode = Test-DwmImmersiveDarkModeApiAvailability
-
-    if ($shouldSetMicaBackdrop) {
-      $Window.Add_Loaded({ Set-MicaBackdrop -Window $Window })
-      Set-ContentBorderThickness -Border $ContentBorder -NoTopBar
-
-      $targetThickness = $ContentBorder.BorderThickness
-      function Adjust-ContentBorderThickness {
-        $Parameters = @{
-          TargetThickness = $targetThickness
-          WindowState     = $Window.WindowState
-        }
-        $ContentBorder.BorderThickness = Get-ContentBorderAdjustedThickness @Parameters
-      }
-      $Window.Add_StateChanged({ Adjust-ContentBorderThickness })
-      Adjust-ContentBorderThickness
-    }
-    else {
-      Set-ContentBorderThickness -Border $ContentBorder
-      if ($shouldSetImmersiveDarkMode) {
-        $Window.Add_Loaded({ Set-ImmersiveDarkMode -Window $Window })
-      }
-    }
-
     $Window.Add_Loaded({
         Set-SearchBoxPlaceholderVisibility
-        $Window.Activate()
       })
     $Window.Add_ContentRendered({
         # prevents the window from resizing on search
@@ -252,9 +227,6 @@ function Show-PackagesDialog {
         #removes scrollbar
         $Window.Height = $Window.ActualHeight + 1
       })
-
-    Add-ColorStyles -Window $Window
-    Set-WindowMaxHeight -Window $Window
 
     $Window.ShowDialog() | Out-Null
   }

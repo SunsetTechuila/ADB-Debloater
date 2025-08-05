@@ -5,6 +5,60 @@ $ErrorActionPreference = 'Stop'
 
 #region Window
 
+function Set-WindowStyling {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)]
+    [System.Windows.Window]$Window,
+
+    [switch]$NoTopBar,
+
+    [switch]$SetWindowMaxHeight,
+
+    [switch]$HideCloseButton
+  )
+  begin {
+    $shouldSetMicaBackdrop = Test-DwmBackdropApiAvailability
+    $shouldSetImmersiveDarkMode = Test-DwmImmersiveDarkModeApiAvailability
+  }
+  process {
+    $ContentBorder = $Window.FindName('ContentBorder')
+
+    if ($shouldSetMicaBackdrop) {
+      $Window.Add_Loaded({ param($Window) Set-MicaBackdrop -Window $Window })
+      Set-ContentBorderThickness -Border $ContentBorder -NoTopBar:$NoTopBar
+
+      $targetBorderThickness = $ContentBorder.BorderThickness
+      $adjustBorderThicknessScript = {
+        $Parameters = @{
+          TargetThickness = $targetBorderThickness
+          WindowState     = $Window.WindowState
+        }
+        $ContentBorder.BorderThickness = Get-ContentBorderAdjustedThickness @Parameters
+      }.GetNewClosure()
+      $Window.Add_StateChanged($adjustBorderThicknessScript)
+      $adjustBorderThicknessScript.Invoke()
+    }
+    else {
+      Set-ContentBorderThickness -Border $ContentBorder
+      if ($shouldSetImmersiveDarkMode) {
+        $Window.Add_Loaded({ param($Window) Set-ImmersiveDarkMode -Window $Window })
+      }
+    }
+
+    $Window.Add_Loaded({ param($Window) $Window.Activate() })
+    Add-ColorStyles -Window $Window
+
+    if ($HideCloseButton) {
+      $Window.Add_SourceInitialized({ param($Window) Hide-CloseButton -Window $Window })
+    }
+
+    if ($SetWindowMaxHeight) {
+      Set-WindowMaxHeight -Window $Window
+    }
+  }
+}
+
 function Set-WindowMaxHeight {
   [CmdletBinding()]
   param (

@@ -46,6 +46,7 @@ function Show-DevicesWindow {
     $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
       Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
     }
+    Set-WindowStyling -Window $Window -NoTopBar -SetWindowMaxHeight
 
     function Set-Devices {
       [CmdletBinding()]
@@ -165,35 +166,6 @@ function Show-DevicesWindow {
     $Window.Add_KeyDown({
         if ($PSItem.Key -eq 'F5') { Set-Devices }
       })
-
-    $shouldSetMicaBackdrop = Test-DwmBackdropApiAvailability
-    $shouldSetImmersiveDarkMode = Test-DwmImmersiveDarkModeApiAvailability
-
-    if ($shouldSetMicaBackdrop) {
-      $Window.Add_Loaded({ Set-MicaBackdrop -Window $Window })
-      Set-ContentBorderThickness -Border $ContentBorder -NoTopBar
-
-      $targetThickness = $ContentBorder.BorderThickness
-      function Adjust-ContentBorderThickness {
-        $Parameters = @{
-          TargetThickness = $targetThickness
-          WindowState     = $Window.WindowState
-        }
-        $ContentBorder.BorderThickness = Get-ContentBorderAdjustedThickness @Parameters
-      }
-      $Window.Add_StateChanged({ Adjust-ContentBorderThickness })
-      Adjust-ContentBorderThickness
-    }
-    else {
-      Set-ContentBorderThickness -Border $ContentBorder
-      if ($shouldSetImmersiveDarkMode) {
-        $Window.Add_Loaded({ Set-ImmersiveDarkMode -Window $Window })
-      }
-    }
-
-    Add-ColorStyles -Window $Window
-    $Window.Add_Loaded({ $Window.Activate() })
-    Set-WindowMaxHeight -Window $Window
 
     $Window.ShowDialog() | Out-Null
 
