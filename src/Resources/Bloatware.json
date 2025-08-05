@@ -1079,6 +1079,15 @@
   },
   {
     "Name": {
+      "en": "Samsung Smart Switch"
+    },
+    "Packages": [
+      "com.sec.android.easyMover",
+      "com.sec.android.easyMover.Agent"
+    ]
+  },
+  {
+    "Name": {
       "en": "Samsung Pass"
     },
     "Packages": [
