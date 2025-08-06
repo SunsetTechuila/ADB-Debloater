@@ -201,7 +201,7 @@
       "ru": "TicSystem"
     },
     "Description": {
-      "en": "Permissions and data collection settings for Mobvoi apps.\nIf you are going to use the built-in fitness apps from Mobvoi, you should not disable this app.",
+      "en": "Responsible for charging animation, «DND Mode» and «Screenshot» options in Settings.",
       "ru": "Отвечает за анимацию при подключении зарядки, пункты «DND Mode» и «Screenshot» в Настройках."
     },
     "Packages": [
@@ -254,7 +254,8 @@
       "ru": "Google Ассистент не работает на часах от Mobvoi, что делает этот пакет бесполезным."
     },
     "Packages": [
-      "com.google.android.wearable.assistant"
+      "com.google.android.wearable.assistant",
+      "com.google.android.apps.googleassistant"
     ]
   },
   {
@@ -573,7 +574,9 @@
       "ru": "Не рекомендуется удалять на Pixel-like прошивках."
     },
     "Packages": [
-      "com.google.android.apps.wellbeing"
+      "com.google.android.apps.wellbeing",
+      "com.samsung.android.forest",
+      "com.samsung.android.wellbeing"
     ]
   },
   {
@@ -718,8 +721,8 @@
       "en": "Gboard"
     },
     "Description": {
-      "en": "Install any other keyboard before uninstalling.",
-      "ru": "Установите любую другую клавиатуру перед удалением."
+      "en": "Install any keyboard with direct boot mode before uninstalling.\nFor example, FUTO Keyboard.",
+      "ru": "Установите другую клавиатуру с поддержкой режима прямой загрузки\n(direct boot mode) перед удалением. Например, FUTO Keyboard."
     },
     "Packages": [
       "com.google.android.inputmethod.latin"
@@ -942,6 +945,56 @@
   },
   {
     "Name": {
+      "en": "Samsung account",
+      "ru": "Аккаунт Samsung"
+    },
+    "Description": {
+      "en": "WARNING: Disabling this package will cause cyclic crashes\nin most Samsung applications (even those that are not account-dependent, such as Good Lock),\nbut will not affect the shell.",
+      "ru": "ВНИМАНИЕ! Отключение этого пакета повлечёт за собой циклические сбои\nв большинстве приложений от Samsung (включая те, что внешне не зависят\nот аккаунта, например Good Lock), но не нарушит работу оболочки."
+    },
+    "Packages": [
+      "com.osp.app.signin",
+      "com.sec.spp.push",
+      "com.sec.location.nsflp2"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Cloud"
+    },
+    "Packages": [
+      "com.samsung.android.scloud"
+    ]
+  },
+  {
+    "Name": {
+      "en": "All Knox related packages",
+      "ru": "Все пакеты, использующие Knox"
+    },
+    "Description": {
+      "en": "Disabling packages tied to the Knox hardware module\nwill not disable the chip itself or trigger the rewriting eFUSE.\nThe following features and applications will be disabled:\n\nAuto Lock, Secure Wi-Fi, Private Share, Knox Folder, Separated Apps,\nKnox analytics collection, and other related packages.",
+      "ru": "Отключение пакетов, завязанных на аппаратном модуле Knox, не приведет\nк отключению самого чипа или срабатыванию предохранителя перезаписи.\n\nБудут отключены следующие функции и приложения:\nАвтоблокировка, Secure Wi-Fi, Private Share, Папка Knox, Separated Apps,\nсбор аналитики Knox и другие связанные пакеты."
+    },
+    "Packages": [
+      "com.samsung.android.bbc.bbcagent",
+      "com.samsung.android.knox.analytics.uploader",
+      "com.samsung.android.knox.attestation",
+      "com.samsung.android.knox.containercore",
+      "com.samsung.android.knox.pushmanager",
+      "com.knox.vpn.proxyhandler",
+      "com.samsung.knox.securefolder",
+      "com.sec.enterprise.mdm.services.simpin",
+      "com.samsung.android.knox.app.networkfilter",
+      "com.samsung.android.knox.mpos",
+      "com.samsung.android.knox.kpecore",
+      "com.samsung.android.appseparation",
+      "com.samsung.android.privateshare",
+      "com.samsung.android.rampart",
+      "com.samsung.android.fast"
+    ]
+  },
+  {
+    "Name": {
       "en": "Samsung Smart suggestions",
       "ru": "Смарт-рекомендации Samsung"
     },
@@ -951,6 +1004,20 @@
     },
     "Packages": [
       "com.samsung.android.smartsuggestions"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung personalization services",
+      "ru": "Сервисы персонализации Samsung"
+    },
+    "Description": {
+      "en": "Responsible for personalising ads in Samsung apps.",
+      "ru": "Отвечают за персонализацию рекламы в приложениях Samsung."
+    },
+    "Packages": [
+      "com.samsung.android.rubin.app",
+      "com.sec.android.app.personalization"
     ]
   },
   {
@@ -1083,7 +1150,57 @@
     },
     "Packages": [
       "com.sec.android.easyMover",
-      "com.sec.android.easyMover.Agent"
+      "com.sec.android.easyMover.Agent",
+      "com.samsung.android.shortcutbackupservice",
+      "com.samsung.android.smartswitchassistant"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Flow / Galaxy Continuity"
+    },
+    "Description": {
+      "en": "«Continue apps on other devices» option in Settings.",
+      "ru": "Опция «Продолжение работы приложений на других устройствах»‎ в Настройках."
+    },
+    "Packages": [
+      "com.samsung.android.galaxycontinuity",
+      "com.samsung.android.mcfds"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Camera sharing",
+      "ru": "Доступ к камере Samsung"
+    },
+    "Description": {
+      "en": "«Camera sharing» option in Settings. Works only in pair with Galaxy Tab.",
+      "ru": "Опция «Доступ к камере»‎ в Настройках. Работает только в связке планшетом Galaxy."
+    },
+    "Packages": [
+      "com.samsung.android.hwresourceshare"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Multi control",
+      "ru": "Несколько устройств Samsung"
+    },
+    "Description": {
+      "en": "«Multi control» option in Settings. Works only in pair with Galaxy devices.",
+      "ru": "Опция «Несколько устройств»‎ в Настройках. Работает только в связке с устройствами Galaxy."
+    },
+    "Packages": [
+      "com.samsung.android.inputshare"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Call & text on other devices",
+      "ru": "Вызовы и SMS на других устройствах"
+    },
+    "Packages": [
+      "com.samsung.android.mdecservice"
     ]
   },
   {
@@ -1109,6 +1226,15 @@
   },
   {
     "Name": {
+      "en": "Samsung My Files",
+      "ru": "Мои файлы Samsung"
+    },
+    "Packages": [
+      "com.sec.android.app.myfiles"
+    ]
+  },
+  {
+    "Name": {
       "en": "Samsung Group Sharing"
     },
     "Packages": [
@@ -1130,8 +1256,8 @@
       "ru": "Клавиатура Samsung"
     },
     "Description": {
-      "en": "Install any other keyboard before uninstalling.",
-      "ru": "Установите любую другую клавиатуру перед удалением."
+      "en": "Install any keyboard with direct boot mode before uninstalling.\nFor example, FUTO Keyboard or Gboard.",
+      "ru": "Установите другую клавиатуру с поддержкой режима прямой загрузки\n(direct boot mode) перед удалением.\nНапример, FUTO Keyboard или Gboard."
     },
     "Packages": [
       "com.samsung.android.honeyboard"
@@ -1181,17 +1307,17 @@
       "en": "Samsung Gallery",
       "ru": "Галерея Samsung"
     },
-    "Packages": [
-      "com.sec.android.gallery3d"
-    ]
-  },
-  {
-    "Name": {
-      "en": "Photo Editor in Samsung Gallery",
-      "ru": "Редактор фото в Галерее Samsung"
+    "Description": {
+      "en": "Along with the Gallery app, the following related packages will be removed/disabled:\nvideo and photo editor; photo face recognition service; cloud synchronization.",
+      "ru": "Вместе с приложением Галереи будут удалены/отключены связанные с ней пакеты:\nредактор видео и фото, сервис распознавания лиц на фото, синхронизация с облаком."
     },
     "Packages": [
-      "com.sec.android.mimage.photoretouching"
+      "com.sec.android.gallery3d",
+      "com.samsung.faceservice",
+      "com.sec.android.mimage.photoretouching",
+      "com.samsung.app.newtrim",
+      "com.samsung.cmh",
+      "com.samsung.android.sume.nn.service"
     ]
   },
   {
@@ -1222,6 +1348,57 @@
     },
     "Packages": [
       "com.samsung.android.game.gamehome"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Game Tools / Booster"
+    },
+    "Packages": [
+      "com.samsung.android.game.gametools"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Game Optimizing Service",
+      "ru": "Сервис оптимизации игр Samsung"
+    },
+    "Packages": [
+      "com.samsung.android.game.gos"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Adaptive Sound",
+      "ru": "Адаптивный звук Samsung"
+    },
+    "Packages": [
+      "com.sec.hearingadjust"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Dolby Atmos and equalizer profiles",
+      "ru": "Dolby Atmos и профили эквалайзера"
+    },
+    "Packages": [
+      "com.sec.android.app.soundalive"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Microsoft OneDrive"
+    },
+    "Packages": [
+      "com.microsoft.skydrive"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Visit In"
+    },
+    "Packages": [
+      "com.samsung.android.ipsgeofence"
     ]
   },
   {
@@ -1302,7 +1479,25 @@
       "en": "SmartView"
     },
     "Packages": [
-      "com.samsung.android.smartmirroring"
+      "com.samsung.android.smartmirroring",
+      "com.samsung.android.allshare.service.mediashare"
+    ]
+  },
+  {
+    "Name": {
+      "en": "SmartThings"
+    },
+    "Packages": [
+      "com.samsung.android.beaconmanager",
+      "com.samsung.android.ststub"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Samsung Kids Home"
+    },
+    "Packages": [
+      "com.samsung.android.kidsinstaller"
     ]
   },
   {
