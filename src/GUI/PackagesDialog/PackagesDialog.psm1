@@ -52,12 +52,14 @@ function Show-PackagesDialog {
         [switch]$OnlyVisible
       )
       process {
-        $CheckBoxesContainer.Children | Where-Object -FilterScript {
-          $isCheckBox = $PSItem -is [System.Windows.Controls.CheckBox]
-          $isVisible = $PSItem.Visibility -eq 'Visible'
+        foreach ($AppRow in $AppsContainer.Children) {
+          $AppRow.Children | Where-Object -FilterScript {
+            $isCheckBox = $PSItem -is [System.Windows.Controls.CheckBox]
+            $isVisible = $PSItem.Parent.Visibility -eq 'Visible'
 
-          if ($OnlyVisible) { $isCheckBox -and $isVisible }
-          else { $isCheckBox }
+            if ($OnlyVisible) { $isCheckBox -and $isVisible }
+            else { $isCheckBox }
+          }
         }
       }
     }
@@ -162,12 +164,15 @@ function Show-PackagesDialog {
       process {
         if ($searchText -eq $Localization.Search) { return }
 
-        foreach ($CheckBox in Get-CheckBoxes) {
-          if (($CheckBox.Content.ToLower().Contains($searchText)) -or ($searchText.Length -eq 0)) {
-            $CheckBox.Visibility = 'Visible'
-          }
-          else {
-            $CheckBox.Visibility = 'Collapsed'
+        foreach ($AppRow in $AppsContainer.Children) {
+          $CheckBox = $AppRow.Children | Where-Object -FilterScript { $PSItem -is [System.Windows.Controls.CheckBox] }
+          if ($CheckBox) {
+            if (($CheckBox.Content.ToLower().Contains($searchText)) -or ($searchText.Length -eq 0)) {
+              $AppRow.Visibility = 'Visible'
+            }
+            else {
+              $AppRow.Visibility = 'Collapsed'
+            }
           }
         }
 
@@ -201,15 +206,29 @@ function Show-PackagesDialog {
       $app = $Apps[$i]
       $nextApp = $Apps[$i + 1]
 
+      $AppRow = New-Object -TypeName 'System.Windows.Controls.StackPanel'
+      $AppRow.Orientation = 'Horizontal'
+      $AppRow.VerticalAlignment = 'Center'
+      if ($nextApp) { $AppRow.Margin = '0,0,0,12' }
+
       $CheckBox = New-Object -TypeName 'System.Windows.Controls.CheckBox'
       $CheckBox.Content = $app.Name
       $CheckBox.Tag = $app.Packages
-      $CheckBox.ToolTip = $app.Description
-      if ($nextApp) { $CheckBox.Margin = '0,0,0,12' }
       $CheckBox.IsChecked = $false
 
       $CheckBox.Add_Click({ OnCheckBoxClick })
-      $CheckBoxesContainer.Children.Add($CheckBox) | Out-Null
+      
+      $AppRow.Children.Add($CheckBox) | Out-Null
+      $AppsContainer.Children.Add($AppRow) | Out-Null
+
+      if ($app.Description) {
+        $HelpIcon = New-Object -TypeName 'System.Windows.Controls.ContentControl'
+        $HelpIcon.Style = $Window.FindResource('HelpIcon')
+        $HelpIcon.Margin = '8,0,0,0'
+        $HelpIcon.ToolTip = $app.Description
+
+        $AppRow.Children.Add($HelpIcon) | Out-Null
+      }
     }
 
     $SearchBox.Add_TextChanged({ OnSearchTextChange })

@@ -424,4 +424,38 @@
     </Setter>
   </Style>
 
+  <Style x:Key="HelpIcon" TargetType="ContentControl">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="Background" Value="{DynamicResource ControlBorderBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="ToolTipService.Placement" Value="Right" />
+    <Setter Property="ToolTipService.HorizontalOffset" Value="8" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ContentControl">
+          <Border
+            Width="{TemplateBinding Width}"
+            Height="{TemplateBinding Height}"
+            CornerRadius="999"
+            Background="{TemplateBinding Background}"
+            ToolTip="{TemplateBinding ToolTip}"
+            ToolTipService.InitialShowDelay="0"
+            ToolTipService.Placement="{TemplateBinding ToolTipService.Placement}"
+            ToolTipService.HorizontalOffset="{TemplateBinding ToolTipService.HorizontalOffset}">
+            <TextBlock
+              Text="&#xE897;"
+              FontSize="{TemplateBinding FontSize}"
+              FontWeight="Bold"
+              Foreground="{TemplateBinding Foreground}"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              FontFamily="{StaticResource SymbolThemeFontFamily}" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
 </ResourceDictionary>

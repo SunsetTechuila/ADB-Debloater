@@ -41,7 +41,7 @@
         CornerRadius="{DynamicResource ControlCornerRadius}">
         <ScrollViewer
           HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Name="CheckBoxesContainer"
+          <StackPanel Name="AppsContainer"
             Orientation="Vertical"
             Margin="0,8,0,8" />
         </ScrollViewer>
