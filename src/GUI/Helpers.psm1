@@ -140,7 +140,7 @@ function Add-ColorStyles {
     [Parameter(Mandatory)]
     [System.Windows.Window] $Window
   )
-  process {
+  begin {
     $systemTheme = Get-SystemTheme
     $accentVariant = if ($systemTheme -eq 'dark') { 'light' } else { 'dark' }
     $accentColor = Get-SystemAccentColor -Variant $accentVariant
@@ -149,6 +149,8 @@ function Add-ColorStyles {
     [xml]$colorStyles = Get-Content -Path $colorStylesPath
     $colorStyles.ResourceDictionary.SolidColorBrush[0].Color = $accentColor
     $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $colorStyles)
+  }
+  process {
     $Window.Resources.MergedDictionaries.Add([Windows.Markup.XamlReader]::Load($reader))
   }
 }
@@ -221,9 +223,9 @@ function Set-ImmersiveDarkMode {
   )
   begin {
     $useImmersiveDarkMode = 20
+    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
   }
   process {
-    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
     Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $useDarkMode
   }
 }
@@ -263,10 +265,9 @@ function Get-SystemAccentColor {
       Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
       Name = 'AccentPalette'
     }
+    $accentPalette = Get-ItemPropertyValue @Parameters
   }
   process {
-    $accentPalette = Get-ItemPropertyValue @Parameters
-
     $accentColor = if ($Variant -eq 'light') {
       $accentPalette[4..6]
     }
