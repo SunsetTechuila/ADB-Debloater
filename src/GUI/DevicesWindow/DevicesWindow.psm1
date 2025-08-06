@@ -140,6 +140,11 @@ function Show-DevicesWindow {
     $PairButton.Add_Click({ OnPairButtonClick })
     $RefreshButton.ToolTip = $Localization.RefreshDevicesList
     $RefreshButton.Add_Click({ Set-Devices })
+    $RefreshButton.Add_Click({
+        if ([System.Windows.Input.Keyboard]::Modifiers -band 'Alt') {
+          Start-Process 'https://www.youtube.com/watch?v=-dt0d23Lrew'
+        }
+      })
 
     $UninstallButton.Content = $Localization.UninstallApps
     $UninstallButton.Tag = 'uninstall'
