@@ -4,7 +4,7 @@
       "name": "Launch Debloater",
       "type": "PowerShell",
       "request": "launch",
-      "script": "${workspaceFolder}/src/Debloater.ps1 -Verbose",
+      "script": "${workspaceFolder}/src/Debloater.ps1 -Dev",
       "createTemporaryIntegratedConsole": true,
     },
     // use to see the error when the script crashes the terminal
@@ -12,7 +12,7 @@
       "name": "Launch Debloater - Crash-Safe (PowerShell 7)",
       "type": "PowerShell",
       "request": "launch",
-      "script": "pwsh.exe -ExecutionPolicy Bypass -File \"${workspaceFolder}/src/Debloater.ps1\" -Verbose",
+      "script": "pwsh.exe -ExecutionPolicy Bypass -File \"${workspaceFolder}/src/Debloater.ps1\" -Dev",
       "createTemporaryIntegratedConsole": true,
     }
   ]

@@ -217,10 +217,10 @@ function Uninstall-Packages {
          # `pm uninstall --user 0` uninstalls the system package for the primary user; when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
          # `am force-stop' is used to ensure that all app processes are terminated
         .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package"
-        Write-Verbose -Message "Uninstalled $package"
+        Write-Host -Object "Uninstalled $package"
       }
       catch {
-        Write-Verbose -Message "Failed to uninstall $($package): $($PSItem.Exception.Message)"
+        Write-Host -Object "Failed to uninstall $($package): $($PSItem.Exception.Message)"
       }
     }
   }
@@ -246,10 +246,10 @@ function Disable-Packages {
         # `am force-stop' is used to ensure that all app processes are terminated
         # `pm clear` clears all application data
         .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package" 
-        Write-Verbose -Message "Disabled $package"
+        Write-Host -Object "Disabled $package"
       }
       catch {
-        Write-Verbose -Message "Failed to disable $($package): $($PSItem.Exception.Message)"
+        Write-Host -Object "Failed to disable $($package): $($PSItem.Exception.Message)"
       }
     }
   }
@@ -267,10 +267,10 @@ function Enable-Packages {
     foreach ($package in $Packages) {
       try {
         .$Env:adb -s $DeviceId shell pm enable $package
-        Write-Verbose -Message "Enabled $package"
+        Write-Host -Object "Enabled $package"
       }
       catch {
-        Write-Verbose -Message "Failed to enable $($package): $($PSItem.Exception.Message)"
+        Write-Host -Object "Failed to enable $($package): $($PSItem.Exception.Message)"
       }
     }
   }
@@ -288,10 +288,10 @@ function Reinstall-Packages {
     foreach ($package in $Packages) {
       try {
         .$Env:adb -s $DeviceId shell "cmd package install-existing $package && pm enable $package"
-        Write-Verbose -Message "Reinstalled $package"
+        Write-Host -Object "Reinstalled $package"
       }
       catch {
-        Write-Verbose -Message "Failed to reinstall $($package): $($PSItem.Exception.Message)"
+        Write-Host -Object "Failed to reinstall $($package): $($PSItem.Exception.Message)"
       }
     }
   }

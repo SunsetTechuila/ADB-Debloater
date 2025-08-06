@@ -1,5 +1,9 @@
 #Requires -Version 5.1
 
+param(
+  [switch]$Dev
+)
+
 #region Preparation
 
 $ErrorActionPreference = 'Stop'
@@ -94,6 +98,8 @@ do {
   Show-PackagesDialog @Parameters
 } while ($true)
 
-Stop-Adb
+if (-not $Dev) {
+  Stop-Adb
+}
 
 #endregion
