@@ -14,7 +14,7 @@ $Parameters = @{
 }
 Import-LocalizedData @Parameters
 
-function Show-PackagesDialog {
+function Show-AppsDialog {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
@@ -36,7 +36,7 @@ function Show-PackagesDialog {
   process {
     [System.Collections.ArrayList]$packagesToProcess = @()
 
-    [xml]$xaml = Get-Content -Path "$PSScriptRoot/PackagesDialog.xaml"
+    [xml]$xaml = Get-Content -Path "$PSScriptRoot/AppsDialog.xaml"
     $xaml = Add-FluentStyles -Xaml $xaml
     $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml)
     $Window = [Windows.Markup.XamlReader]::Load($reader)

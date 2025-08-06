@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop'
 
 @(
   'Functions',
-  'PackagesDialog',
+  'AppsDialog',
   'DevicesWindow',
   'TextAlertWindow'
 ) | ForEach-Object -Process {
@@ -95,7 +95,7 @@ do {
     Apps       = $appsToProcess
     DeviceId   = $deviceId
   }
-  Show-PackagesDialog @Parameters
+  Show-AppsDialog @Parameters
 } while ($true)
 
 if (-not $Dev) {
