@@ -214,6 +214,7 @@ function Show-PackagesDialog {
       $CheckBox = New-Object -TypeName 'System.Windows.Controls.CheckBox'
       $CheckBox.Content = $app.Name
       $CheckBox.Tag = $app.Packages
+      $CheckBox.ToolTip = $app.Packages -join "`n"
       $CheckBox.IsChecked = $false
 
       $CheckBox.Add_Click({ OnCheckBoxClick })
