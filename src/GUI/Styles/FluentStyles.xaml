@@ -238,16 +238,12 @@
               Background="{TemplateBinding Background}"
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}"
-              CornerRadius="{TemplateBinding Border.CornerRadius}">
-              <Grid
-                Margin="{TemplateBinding Padding}">
-                <ScrollViewer
-                  Name="PART_ContentHost"
-                  Margin="0"
-                  Padding="0"
-                  VerticalAlignment="Center"
-                  TextElement.Foreground="{TemplateBinding Foreground}" />
-              </Grid>
+              CornerRadius="{TemplateBinding Border.CornerRadius}"
+              Padding="{TemplateBinding Padding}">
+              <ScrollViewer
+                Name="PART_ContentHost"
+                VerticalAlignment="Center"
+                TextElement.Foreground="{TemplateBinding Foreground}" />
             </Border>
             <Border
               Name="AccentBorder"
