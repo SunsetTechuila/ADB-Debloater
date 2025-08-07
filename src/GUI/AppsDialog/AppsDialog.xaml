@@ -4,10 +4,7 @@
   Title="ADB Debloater"
   WindowStartupLocation="CenterScreen"
   SizeToContent="WidthAndHeight"
-  MinWidth="450" MinHeight="350"
-  SnapsToDevicePixels="True"
-  FontFamily="Segoe UI Variable,SegoeUI" FontSize="16"
-  Background="{DynamicResource BackgroundBrush}">
+  MinWidth="450" MinHeight="350">
 
   <Window.Resources>
     <ResourceDictionary>

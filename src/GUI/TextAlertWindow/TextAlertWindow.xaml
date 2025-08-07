@@ -4,9 +4,6 @@
   WindowStartupLocation="CenterOwner"
   MinWidth="250" MinHeight="100"
   MaxWidth="250" MaxHeight="100"
-  SnapsToDevicePixels="True"
-  FontFamily="Segoe UI Variable,SegoeUI" FontSize="16"
-  Background="{DynamicResource BackgroundBrush}"
   Topmost="True"
   ShowInTaskbar="False"
   ResizeMode="NoResize">
