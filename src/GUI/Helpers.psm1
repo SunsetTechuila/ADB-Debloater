@@ -47,7 +47,6 @@ function Set-WindowStyling {
     }
 
     $Window.Add_Loaded({ param($Window) $Window.Activate() })
-    Add-ColorStyles -Window $Window
 
     if ($HideCloseButton) {
       $Window.Add_SourceInitialized({ param($Window) Hide-CloseButton -Window $Window })
@@ -134,11 +133,11 @@ function Set-ContentBorderThickness {
   }
 }
 
-function Add-ColorStyles {
+function Add-FluentStyles {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Window] $Window
+    [xml]$Xaml
   )
   begin {
     $systemTheme = Get-SystemTheme
@@ -148,36 +147,32 @@ function Add-ColorStyles {
 
     [xml]$colorStyles = Get-Content -Path $colorStylesPath
     $colorStyles.ResourceDictionary.SolidColorBrush[0].Color = $accentColor
-    $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $colorStyles)
   }
-  process {
-    $Window.Resources.MergedDictionaries.Add([Windows.Markup.XamlReader]::Load($reader))
-  }
-}
-
-function Add-FluentStyles {
-  [CmdletBinding()]
-  param (
-    [Parameter(Mandatory)]
-    [xml]$Xaml
-  )
   process {
     $xmlNS = $Xaml.DocumentElement.NamespaceURI
 
-    $windowResources = $Xaml.CreateElement('Window.Resources', $xmlNS)
-    $resourceDictionary = $Xaml.CreateElement('ResourceDictionary', $xmlNS)
+    $windowResources = $Xaml.DocumentElement.SelectSingleNode("*[local-name()='Window.Resources']", $Xaml.CreateNavigator().NamespaceManager)
+    if (-not $windowResources) {
+      $windowResources = $Xaml.CreateElement('Window.Resources', $xmlNS)
+      $resourceDictionary = $Xaml.CreateElement('ResourceDictionary', $xmlNS)
+      $windowResources.AppendChild($resourceDictionary) | Out-Null
+      $Xaml.DocumentElement.PrependChild($windowResources) | Out-Null
+    }
+    else {
+      $resourceDictionary = $windowResources.SelectSingleNode("*[local-name()='ResourceDictionary']")
+    }
+    
     $mergedDictionaries = $Xaml.CreateElement('ResourceDictionary.MergedDictionaries', $xmlNS)
-    $fluentResourceDictionary = $Xaml.CreateElement('ResourceDictionary', $xmlNS)
+    $resourceDictionary.AppendChild($mergedDictionaries) | Out-Null
 
+    $fluentResourceDictionary = $Xaml.CreateElement('ResourceDictionary', $xmlNS)
     $sourceAttribute = $Xaml.CreateAttribute('Source')
     $sourceAttribute.Value = $FluentStyles
-
-    $windowResources.AppendChild($resourceDictionary) | Out-Null
-    $resourceDictionary.AppendChild($mergedDictionaries) | Out-Null
     $fluentResourceDictionary.Attributes.Append($sourceAttribute) | Out-Null
     $mergedDictionaries.AppendChild($fluentResourceDictionary) | Out-Null
 
-    $Xaml.DocumentElement.PrependChild($windowResources) | Out-Null
+    $importedColorStyles = $Xaml.ImportNode($colorStyles.ResourceDictionary, $true)
+    $mergedDictionaries.AppendChild($importedColorStyles) | Out-Null
 
     $Xaml
   }

@@ -9,6 +9,37 @@
   FontFamily="Segoe UI Variable,SegoeUI" FontSize="16"
   Background="{DynamicResource BackgroundBrush}">
 
+  <Window.Resources>
+    <ResourceDictionary>
+      <Style x:Key="HelpIcon" TargetType="ContentControl">
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="ContentControl">
+              <Border
+                Width="18"
+                Height="18"
+                CornerRadius="999"
+                Background="{DynamicResource ControlBorderBrush}"
+                ToolTip="{TemplateBinding ToolTip}"
+                ToolTipService.InitialShowDelay="0"
+                ToolTipService.Placement="Right"
+                ToolTipService.HorizontalOffset="8">
+                <TextBlock
+                  Text="&#xE897;"
+                  FontSize="10"
+                  FontWeight="Bold"
+                  Foreground="{DynamicResource TextBrush}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  FontFamily="{DynamicResource SymbolThemeFontFamily}" />
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ResourceDictionary>
+  </Window.Resources>
+
   <Border Name="ContentBorder">
     <Grid>
       <Grid.RowDefinitions>
