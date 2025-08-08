@@ -1,4 +1,7 @@
 #Requires -Version 5.1
+
+using module ../Helpers.psm1
+
 $ErrorActionPreference = 'Stop'
 
 ."$PSScriptRoot/../../Paths.ps1"
@@ -34,8 +37,6 @@ function Show-AppsDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    [System.Collections.ArrayList]$packagesToProcess = @()
-
     [xml]$xaml = Get-Content -Path "$PSScriptRoot/AppsDialog.xaml"
     $xaml = Add-FluentStyles -Xaml $xaml
     $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml)
@@ -45,178 +46,52 @@ function Show-AppsDialog {
     }
     Set-WindowStyling -Window $Window -NoTopBar -SetWindowMaxHeight
 
-    function Get-CheckBoxes {
-      [CmdletBinding()]
-      [OutputType([System.Windows.Controls.CheckBox[]])]
-      param(
-        [switch]$OnlyVisible
-      )
-      process {
-        foreach ($AppRow in $AppsContainer.Children) {
-          $AppRow.Children | Where-Object -FilterScript {
-            $isCheckBox = $PSItem -is [System.Windows.Controls.CheckBox]
-            $isVisible = $PSItem.Parent.Visibility -eq 'Visible'
-
-            if ($OnlyVisible) { $isCheckBox -and $isVisible }
-            else { $isCheckBox }
-          }
-        }
-      }
-    }
-
-    function Set-ActionButtonState {
-      [CmdletBinding()]
-      param()
-      process {
-        $ActionButton.IsEnabled = $packagesToProcess.Count -gt 0
-      }
-    }
-
-    function Set-SelectAllCheckBoxState {
-      [CmdletBinding()]
-      param()
-      process {
-        $foundNotChecked = $false
-        $hasVisibleCheckBoxes = $false
-
-        foreach ($checkBox in Get-CheckBoxes -OnlyVisible) {
-          $hasVisibleCheckBoxes = $true
-          if (-not $checkBox.IsChecked) {
-            $foundNotChecked = $true
-            break
-          }
-        }
-
-        $SelectAllCheckBox.IsChecked = (-not $foundNotChecked) -and ($hasVisibleCheckBoxes)
-      }
-    }
-
-    function OnCheckBoxClick {
-      [CmdletBinding()]
-      param()
-      begin {
-        $CheckBox = $PSItem.Source
-      }
-      process {
-        if ($CheckBox.IsChecked) {
-          foreach ($package in $CheckBox.Tag) {
-            if ($package -notin $packagesToProcess) {
-              $packagesToProcess.Add($package)
-            }
-          }
-        }
-        else {
-          foreach ($package in $CheckBox.Tag) {
-            $packagesToProcess.Remove($package)
-          }
-        }
-
-        Set-SelectAllCheckBoxState
-        Set-ActionButtonState
-      }
-    }
-
-    function OnSelectAllClick {
-      [CmdletBinding()]
-      param()
-      begin {
-        $SelectAllCheckBox = $PSItem.Source
-      }
-      process {
-        foreach ($CheckBox in Get-CheckBoxes -OnlyVisible) {
-          if ($SelectAllCheckBox.IsChecked) {
-            $CheckBox.IsChecked = $true
-            foreach ($package in $CheckBox.Tag) {
-              if ($package -notin $packagesToProcess) {
-                $packagesToProcess.Add($package)
-              }
-            }
-          }
-          else {
-            $CheckBox.IsChecked = $false
-            foreach ($package in $CheckBox.Tag) {
-              $packagesToProcess.Remove($package)
-            }
-          }
-        }
-
-        # make it unchecked if there are no visible checkboxes
-        Set-SelectAllCheckBoxState
-        Set-ActionButtonState
-      }
-    }
-
-    function OnActionButtonClick {
+    $OnActionButtonClick = {
       [CmdletBinding()]
       param()
       process {
         $Window.Close()
-        $Action.Invoke($packagesToProcess, $DeviceId)
+        $packages = $AppsViewModel.GetSelectedPackages()
+        $Action.Invoke($packages, $DeviceId)
       }
     }
 
-    function OnSearchTextChange {
+    $OnSearchTextChanged = {
       [CmdletBinding()]
-      param()
-      begin {
-        $searchText = $PSItem.Source.Text.ToLower()
-      }
+      param($eventSender)
       process {
-        if ($searchText -eq $Localization.Search) { return }
-
-        foreach ($AppRow in $AppsContainer.Children) {
-          $CheckBox = $AppRow.Children | Where-Object -FilterScript { $PSItem -is [System.Windows.Controls.CheckBox] }
-          if ($CheckBox) {
-            if (($CheckBox.Content.ToLower().Contains($searchText)) -or ($searchText.Length -eq 0)) {
-              $AppRow.Visibility = 'Visible'
-            }
-            else {
-              $AppRow.Visibility = 'Collapsed'
-            }
-          }
-        }
-
-        Set-SelectAllCheckBoxState
+        $AppsViewModel.FilterAppsByName($eventSender.Text)
+        $AppsViewModel.UpdateSelectionFlags()
       }
     }
 
-    $SelectAllCheckBox.Content = $Localization.SelectAll
-    $ActionButton.Content = $Localization.$ActionName
-
-    for ($i = 0; $i -lt $Apps.Count; $i++) {
-      $app = $Apps[$i]
-      $nextApp = $Apps[$i + 1]
-
-      $AppRow = New-Object -TypeName 'System.Windows.Controls.StackPanel'
-      $AppRow.Orientation = 'Horizontal'
-      $AppRow.VerticalAlignment = 'Center'
-      if ($nextApp) { $AppRow.Margin = '0,0,0,12' }
-
-      $CheckBox = New-Object -TypeName 'System.Windows.Controls.CheckBox'
-      $CheckBox.Content = $app.Name
-      $CheckBox.Tag = $app.Packages
-      $CheckBox.ToolTip = $app.Packages -join "`n"
-      $CheckBox.IsChecked = $false
-
-      $CheckBox.Add_Click({ OnCheckBoxClick })
-      
-      $AppRow.Children.Add($CheckBox) | Out-Null
-      $AppsContainer.Children.Add($AppRow) | Out-Null
-
-      if ($app.Description) {
-        $HelpIcon = New-Object -TypeName 'System.Windows.Controls.ContentControl'
-        $HelpIcon.Style = $Window.FindResource('HelpIcon')
-        $HelpIcon.Margin = '8,0,0,0'
-        $HelpIcon.ToolTip = $app.Description
-
-        $AppRow.Children.Add($HelpIcon) | Out-Null
+    $AppItems = @(
+      foreach ($app in $Apps) {
+        [AppItem]::new($app.Name, $app.Packages, $app.Description)
       }
+    )
+    $AppsViewModel = [AppsViewModel]::new($AppItems)
+    $Window.DataContext = [PSCustomObject]@{
+      AppsViewModel = $AppsViewModel
+      Localization  = $Localization
+      ActionLabel   = $Localization.$ActionName
     }
+
+    $AppsContainer.AddHandler(
+      [System.Windows.Controls.Primitives.ToggleButton]::CheckedEvent,
+      [System.Windows.RoutedEventHandler] {
+        $AppsViewModel.UpdateSelectionFlags()
+      })
+    $AppsContainer.AddHandler(
+      [System.Windows.Controls.Primitives.ToggleButton]::UncheckedEvent,
+      [System.Windows.RoutedEventHandler] {
+        $AppsViewModel.UpdateSelectionFlags()
+      })
 
     $SearchBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.Search }
-    $SearchBox.Add_TextChanged({ OnSearchTextChange })
-    $SelectAllCheckBox.Add_Click({ OnSelectAllClick })
-    $ActionButton.Add_Click({ OnActionButtonClick })
+    $SearchBox.Add_TextChanged($OnSearchTextChanged)
+    $SelectAllCheckBox.Add_Click({ $AppsViewModel.ToggleVisibleAppItemsSelection() })
+    $ActionButton.Add_Click($OnActionButtonClick)
 
     $Window.Add_ContentRendered({
         # prevents the window from resizing on search
@@ -226,5 +101,97 @@ function Show-AppsDialog {
       })
 
     $Window.ShowDialog() | Out-Null
+  }
+}
+
+class AppsViewModel : INotifyPropertyChanged {
+  [AppItem[]] $AppItems
+  [bool] $HasAnyVisibleAppItem = $false
+  [bool] $HasAnyAppItemSelected = $false
+  [bool] $AreAllVisibleAppItemsSelected = $false
+
+  AppsViewModel([AppItem[]] $appItems) {
+    $this.AppItems = $appItems
+  }
+
+  hidden [void] UpdateSelectionFlags() {
+    $anySelected = $false
+    $allVisibleSelected = $true
+    $hasAnyVisible = $false
+
+    foreach ($appItem in $this.AppItems) {
+      if ($appItem.IsSelected) { $anySelected = $true }
+      if ($appItem.IsVisible) {
+        $hasAnyVisible = $true
+        if (-not $appItem.IsSelected) { $allVisibleSelected = $false }
+      }
+    }
+
+    $this.HasAnyVisibleAppItem = $hasAnyVisible
+    $this.HasAnyAppItemSelected = $anySelected
+    $this.AreAllVisibleAppItemsSelected = ($hasAnyVisible -and $allVisibleSelected)
+
+    $this.OnPropertyChanged('HasAnyVisibleAppItem')
+    $this.OnPropertyChanged('HasAnyAppItemSelected')
+    $this.OnPropertyChanged('AreAllVisibleAppItemsSelected')
+  }
+
+  [void] FilterAppsByName([string] $searchText) {
+    if ($searchText.Equals('Search')) { return }
+    $searchTextLowered = $searchText.ToLower()
+    foreach ($appItem in $this.AppItems) {
+      $appItem.SetIsVisible($appItem.Name.ToLower().Contains($searchTextLowered) -or $appItem.Packages.Contains($searchTextLowered))
+    }
+  }
+
+  [void] ToggleVisibleAppItemsSelection() {
+    $shouldSelect = -not $this.AreAllVisibleAppItemsSelected
+    foreach ($appItem in $this.AppItems) {
+      if ($appItem.IsVisible) { $appItem.SetIsSelected($shouldSelect) }
+    }
+  }
+
+  [string[]] GetSelectedPackages() {
+    [System.Collections.ArrayList]$selectedPackages = @()
+    foreach ($app in $this.AppItems) {
+      if ($app.IsSelected) {
+        foreach ($package in $app.Packages) { $selectedPackages.Add($package) }
+      }
+    }
+    return $selectedPackages
+  }
+}
+
+class AppItem : INotifyPropertyChanged {
+  [string] $Name
+  [string[]] $Packages
+  [bool] $IsSelected = $false
+  [bool] $IsVisible = $true
+  hidden [string] $HelpMessage
+  hidden [string] $PackagesString
+
+  AppItem(
+    [string] $name,
+    [string[]] $packages,
+    [string] $helpMessage
+  ) {
+    $this.Name = $name
+    $this.Packages = $packages
+    $this.HelpMessage = $helpMessage
+    $this.PackagesString = ($packages -join "`n")
+  }
+
+  [void] SetIsSelected([bool] $value) {
+    if ($this.IsSelected -ne $value) {
+      $this.IsSelected = $value
+      $this.OnPropertyChanged('IsSelected')
+    }
+  }
+
+  [void] SetIsVisible([bool] $value) {
+    if ($this.IsVisible -ne $value) {
+      $this.IsVisible = $value
+      $this.OnPropertyChanged('IsVisible')
+    }
   }
 }

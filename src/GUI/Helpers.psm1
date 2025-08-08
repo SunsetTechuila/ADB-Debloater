@@ -400,3 +400,25 @@ public class WinApi {
     $Window.UpdateLayout()
   }
 }
+
+#region C#
+
+class INotifyPropertyChanged : System.ComponentModel.INotifyPropertyChanged {
+  hidden [System.ComponentModel.PropertyChangedEventHandler] $PropertyChanged
+
+  [void] add_PropertyChanged([System.ComponentModel.PropertyChangedEventHandler] $handler) {
+    $this.PropertyChanged = [System.Delegate]::Combine($this.PropertyChanged, $handler)
+  }
+
+  [void] remove_PropertyChanged([System.ComponentModel.PropertyChangedEventHandler] $handler) {
+    $this.PropertyChanged = [System.Delegate]::Remove($this.PropertyChanged, $handler)
+  }
+
+  hidden [void] OnPropertyChanged([string] $propertyName) {
+    if ($this.PropertyChanged) {
+      $this.PropertyChanged.Invoke($this, ([System.ComponentModel.PropertyChangedEventArgs]::new($propertyName)))
+    }
+  }
+}
+
+#endregion

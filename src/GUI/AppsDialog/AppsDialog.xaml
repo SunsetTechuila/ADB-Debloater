@@ -6,8 +6,97 @@
   SizeToContent="WidthAndHeight"
   MinWidth="450" MinHeight="350">
 
+  <Border Name="ContentBorder">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="8" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="12" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="12" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <TextBox Name="SearchBox" Grid.Row="0"
+        Height="32" Width="Auto"
+        MaxWidth="600"
+        Margin="130,0,130,0" />
+
+      <CheckBox Name="SelectAllCheckBox" Grid.Row="2"
+        Content="{Binding Localization.SelectAll}"
+        IsChecked="{Binding AppsViewModel.AreAllVisibleAppItemsSelected, Mode=OneWay}"
+        IsEnabled="{Binding AppsViewModel.HasAnyVisibleAppItem}">
+        <CheckBox.LayoutTransform>
+          <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
+        </CheckBox.LayoutTransform>
+      </CheckBox>
+
+      <Border Grid.Row="4"
+        Background="{DynamicResource BackgroundElevatedBrush}"
+        Padding="8,0,0,0"
+        Margin="0"
+        BorderBrush="{DynamicResource ControlBorderBrush}"
+        BorderThickness="{DynamicResource ControlBorderThickness}"
+        CornerRadius="{DynamicResource ControlCornerRadius}">
+        <ScrollViewer
+          HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl Name="AppsContainer"
+            ItemsSource="{Binding AppsViewModel.AppItems}"
+            ItemTemplate="{DynamicResource AppItemTemplate}"
+            Margin="0,8,0,8">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+
+      <Button Name="ActionButton" Grid.Row="6"
+        Content="{Binding ActionLabel}"
+        IsEnabled="{Binding AppsViewModel.HasAnyAppItemSelected}"
+        Padding="8" />
+    </Grid>
+  </Border>
+
   <Window.Resources>
     <ResourceDictionary>
+      <DataTemplate x:Key="AppItemTemplate">
+        <StackPanel
+          Name="AppItemPanel"
+          Orientation="Horizontal"
+          VerticalAlignment="Center"
+          Margin="0,12,0,0">
+          <CheckBox
+            Content="{Binding Name}"
+            Tag="{Binding Packages}"
+            ToolTip="{Binding PackagesString}"
+            IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+          <ContentControl
+            Name="HelpIcon"
+            Style="{DynamicResource HelpIcon}"
+            Margin="8,0,0,0"
+            ToolTip="{Binding HelpMessage}" />
+        </StackPanel>
+        <DataTemplate.Triggers>
+          <DataTrigger Binding="{Binding HelpMessage}" Value="">
+            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
+          </DataTrigger>
+          <DataTrigger Binding="{Binding IsVisible}" Value="False">
+            <Setter TargetName="AppItemPanel" Property="Visibility" Value="Collapsed" />
+          </DataTrigger>
+          <DataTrigger Binding="{Binding IsVisible}" Value="True">
+            <Setter TargetName="AppItemPanel" Property="Visibility" Value="Visible" />
+          </DataTrigger>
+          <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}"
+            Value="{x:Null}">
+            <Setter TargetName="AppItemPanel" Property="Margin" Value="0" />
+          </DataTrigger>
+        </DataTemplate.Triggers>
+      </DataTemplate>
+
       <Style x:Key="HelpIcon" TargetType="ContentControl">
         <Setter Property="Template">
           <Setter.Value>
@@ -36,48 +125,4 @@
       </Style>
     </ResourceDictionary>
   </Window.Resources>
-
-  <Border Name="ContentBorder">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="8" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="12" />
-        <RowDefinition Height="*" />
-        <RowDefinition Height="12" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
-
-      <TextBox Name="SearchBox" Grid.Row="0"
-        Height="32" Width="Auto"
-        MaxWidth="600"
-        Margin="130,0,130,0" />
-
-      <CheckBox Name="SelectAllCheckBox" Grid.Row="2">
-        <CheckBox.LayoutTransform>
-          <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
-        </CheckBox.LayoutTransform>
-      </CheckBox>
-
-      <Border Grid.Row="4"
-        Background="{DynamicResource BackgroundElevatedBrush}"
-        Padding="8,0,0,0"
-        Margin="0"
-        BorderBrush="{DynamicResource ControlBorderBrush}"
-        BorderThickness="{DynamicResource ControlBorderThickness}"
-        CornerRadius="{DynamicResource ControlCornerRadius}">
-        <ScrollViewer
-          HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Name="AppsContainer"
-            Orientation="Vertical"
-            Margin="0,8,0,8" />
-        </ScrollViewer>
-      </Border>
-
-      <Button Name="ActionButton" Grid.Row="6"
-        IsEnabled="False"
-        Padding="8" />
-    </Grid>
-  </Border>
 </Window>
