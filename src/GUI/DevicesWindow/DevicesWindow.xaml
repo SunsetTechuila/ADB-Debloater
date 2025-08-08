@@ -28,14 +28,14 @@
             Padding="8"
             FontFamily="{DynamicResource SymbolThemeFontFamily}"
             Content="&#xE72C;" />
-          <Button Name="ConnectButton"
+          <Button Name="PairButton"
             Margin="0,0,8,0"
             Padding="8"
             HorizontalContentAlignment="Center"
             HorizontalAlignment="Center"
             FontFamily="{DynamicResource SymbolThemeFontFamily}"
             Content="&#xE703;" />
-          <Button Name="PairButton"
+          <Button Name="ConnectButton"
             Margin="0,0,8,0"
             Padding="8"
             HorizontalContentAlignment="Center"
