@@ -252,6 +252,36 @@
                 VerticalAlignment="Center"
                 TextElement.Foreground="{TemplateBinding Foreground}" />
             </Border>
+            <TextBlock
+              Name="PlaceholderText"
+              Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
+              Foreground="{DynamicResource InactiveTextBrush}"
+              VerticalAlignment="Center"
+              Margin="8,0,0,0"
+              IsHitTestVisible="False">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                  <Style.Triggers>
+                    <DataTrigger
+                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text.Length}"
+                      Value="0">
+                      <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger
+                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
+                      Value="">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger
+                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
+                      Value="{x:Null}">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
             <Border
               Name="AccentBorder"
               BorderBrush="{DynamicResource ControlBorderBrush}"

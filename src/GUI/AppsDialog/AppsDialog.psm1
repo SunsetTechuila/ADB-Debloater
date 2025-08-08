@@ -180,25 +180,6 @@ function Show-AppsDialog {
       }
     }
 
-    function Set-SearchBoxPlaceholderVisibility {
-      [CmdletBinding()]
-      param()
-      process {
-        $searchText = $SearchBox.Text
-
-        if ($SearchBox.IsFocused) {
-          if ($searchText -eq $Localization.Search) {
-            $SearchBox.Foreground = $Window.FindResource('TextBrush')
-            $SearchBox.Text = ''
-          }
-        }
-        elseif ($searchText.Length -eq 0) {
-          $SearchBox.Foreground = $Window.FindResource('InactiveTextBrush')
-          $SearchBox.Text = $Localization.Search
-        }
-      }
-    }
-
     $SelectAllCheckBox.Content = $Localization.SelectAll
     $ActionButton.Content = $Localization.$ActionName
 
@@ -232,15 +213,11 @@ function Show-AppsDialog {
       }
     }
 
+    $SearchBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.Search }
     $SearchBox.Add_TextChanged({ OnSearchTextChange })
-    $SearchBox.Add_GotFocus({ Set-SearchBoxPlaceholderVisibility })
-    $SearchBox.Add_LostFocus({ Set-SearchBoxPlaceholderVisibility })
     $SelectAllCheckBox.Add_Click({ OnSelectAllClick })
     $ActionButton.Add_Click({ OnActionButtonClick })
 
-    $Window.Add_Loaded({
-        Set-SearchBoxPlaceholderVisibility
-      })
     $Window.Add_ContentRendered({
         # prevents the window from resizing on search
         $Window.SizeToContent = 'Manual'

@@ -48,59 +48,6 @@ function Show-PairDeviceDialog {
       }
     }
 
-    function Set-TextBoxPlaceholderVisibility {
-      [CmdletBinding()]
-      param(
-        [Parameter(Mandatory)]
-        [System.Windows.Controls.TextBox] $TextBox,
-
-        [Parameter(Mandatory)]
-        [string] $Placeholder
-      )
-      process {
-        $inputText = $TextBox.Text
-
-        if ($TextBox.IsFocused) {
-          if ($inputText -eq $Placeholder) {
-            $TextBox.Foreground = $Window.FindResource('TextBrush')
-            $TextBox.Text = ''
-          }
-        }
-        elseif ($inputText.Length -eq 0) {
-          $TextBox.Foreground = $Window.FindResource('InactiveTextBrush')
-          $TextBox.Text = $Placeholder
-        }
-      }
-    }
-
-    function Set-IpAdressBoxPlaceholderVisibility {
-      [CmdletBinding()]
-      param()
-      begin {
-        $Parameters = @{
-          TextBox     = $IpAdressBox
-          Placeholder = $Localization.EnterIpAddress
-        }
-      }
-      process {
-        Set-TextBoxPlaceholderVisibility @Parameters
-      }
-    }
-
-    function Set-PairingCodeBoxPlaceholderVisibility {
-      [CmdletBinding()]
-      param()
-      begin {
-        $Parameters = @{
-          TextBox     = $PairingCodeBox
-          Placeholder = $Localization.EnterPairingCode
-        }
-      }
-      process {
-        Set-TextBoxPlaceholderVisibility @Parameters
-      }
-    }
-
     function OnOkButtonClick {
       [CmdletBinding()]
       param()
@@ -111,13 +58,11 @@ function Show-PairDeviceDialog {
       }
     }
 
+    $IpAdressBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterIpAddress }
     $IpAdressBox.Add_TextChanged({ Set-OkButtonState })
-    $IpAdressBox.Add_GotFocus({ Set-IpAdressBoxPlaceholderVisibility })
-    $IpAdressBox.Add_LostFocus({ Set-IpAdressBoxPlaceholderVisibility })
 
+    $PairingCodeBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterPairingCode }
     $PairingCodeBox.Add_TextChanged({ Set-OkButtonState })
-    $PairingCodeBox.Add_GotFocus({ Set-PairingCodeBoxPlaceholderVisibility })
-    $PairingCodeBox.Add_LostFocus({ Set-PairingCodeBoxPlaceholderVisibility })
 
     $OkButton.Content = $Localization.Ok
     $OkButton.Add_Click({ OnOkButtonClick })
@@ -135,11 +80,6 @@ function Show-PairDeviceDialog {
             break
           }
         }
-      })
-
-    $Window.Add_Loaded({
-        Set-IpAdressBoxPlaceholderVisibility
-        Set-PairingCodeBoxPlaceholderVisibility
       })
 
     if ($ParentWindow) { $Window.Owner = $ParentWindow }

@@ -46,25 +46,6 @@ function Show-ConnectDeviceDialog {
       }
     }
 
-    function Set-IpAdressBoxPlaceholderVisibility {
-      [CmdletBinding()]
-      param()
-      process {
-        $inputText = $IpAdressBox.Text
-
-        if ($IpAdressBox.IsFocused) {
-          if ($inputText -eq $Localization.EnterIpAddress) {
-            $IpAdressBox.Foreground = $Window.FindResource('TextBrush')
-            $IpAdressBox.Text = ''
-          }
-        }
-        elseif ($inputText.Length -eq 0) {
-          $IpAdressBox.Foreground = $Window.FindResource('InactiveTextBrush')
-          $IpAdressBox.Text = $Localization.EnterIpAddress
-        }
-      }
-    }
-
     function OnOkButtonClick {
       [CmdletBinding()]
       param()
@@ -74,9 +55,8 @@ function Show-ConnectDeviceDialog {
       }
     }
 
+    $IpAdressBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterIpAddress }
     $IpAdressBox.Add_TextChanged({ Set-OkButtonState })
-    $IpAdressBox.Add_GotFocus({ Set-IpAdressBoxPlaceholderVisibility })
-    $IpAdressBox.Add_LostFocus({ Set-IpAdressBoxPlaceholderVisibility })
 
     $OkButton.Content = $Localization.Ok
     $OkButton.Add_Click({ OnOkButtonClick })
@@ -94,10 +74,6 @@ function Show-ConnectDeviceDialog {
             break
           }
         }
-      })
-
-    $Window.Add_Loaded({
-        Set-IpAdressBoxPlaceholderVisibility
       })
 
     if ($ParentWindow) { $Window.Owner = $ParentWindow }
