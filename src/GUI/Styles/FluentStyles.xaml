@@ -13,6 +13,35 @@
     <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
   </Style>
 
+  <Style x:Key="DefaultControlFocusVisualStyle">
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Rectangle
+            RadiusX="4"
+            RadiusY="4"
+            Margin="-3"
+            Stroke="{DynamicResource TextBrush}"
+            StrokeThickness="2" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="DefaultCollectionFocusVisualStyle">
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Rectangle
+            RadiusX="4"
+            RadiusY="4"
+            Stroke="{DynamicResource TextBrush}"
+            StrokeThickness="2" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <Style TargetType="RepeatButton">
     <Setter Property="Template">
       <Setter.Value>
@@ -185,6 +214,7 @@
     <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
@@ -331,6 +361,7 @@
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Border.CornerRadius" Value="{StaticResource ControlCornerRadius}" />
     <Setter Property="OverridesDefaultStyle" Value="True" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultCollectionFocusVisualStyle}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="ListViewItem">
