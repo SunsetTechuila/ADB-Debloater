@@ -400,3 +400,114 @@ public class WinApi {
     $Window.UpdateLayout()
   }
 }
+
+#region MVVM
+
+class ObservableObject : ComponentModel.INotifyPropertyChanged {
+  [ComponentModel.PropertyChangedEventHandler] $PropertyChanged
+
+  [ComponentModel.PropertyChangingEventHandler] $PropertyChanging
+
+  [void] add_PropertyChanged([ComponentModel.PropertyChangedEventHandler] $handler) {
+    $this.PropertyChanged = [Delegate]::Combine($this.PropertyChanged, $handler)
+  }
+
+  [void] remove_PropertyChanged([ComponentModel.PropertyChangedEventHandler] $handler) {
+    $this.PropertyChanged = [Delegate]::Remove($this.PropertyChanged, $handler)
+  }
+
+  [void] add_PropertyChanging([ComponentModel.PropertyChangingEventHandler] $handler) {
+    $this.PropertyChanging = [Delegate]::Combine($this.PropertyChanging, $handler)
+  }
+
+  [void] remove_PropertyChanging([ComponentModel.PropertyChangingEventHandler] $handler) {
+    $this.PropertyChanging = [Delegate]::Remove($this.PropertyChanging, $handler)
+  }
+
+  [void] OnPropertyChanged([ComponentModel.PropertyChangedEventArgs] $eventArguments) {
+    if ($this.PropertyChanged) {
+      $this.PropertyChanged.Invoke($this, $eventArguments)
+    }
+  }
+
+  [void] OnPropertyChanging([ComponentModel.PropertyChangingEventArgs] $eventArguments) {
+    if ($this.PropertyChanging) {
+      $this.PropertyChanging.Invoke($this, $eventArguments)
+    }
+  }
+
+  [bool] SetProperty([string] $propertyName, $newValue) {
+    $currentValue = $this.$propertyName
+
+    if (
+      (($null -eq $currentValue) -and ($null -eq $newValue)) -or 
+      (($null -ne $currentValue) -and ($currentValue.Equals($newValue)))
+    ) {
+      return $false
+    }
+
+    $this.OnPropertyChanging($propertyName)
+    $this.$propertyName = $newValue
+    $this.OnPropertyChanged($propertyName)
+    
+    return $true
+  }
+
+  [bool] SetProperty($newValue, [scriptblock] $comparer, [string] $propertyName) {
+    $currentValue = $this.$propertyName
+
+    if ($comparer.Invoke($currentValue, $newValue)) {
+      return $false
+    }
+
+    $this.OnPropertyChanging($propertyName)
+    $this.$propertyName = $newValue
+    $this.OnPropertyChanged($propertyName)
+    
+    return $true
+  }
+}
+
+class RelayCommand : Windows.Input.ICommand {
+  [EventHandler] $CanExecuteChanged
+
+  hidden [scriptblock] $_execute
+
+  hidden [scriptblock] $_canExecute
+
+  [void] add_CanExecuteChanged([EventHandler] $handler) {
+    $this.CanExecuteChanged = [Delegate]::Combine($this.CanExecuteChanged, $handler)
+  }
+
+  [void] remove_CanExecuteChanged([EventHandler] $handler) {
+    $this.CanExecuteChanged = [Delegate]::Remove($this.CanExecuteChanged, $handler)
+  }
+
+  RelayCommand([scriptblock] $execute) {
+    $this._execute = $execute
+  }
+
+  RelayCommand([scriptblock] $execute, [scriptblock] $canExecute) {
+    $this._execute = $execute
+    $this._canExecute = $canExecute
+  }
+
+  [void] NotifyCanExecuteChanged() {
+    if ($this.CanExecuteChanged) {
+      $this.CanExecuteChanged.Invoke($this, [EventArgs]::Empty)
+    }
+  }
+
+  [bool] CanExecute([object] $parameter) {
+    if ($this._canExecute) {
+      return $this._canExecute.Invoke($parameter)
+    }
+    return $true
+  }
+
+  [void] Execute([object] $parameter) {
+    $this._execute.Invoke($parameter)
+  }
+}
+
+#endregion

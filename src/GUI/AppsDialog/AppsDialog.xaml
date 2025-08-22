@@ -8,6 +8,28 @@
 
   <Window.Resources>
     <ResourceDictionary>
+      <DataTemplate x:Key="AppItemTemplate">
+        <StackPanel
+          Margin="11,0,0,0"
+          Orientation="Horizontal"
+          VerticalAlignment="Center">
+          <TextBlock Text="{Binding Name}" />
+          <ContentControl
+            Name="HelpIcon"
+            Style="{DynamicResource HelpIcon}"
+            Margin="8,0,0,0"
+            ToolTip="{Binding HelpMessage}" />
+        </StackPanel>
+        <DataTemplate.Triggers>
+          <DataTrigger Binding="{Binding HelpMessage}" Value="">
+            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
+          </DataTrigger>
+          <DataTrigger Binding="{Binding HelpMessage}" Value="{x:Null}">
+            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
+          </DataTrigger>
+        </DataTemplate.Triggers>
+      </DataTemplate>
+
       <Style x:Key="HelpIcon" TargetType="ContentControl">
         <Setter Property="Template">
           <Setter.Value>
@@ -54,29 +76,40 @@
         MaxWidth="600"
         Margin="130,0,130,0" />
 
-      <CheckBox Name="SelectAllCheckBox" Grid.Row="2">
+      <CheckBox Grid.Row="2"
+        Content="{Binding Localization.SelectAll}"
+        Command="{Binding ViewModel.ToggleFilteredAppItemsSelectionCommand}"
+        IsChecked="{Binding ViewModel.AreAllFilteredAppItemsSelected, Mode=OneWay}">
         <CheckBox.LayoutTransform>
           <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
         </CheckBox.LayoutTransform>
       </CheckBox>
 
       <Border Grid.Row="4"
-        Background="{DynamicResource BackgroundElevatedBrush}"
-        Padding="8,0,0,0"
-        Margin="0"
-        BorderBrush="{DynamicResource ControlBorderBrush}"
-        BorderThickness="{DynamicResource ControlBorderThickness}"
-        CornerRadius="{DynamicResource ControlCornerRadius}">
-        <ScrollViewer
-          HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Name="AppsContainer"
-            Orientation="Vertical"
-            Margin="0,8,0,8" />
-        </ScrollViewer>
+        Background="{StaticResource BackgroundElevatedBrush}"
+        BorderBrush="{StaticResource ControlBorderBrush}"
+        BorderThickness="{StaticResource ControlBorderThickness}"
+        CornerRadius="{StaticResource ControlCornerRadius}">
+        <ListView Name="AppsListView"
+          ItemsSource="{Binding ViewModel.FilteredAppItems}"
+          ItemTemplate="{StaticResource AppItemTemplate}"
+          SelectionMode="Multiple"
+          ScrollViewer.CanContentScroll="False"
+          ScrollViewer.VerticalScrollBarVisibility="Auto"
+          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+          Padding="1">
+          <ListView.ItemContainerStyle>
+            <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItemStyle}">
+              <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+              <Setter Property="ToolTip" Value="{Binding PackagesString}" />
+            </Style>
+          </ListView.ItemContainerStyle>
+        </ListView>
       </Border>
 
-      <Button Name="ActionButton" Grid.Row="6"
-        IsEnabled="False"
+      <Button Grid.Row="6"
+        Content="{Binding ActionLabel}"
+        Command="{Binding ViewModel.ActionCommand}"
         Padding="8" />
     </Grid>
   </Border>
