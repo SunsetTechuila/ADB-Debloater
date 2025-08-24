@@ -79,7 +79,8 @@
       <CheckBox Grid.Row="2"
         Content="{Binding Localization.SelectAll}"
         Command="{Binding ViewModel.ToggleFilteredAppItemsSelectionCommand}"
-        IsChecked="{Binding ViewModel.AreAllFilteredAppItemsSelected, Mode=OneWay}">
+        IsThreeState="True"
+        IsChecked="{Binding ViewModel.SelectAllState, Mode=OneWay}">
         <CheckBox.LayoutTransform>
           <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
         </CheckBox.LayoutTransform>

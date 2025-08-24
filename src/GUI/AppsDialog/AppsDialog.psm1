@@ -116,12 +116,11 @@ class ViewModel : ObservableObject {
     {
       $ViewModel.IsTogglingSelection = $true
 
-      $shouldSelect = -not $ViewModel.AreAllFilteredAppItemsSelected
-      if ($shouldSelect) {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($true) })
+      if ($ViewModel.SelectAllState) {
+        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($false) })
       }
       else {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($false) })
+        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($true) })
       }
 
       $ViewModel.IsTogglingSelection = $false
@@ -134,9 +133,9 @@ class ViewModel : ObservableObject {
 
   hidden [ComponentModel.ICollectionView] $FilteredAppItems
 
-  hidden $AreAllFilteredAppItemsSelected = $false
-  hidden [void] SetAreAllFilteredAppItemsSelected([bool] $value) {
-    $this.SetProperty('AreAllFilteredAppItemsSelected', $value)
+  hidden [Nullable[bool]] $SelectAllState = $false
+  hidden [void] SetSelectAllState([Nullable[bool]] $value) {
+    $this.SetProperty('SelectAllState', $value)
   }
 
   hidden [string] $SearchText
@@ -183,19 +182,26 @@ class ViewModel : ObservableObject {
 
   hidden [void] UpdateSelectAllState() {
     if ($this.FilteredAppItems.Count.Equals(0)) {
-      $this.SetAreAllFilteredAppItemsSelected($false)
+      $this.SetSelectAllState($false)
       return
     }
 
-    $allFilteredAppItemsSelected = $true
+    $selectedItemsCount = 0
+    $totalItemsCount = 0
     foreach ($appItem in $this.FilteredAppItems) {
-      if (-not $appItem.IsSelected) {
-        $allFilteredAppItemsSelected = $false
-        break
-      }
+      $totalItemsCount += 1
+      if ($appItem.IsSelected) { $selectedItemsCount += 1 }
     }
 
-    $this.SetAreAllFilteredAppItemsSelected($allFilteredAppItemsSelected)
+    if ($selectedItemsCount.Equals(0)) {
+      $this.SetSelectAllState($false)
+    }
+    elseif ($selectedItemsCount.Equals($totalItemsCount)) {
+      $this.SetSelectAllState($true)
+    }
+    else {
+      $this.SetSelectAllState($null)
+    }
   }
 }
 
