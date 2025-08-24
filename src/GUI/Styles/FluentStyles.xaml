@@ -180,6 +180,16 @@
                       FontFamily="{StaticResource SymbolThemeFontFamily}"
                       Visibility="Collapsed"
                       Text="&#xE73E;" />
+                    <Rectangle
+                      Name="IndeterminateBar"
+                      Width="8"
+                      Height="2"
+                      RadiusX="1"
+                      RadiusY="1"
+                      Fill="{DynamicResource BackgroundBrush}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Visibility="Collapsed" />
                   </Grid>
                 </Border>
               </Border>
@@ -189,6 +199,15 @@
           <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
               <Setter TargetName="ControlIcon" Property="Visibility" Value="Visible" />
+              <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Collapsed" />
+              <Setter TargetName="ControlBorderIconPresenter" Property="Background"
+                Value="{DynamicResource AccentBrush}" />
+              <Setter TargetName="StrokeBorder" Property="BorderBrush"
+                Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsChecked" Value="{x:Null}">
+              <Setter TargetName="ControlIcon" Property="Visibility" Value="Collapsed" />
+              <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Visible" />
               <Setter TargetName="ControlBorderIconPresenter" Property="Background"
                 Value="{DynamicResource AccentBrush}" />
               <Setter TargetName="StrokeBorder" Property="BorderBrush"
