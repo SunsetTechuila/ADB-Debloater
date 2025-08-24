@@ -508,6 +508,12 @@ class RelayCommand : Windows.Input.ICommand {
   [void] Execute([object] $parameter) {
     $this._execute.Invoke($parameter)
   }
+
+  [void] ExecuteIfCan([object] $parameter) {
+    if ($this.CanExecute($parameter)) {
+      $this.Execute($parameter)
+    }
+  }
 }
 
 #endregion

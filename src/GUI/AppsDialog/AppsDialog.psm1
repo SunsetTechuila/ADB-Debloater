@@ -60,6 +60,13 @@ function Show-AppsDialog {
     }
 
     $AppsListView.add_SelectionChanged({ $ViewModel.OnSelectionChanged() })
+    $AppsListView.add_PreviewKeyDown({
+        param($eventSender, $eventArguments)
+        if ($eventArguments.Key -eq 'A' -and ($eventArguments.KeyboardDevice.Modifiers -band 'Control')) {
+          $ViewModel.ToggleFilteredAppItemsSelectionCommand.ExecuteIfCan($null)
+          $eventArguments.Handled = $true
+        }
+      })
 
     $OnSearchTextChanged = {
       param($eventSender)
