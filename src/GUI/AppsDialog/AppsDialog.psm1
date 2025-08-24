@@ -68,9 +68,17 @@ function Show-AppsDialog {
         }
       })
 
+    $searchDebounceTimer = [Windows.Threading.DispatcherTimer]::new()
+    $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(150)
+    $searchDebounceTimer.add_Tick({
+        $searchDebounceTimer.Stop()
+        $ViewModel.FilterApps($SearchBox.Text)
+      })
+
     $OnSearchTextChanged = {
       param($eventSender)
-      $ViewModel.FilterApps($eventSender.Text)
+      $searchDebounceTimer.Stop()
+      $searchDebounceTimer.Start()
     }
     $SearchBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.Search }
     $SearchBox.Add_TextChanged($OnSearchTextChanged)
