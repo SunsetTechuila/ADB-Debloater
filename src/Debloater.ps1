@@ -14,7 +14,7 @@ $ErrorActionPreference = 'Stop'
   'Functions',
   'AppsDialog',
   'DevicesWindow',
-  'TextAlertWindow'
+  'MessageDialog'
 ) | ForEach-Object -Process {
   Remove-Module -Name $PSItem -Force -ErrorAction 'SilentlyContinue'
   Import-Module -Name (Get-Variable -Name $PSItem -ValueOnly) -DisableNameChecking
@@ -74,7 +74,7 @@ do {
   }
 
   if (-not $packages) {
-    Show-TextAlertWindow -Message $Localization.NoPackagesFound
+    Show-MessageDialog -Message $Localization.NoPackagesFound
     continue
   }
 
@@ -85,7 +85,7 @@ do {
   $appsToProcess = Get-AppsToProcess @Parameters
 
   if (-not $appsToProcess) {
-    Show-TextAlertWindow -Message $Localization.NoPackagesFound
+    Show-MessageDialog -Message $Localization.NoPackagesFound
     continue
   }
 

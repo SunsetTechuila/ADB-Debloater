@@ -14,7 +14,7 @@ $Parameters = @{
 }
 Import-LocalizedData @Parameters
 
-function Show-TextAlertWindow {
+function Show-MessageDialog {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)]
@@ -26,7 +26,7 @@ function Show-TextAlertWindow {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    [xml]$xaml = Get-Content -Path "$PSScriptRoot/TextAlertWindow.xaml"
+    [xml]$xaml = Get-Content -Path "$PSScriptRoot/MessageDialog.xaml"
     $xaml = Add-FluentStyles -Xaml $xaml
     $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml)
     $Window = [Windows.Markup.XamlReader]::Load($reader)
