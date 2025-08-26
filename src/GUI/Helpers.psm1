@@ -25,7 +25,7 @@ function Set-WindowStyling {
     $ContentBorder = $Window.FindName('ContentBorder')
 
     if ($shouldSetMicaBackdrop) {
-      $Window.Add_Loaded({ param($Window) Set-MicaBackdrop -Window $Window })
+      Set-MicaBackdrop -Window $Window
       Set-ContentBorderThickness -Border $ContentBorder -NoTopBar:$NoTopBar
 
       $targetBorderThickness = $ContentBorder.BorderThickness
@@ -186,27 +186,31 @@ function Set-MicaBackdrop {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Window] $Window,
-
-    [switch] $NoChrome
+    [System.Windows.Window] $Window
   )
   begin {
     $systemBackdropType = 38
     $micaBackdrop = 2
     $useImmersiveDarkMode = 20
+    $isSystemInDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
   }
   process {
     $Window.Background = 'Transparent'
 
-    $WindowChrome = [System.Windows.Shell.WindowChrome]::new()
+    $WindowChrome = [System.Windows.Shell.WindowChrome]::GetWindowChrome($Window)
+    if (-not $WindowChrome) {
+      $WindowChrome = [System.Windows.Shell.WindowChrome]::new()
+    }
+
     $WindowChrome.GlassFrameThickness = '-1'
     # fixes close button right margin
     $WindowChrome.NonClientFrameEdges = 'Bottom, Left, Right'
     [System.Windows.Shell.WindowChrome]::SetWindowChrome($Window, $WindowChrome)
 
-    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
-    Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
-    Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $useDarkMode
+    $Window.Add_SourceInitialized({
+        Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
+        Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $isSystemInDarkMode
+      }.GetNewClosure())
   }
 }
 
