@@ -111,7 +111,8 @@
       <Button Grid.Row="6"
         Content="{Binding ActionLabel}"
         Command="{Binding ViewModel.ActionCommand}"
-        Padding="8" />
+        Padding="8"
+        HorizontalAlignment="Stretch" />
     </Grid>
   </Border>
 </Window>

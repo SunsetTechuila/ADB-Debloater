@@ -31,15 +31,11 @@
           <Button Name="PairButton"
             Margin="0,0,8,0"
             Padding="8"
-            HorizontalContentAlignment="Center"
-            HorizontalAlignment="Center"
             FontFamily="{DynamicResource SymbolThemeFontFamily}"
             Content="&#xE703;" />
           <Button Name="ConnectButton"
             Margin="0,0,8,0"
             Padding="8"
-            HorizontalContentAlignment="Center"
-            HorizontalAlignment="Center"
             FontFamily="{DynamicResource SymbolThemeFontFamily}"
             Content="&#xE710;" />
         </StackPanel>
@@ -96,15 +92,19 @@
         </Grid.ColumnDefinitions>
         <Button Name="UninstallButton"
           Grid.Column="0"
+          HorizontalAlignment="Stretch"
           IsEnabled="False" />
         <Button Name="DisableButton"
           Grid.Column="2"
+          HorizontalAlignment="Stretch"
           IsEnabled="False" />
         <Button Name="EnableButton"
           Grid.Column="4"
+          HorizontalAlignment="Stretch"
           IsEnabled="False" />
         <Button Name="ReinstallButton"
           Grid.Column="6"
+          HorizontalAlignment="Stretch"
           IsEnabled="False" />
       </Grid>
     </Grid>

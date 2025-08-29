@@ -31,9 +31,11 @@
         </Grid.ColumnDefinitions>
         <Button Name="OkButton"
           Grid.Column="0"
+          HorizontalAlignment="Stretch"
           IsEnabled="False" />
         <Button Name="CancelButton"
-          Grid.Column="2" />
+          Grid.Column="2"
+          HorizontalAlignment="Stretch" />
       </Grid>
     </Grid>
   </Border>
