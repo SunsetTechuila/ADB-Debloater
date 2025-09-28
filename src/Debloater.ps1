@@ -8,6 +8,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+Add-Type -AssemblyName 'PresentationFramework'
+
 ."$PSScriptRoot/Paths.ps1"
 
 @(
