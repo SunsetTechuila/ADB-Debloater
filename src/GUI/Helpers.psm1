@@ -197,20 +197,26 @@ function Set-MicaBackdrop {
   process {
     $Window.Background = 'Transparent'
 
-    $WindowChrome = [System.Windows.Shell.WindowChrome]::GetWindowChrome($Window)
-    if (-not $WindowChrome) {
-      $WindowChrome = [System.Windows.Shell.WindowChrome]::new()
-    }
+    $Window.Add_SourceInitialized(
+      {
+        Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
+        Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $isSystemInDarkMode
+      }.GetNewClosure()
+    )
 
+    $WindowChrome = [Windows.Shell.WindowChrome]::GetWindowChrome($Window)
+    if (-not $WindowChrome) {
+      $WindowChrome = [Windows.Shell.WindowChrome]::new()
+    }
     $WindowChrome.GlassFrameThickness = '-1'
     # fixes close button right margin
     $WindowChrome.NonClientFrameEdges = 'Bottom, Left, Right'
-    [System.Windows.Shell.WindowChrome]::SetWindowChrome($Window, $WindowChrome)
 
-    $Window.Add_SourceInitialized({
-        Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
-        Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $isSystemInDarkMode
-      }.GetNewClosure())
+    $Window.Add_Loaded(
+      {
+        [Windows.Shell.WindowChrome]::SetWindowChrome($Window, $WindowChrome)
+      }.GetNewClosure()
+    )
   }
 }
 
