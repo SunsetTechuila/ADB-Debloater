@@ -191,8 +191,6 @@ function Set-MicaBackdrop {
   begin {
     $systemBackdropType = 38
     $micaBackdrop = 2
-    $useImmersiveDarkMode = 20
-    $isSystemInDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
   }
   process {
     $Window.Background = 'Transparent'
@@ -200,7 +198,7 @@ function Set-MicaBackdrop {
     $Window.Add_SourceInitialized(
       {
         Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
-        Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $isSystemInDarkMode
+        Set-ImmersiveDarkMode -Window $Window
       }.GetNewClosure()
     )
 
