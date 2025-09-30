@@ -105,6 +105,10 @@
               <Setter Property="ToolTip" Value="{Binding PackagesString}" />
             </Style>
           </ListView.ItemContainerStyle>
+          <ListView.InputBindings>
+            <KeyBinding Key="A" Modifiers="Control"
+              Command="{Binding ViewModel.ToggleFilteredAppItemsSelectionCommand}" />
+          </ListView.InputBindings>
         </ListView>
       </Border>
 
