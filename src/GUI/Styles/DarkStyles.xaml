@@ -13,7 +13,8 @@
   <SolidColorBrush x:Key="ActiveButtonBackgroundBrush" Color="#FFFFFF" Opacity="0.085" />
   <SolidColorBrush x:Key="ControlBorderBrush" Color="#FFFFFF" Opacity="0.08" />
   <SolidColorBrush x:Key="ScrollBarBackgroundBrush" Color="#A0A0A0" />
-  <SolidColorBrush x:Key="ToolTipBackgroundBrush" Color="#2E2E2E" />
+  <SolidColorBrush x:Key="OverlayBackgroundBrush" Color="#2E2E2E" />
+  <SolidColorBrush x:Key="OverlayBorderBrush" Color="#FFFFFF" Opacity="0.2" />
   <SolidColorBrush x:Key="CheckBoxBorderBrush" Color="#999999" />
   <SolidColorBrush x:Key="GreenBrush" Color="#6CCB5F" />
 
