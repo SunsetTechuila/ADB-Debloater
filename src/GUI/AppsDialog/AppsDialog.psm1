@@ -61,6 +61,70 @@ function Show-AppsDialog {
 
     $AppsListView.add_SelectionChanged({ $ViewModel.OnSelectionChanged() })
 
+    #region Shift Multi-selection
+
+    $selectionStartItem = [ref]$null
+
+    $AppsListView.add_PreviewMouseLeftButtonDown({
+        param($eventSender, $eventArguments)
+
+        $clickedElement = [Windows.Controls.ItemsControl]::ContainerFromElement(
+          $AppsListView,
+          $eventArguments.OriginalSource
+        )
+        if (-not ($clickedElement -is [Windows.Controls.ListViewItem])) { return }
+        $clickedItem = $clickedElement.DataContext
+
+        $isShiftPressed = ([Windows.Input.Keyboard]::Modifiers -band [Windows.Input.ModifierKeys]::Shift) -ne 0
+        if (-not $isShiftPressed) {
+          $selectionStartItem.Value = $clickedItem
+          return
+        }
+
+        if (-not $AppsListView.Items.Contains($selectionStartItem.Value)) {
+          $selectionStartItem.Value = $AppsListView.Items.GetItemAt(0)
+        }
+
+        $ViewModel.SelectItemsFromTo($selectionStartItem.Value, $clickedItem)
+        $clickedElement.Focus()
+        $eventArguments.Handled = $true
+      })
+
+    $AppsListView.add_PreviewKeyDown({
+        param($eventSender, $eventArguments)
+
+        $isUpOrDownPressed = $eventArguments.Key -in [Windows.Input.Key]::Up, [Windows.Input.Key]::Down
+        $isShiftPressed = ([Windows.Input.Keyboard]::Modifiers -band [Windows.Input.ModifierKeys]::Shift) -ne 0
+        if ((-not $isUpOrDownPressed) -or (-not $isShiftPressed)) { return }
+
+        $focusedElement = [Windows.Controls.ItemsControl]::ContainerFromElement(
+          $AppsListView,
+          [Windows.Input.Keyboard]::FocusedElement
+        )
+        if (-not ($focusedElement -is [Windows.Controls.ListViewItem])) { return }
+        $focusedItem = $focusedElement.DataContext
+
+        if (-not $focusedItem.IsSelected) {
+          $selectionStartItem.Value = $focusedItem
+        }
+
+        $nextItemIndex = $AppsListView.ItemContainerGenerator.IndexFromContainer($focusedElement) + $(
+          if ($eventArguments.Key -eq [Windows.Input.Key]::Up) { -1 } else { 1 }
+        )
+        if (($nextItemIndex -lt 0) -or ($nextItemIndex -ge $AppsListView.Items.Count)) {
+          $eventArguments.Handled = $true
+          return
+        }
+        $nextItem = $AppsListView.Items.GetItemAt($nextItemIndex)
+
+        $ViewModel.SelectItemsFromTo($selectionStartItem.Value, $nextItem)
+        $AppsListView.ScrollIntoView($nextItem)
+        $AppsListView.ItemContainerGenerator.ContainerFromItem($nextItem).Focus()
+        $eventArguments.Handled = $true
+      })
+
+    #endregion
+
     $searchDebounceTimer = [Windows.Threading.DispatcherTimer]::new()
     $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(150)
     $searchDebounceTimer.add_Tick({
@@ -117,12 +181,8 @@ class ViewModel : ObservableObject {
     {
       $ViewModel.IsTogglingSelection = $true
 
-      if ($ViewModel.SelectAllState) {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($false) })
-      }
-      else {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($true) })
-      }
+      $targetState = -not $ViewModel.SelectAllState
+      $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($targetState) })
 
       $ViewModel.IsTogglingSelection = $false
       $ViewModel.OnSelectionChanged()
@@ -142,6 +202,24 @@ class ViewModel : ObservableObject {
   hidden [string] $SearchText
 
   hidden $IsTogglingSelection = $false
+
+  [void] SelectItemsFromTo([AppItem] $startItem, [AppItem] $endItem) {
+    $startItemIndex = $this.FilteredAppItems.IndexOf($startItem)
+    $endItemIndex = $this.FilteredAppItems.IndexOf($endItem)
+    $selectionStartIndex = [Math]::Min($startItemIndex, $endItemIndex)
+    $selectionEndIndex = [Math]::Max($startItemIndex, $endItemIndex)
+
+    $this.IsTogglingSelection = $true
+
+    $this.FilteredAppItems.ForEach({
+        $itemIndex = $this.FilteredAppItems.IndexOf($PSItem)
+        $shouldSelect = ($itemIndex -ge $selectionStartIndex) -and ($itemIndex -le $selectionEndIndex)
+        $PSItem.SetIsSelected($shouldSelect)
+      })
+
+    $this.IsTogglingSelection = $false
+    $this.OnSelectionChanged()
+  }
 
   ViewModel([AppItem[]] $appItems) {
     $appItemsCollection = [Collections.ObjectModel.ObservableCollection[AppItem]]::new($appItems)
