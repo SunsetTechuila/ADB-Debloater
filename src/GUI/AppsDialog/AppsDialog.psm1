@@ -7,8 +7,7 @@ $ErrorActionPreference = 'Stop'
 ."$PSScriptRoot/../../Paths.ps1"
 ."$PSScriptRoot/../Paths.ps1"
 
-Remove-Module -Name 'Helpers' -Force -ErrorAction 'SilentlyContinue'
-Import-Module -Name $Helpers -DisableNameChecking
+Import-Module -Name $Helpers -Force -DisableNameChecking
 
 $Parameters = @{
   BindingVariable = 'Localization'
@@ -28,7 +27,7 @@ function Show-AppsDialog {
     [scriptblock]$Action,
 
     [Parameter(Mandatory)]
-    [array]$Apps,
+    [hashtable[]]$Apps,
 
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -39,11 +38,9 @@ function Show-AppsDialog {
   process {
     $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml" -NoTopBar -SetWindowMaxHeight
 
-    $appItems = @(
-      foreach ($app in $Apps) {
-        [AppItem]::new($app.Name, $app.Packages, $app.Description)
-      }
-    )
+    $appItems = foreach ($app in $Apps) {
+      [AppItem]::new($app.Name, $app.Packages, $app.Description)
+    }
     $ViewModel = [ViewModel]::new($appItems)
 
     $Window.DataContext = [PSCustomObject]@{
@@ -65,18 +62,18 @@ function Show-AppsDialog {
 
     $searchDebounceTimer = [Windows.Threading.DispatcherTimer]::new()
     $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(75)
-    $searchDebounceTimer.add_Tick({
+    $searchDebounceTimer.Add_Tick({
         $searchDebounceTimer.Stop()
         $ViewModel.FilterApps($Window.SearchBox.Text)
       })
 
-    $OnSearchTextChanged = {
-      param($eventSender)
-      $searchDebounceTimer.Stop()
-      $searchDebounceTimer.Start()
-    }
     $Window.SearchBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.Search }
-    $Window.SearchBox.Add_TextChanged($OnSearchTextChanged)
+    $Window.SearchBox.Add_TextChanged({
+        $searchDebounceTimer.Stop()
+        $searchDebounceTimer.Start()
+      })
+
+    $Window.Add_Closed({ $searchDebounceTimer.Stop() })
 
     $Window.Add_ContentRendered({
         # prevents the window from resizing on search
@@ -96,9 +93,7 @@ class ViewModel : ObservableObject {
 
       foreach ($appItem in $ViewModel.FilteredAppItems.SourceCollection) {
         if ($appItem.IsSelected) {
-          foreach ($package in $appItem.Packages) {
-            $selectedPackages.Add($package) | Out-Null
-          }
+          $selectedPackages.UnionWith($appItem.Packages)
         }
       }
 
@@ -126,7 +121,9 @@ class ViewModel : ObservableObject {
         # Clearing SelectedItems prevents ListView from re-selecting those items when scrolled back into view.
         $Window.AppsListView.SelectedItems.Clear()
       }
-      $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($targetState) })
+      foreach ($appItem in $ViewModel.FilteredAppItems) {
+        $appItem.SetIsSelected($targetState)
+      }
 
       $ViewModel.IsTogglingSelection = $false
       $ViewModel.OnSelectionChanged()
@@ -139,7 +136,7 @@ class ViewModel : ObservableObject {
   hidden [ComponentModel.ICollectionView] $FilteredAppItems
 
   hidden [Nullable[bool]] $SelectAllState = $false
-  hidden [void] SetSelectAllState([Nullable[bool]] $value) {
+  hidden [void] SetSelectAllState($value) {
     $this.SetProperty('SelectAllState', $value)
   }
 
@@ -148,22 +145,29 @@ class ViewModel : ObservableObject {
   hidden $IsTogglingSelection = $false
 
   ViewModel([AppItem[]] $appItems) {
-    $appItemsCollection = [Collections.ObjectModel.ObservableCollection[AppItem]]::new($appItems)
-    $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItemsCollection)
-
-    $this.FilteredAppItems.Filter = { param($appItem) $this.FilterAppAppItem($appItem) }
-
+    $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItems)
+    $this.FilteredAppItems.Filter = { param($appItem) $this.FilterAppItem($appItem) }
     $this.FilteredAppItems.add_CollectionChanged({
         $ViewModel.ToggleFilteredAppItemsSelectionCommand.NotifyCanExecuteChanged()
         $ViewModel.UpdateSelectAllState()
       })
-
-    $this.UpdateSelectAllState()
   }
 
   [void] FilterApps([string] $text) {
-    $this.SearchText = $text
+    $this.SearchText = $text.ToLower()
     $this.FilteredAppItems.Refresh()
+  }
+
+  hidden [bool] FilterAppItem($appItem) {
+    if ([string]::IsNullOrEmpty($this.SearchText)) {
+      return $true
+    }
+    else {
+      return (
+        ($appItem.Name.ToLower().Contains($this.SearchText)) -or
+        ($appItem.Packages.Contains($this.SearchText))
+      )
+    }
   }
 
   [void] OnSelectionChanged() {
@@ -172,41 +176,25 @@ class ViewModel : ObservableObject {
     $this.UpdateSelectAllState()
   }
 
-  hidden [bool] FilterAppAppItem($appItem) {
-    if ([string]::IsNullOrEmpty($this.SearchText)) {
-      return $true
-    }
-    else {
-      $searchTextLowered = $this.SearchText.ToLower()
-      return (
-        ($appItem.Name.ToLower().Contains($searchTextLowered)) -or
-        ($appItem.Packages.Contains($searchTextLowered))
-      )
-    }
-  }
-
   hidden [void] UpdateSelectAllState() {
-    if ($this.FilteredAppItems.Count.Equals(0)) {
-      $this.SetSelectAllState($false)
-      return
-    }
+    $hasSelected = $false
+    $hasUnselected = $false
 
-    $selectedItemsCount = 0
-    $totalItemsCount = 0
     foreach ($appItem in $this.FilteredAppItems) {
-      $totalItemsCount += 1
-      if ($appItem.IsSelected) { $selectedItemsCount += 1 }
+      if ($appItem.IsSelected) {
+        $hasSelected = $true
+      }
+      else {
+        $hasUnselected = $true
+      }
+
+      if ($hasSelected -and $hasUnselected) {
+        $this.SetSelectAllState($null)
+        return
+      }
     }
 
-    if ($selectedItemsCount.Equals(0)) {
-      $this.SetSelectAllState($false)
-    }
-    elseif ($selectedItemsCount.Equals($totalItemsCount)) {
-      $this.SetSelectAllState($true)
-    }
-    else {
-      $this.SetSelectAllState($null)
-    }
+    $this.SetSelectAllState($hasSelected)
   }
 }
 
@@ -215,13 +203,13 @@ class AppItem : ObservableObject {
 
   [string[]] $Packages
 
-  $IsSelected = $false
-  [void] SetIsSelected([bool] $value) {
+  [bool] $IsSelected
+  [void] SetIsSelected($value) {
     $this.SetProperty('IsSelected', $value)
   }
 
   [string] $HelpMessage
-  
+
   hidden [string] $PackagesString
 
   AppItem(
