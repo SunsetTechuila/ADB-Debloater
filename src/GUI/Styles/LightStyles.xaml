@@ -1,6 +1,7 @@
 <ResourceDictionary
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
   <SolidColorBrush x:Key="AccentBrush" Color="PLACEHOLDER" />
   <SolidColorBrush x:Key="TextBrush" Color="#000000" />
@@ -13,7 +14,9 @@
   <SolidColorBrush x:Key="ActiveButtonBackgroundBrush" Color="#000000" Opacity="0.02" />
   <SolidColorBrush x:Key="ControlBorderBrush" Color="#000000" Opacity="0.10" />
   <SolidColorBrush x:Key="ScrollBarBackgroundBrush" Color="#A0A0A0" />
-  <SolidColorBrush x:Key="ToolTipBackgroundBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="OverlayBackgroundBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="OverlayBorderBrush" Color="#000000" Opacity="0.07" />
+  <sys:Double x:Key="OverlayShadowOpacity">0.15</sys:Double>
   <SolidColorBrush x:Key="CheckBoxBorderBrush" Color="#858585" />
   <SolidColorBrush x:Key="GreenBrush" Color="#0F7B0F" />
 
