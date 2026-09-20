@@ -94,9 +94,7 @@ class ViewModel : ObservableObject {
 
       foreach ($appItem in $ViewModel.FilteredAppItems.SourceCollection) {
         if ($appItem.IsSelected) {
-          foreach ($package in $appItem.Packages) {
-            $selectedPackages.Add($package) | Out-Null
-          }
+          $selectedPackages.UnionWith($appItem.Packages)
         }
       }
 
@@ -117,12 +115,8 @@ class ViewModel : ObservableObject {
     {
       $ViewModel.IsTogglingSelection = $true
 
-      if ($ViewModel.SelectAllState) {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($false) })
-      }
-      else {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($true) })
-      }
+      $targetState = -not $ViewModel.SelectAllState
+      $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($targetState) })
 
       $ViewModel.IsTogglingSelection = $false
       $ViewModel.OnSelectionChanged()
@@ -135,7 +129,7 @@ class ViewModel : ObservableObject {
   hidden [ComponentModel.ICollectionView] $FilteredAppItems
 
   hidden [Nullable[bool]] $SelectAllState = $false
-  hidden [void] SetSelectAllState([Nullable[bool]] $value) {
+  hidden [void] SetSelectAllState($value) {
     $this.SetProperty('SelectAllState', $value)
   }
 
@@ -147,7 +141,7 @@ class ViewModel : ObservableObject {
     $appItemsCollection = [Collections.ObjectModel.ObservableCollection[AppItem]]::new($appItems)
     $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItemsCollection)
 
-    $this.FilteredAppItems.Filter = $this.FilterAppAppItem
+    $this.FilteredAppItems.Filter = $this.FilterAppItem
 
     $this.FilteredAppItems.add_CollectionChanged({
         $ViewModel.ToggleFilteredAppItemsSelectionCommand.NotifyCanExecuteChanged()
@@ -158,7 +152,7 @@ class ViewModel : ObservableObject {
   }
 
   [void] FilterApps([string] $text) {
-    $this.SearchText = $text
+    $this.SearchText = $text.ToLower()
     $this.FilteredAppItems.Refresh()
   }
 
@@ -168,15 +162,14 @@ class ViewModel : ObservableObject {
     $this.UpdateSelectAllState()
   }
 
-  hidden [bool] FilterAppAppItem($appItem) {
+  hidden [bool] FilterAppItem($appItem) {
     if ([string]::IsNullOrEmpty($this.SearchText)) {
       return $true
     }
     else {
-      $searchTextLowered = $this.SearchText.ToLower()
       return (
-        ($appItem.Name.ToLower().Contains($searchTextLowered)) -or
-        ($appItem.Packages.Contains($searchTextLowered))
+        ($appItem.Name.ToLower().Contains($this.SearchText)) -or
+        ($appItem.Packages.Contains($this.SearchText))
       )
     }
   }
@@ -212,7 +205,7 @@ class AppItem : ObservableObject {
   [string[]] $Packages
 
   $IsSelected = $false
-  [void] SetIsSelected([bool] $value) {
+  [void] SetIsSelected($value) {
     $this.SetProperty('IsSelected', $value)
   }
 

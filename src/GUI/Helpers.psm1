@@ -412,9 +412,9 @@ public class WinApi {
 #region MVVM
 
 class ObservableObject : ComponentModel.INotifyPropertyChanged {
-  [ComponentModel.PropertyChangedEventHandler] $PropertyChanged
+  hidden [ComponentModel.PropertyChangedEventHandler] $PropertyChanged
 
-  [ComponentModel.PropertyChangingEventHandler] $PropertyChanging
+  hidden [ComponentModel.PropertyChangingEventHandler] $PropertyChanging
 
   [void] add_PropertyChanged([ComponentModel.PropertyChangedEventHandler] $handler) {
     $this.PropertyChanged = [Delegate]::Combine($this.PropertyChanged, $handler)

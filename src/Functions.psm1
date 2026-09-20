@@ -116,6 +116,7 @@ function Pair-DeviceOverWiFi {
 
 function Get-Devices {
   [CmdletBinding()]
+  [OutputType([hashtable])]
   param()
   process {
     .$Env:adb devices -l | Select-Object -Skip 1 | ForEach-Object -Process {
@@ -140,7 +141,7 @@ function Get-Devices {
 
 function Get-InstalledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -154,7 +155,7 @@ function Get-InstalledPackages {
 
 function Get-EnabledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -168,7 +169,7 @@ function Get-EnabledPackages {
 
 function Get-DisabledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -182,7 +183,7 @@ function Get-DisabledPackages {
 
 function Get-UninstalledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -214,8 +215,8 @@ function Uninstall-Packages {
           .$Env:adb -s $DeviceId shell pm uninstall $package
         }
         catch { }
-         # `pm uninstall --user 0` uninstalls the system package for the primary user; when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
-         # `am force-stop' is used to ensure that all app processes are terminated
+        # `pm uninstall --user 0` uninstalls the system package for the primary user; when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
+        # `am force-stop' is used to ensure that all app processes are terminated
         .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package"
         Write-Host -Object "Uninstalled $package"
       }
@@ -305,7 +306,7 @@ function Reinstall-Packages {
 
 function Get-AppsToProcess {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
     [array]$Packages,
@@ -317,35 +318,31 @@ function Get-AppsToProcess {
     $targetLanguage = $PSUICulture.Split('-')[0]
   }
   process {
-    $appsToProcess = @()
-    $i = 0
+    $appsToProcess = [Collections.Generic.List[hashtable]]::new()
 
     foreach ($bloatwareApp in $BloatwareList) {
-      $found = $false
-
-      foreach ($package in $Packages) {
-        if ($package -in $bloatwareApp.Packages) {
-          $found = $true
-
-          if (-not $appsToProcess[$i]) {
-            $appsToProcess += @{}
-            $appsToProcess[$i].Packages = @()
-          }
-
-          $appsToProcess[$i].Name = $bloatwareApp.Name.$targetLanguage
-          if (-not $appsToProcess[$i].Name) {
-            $appsToProcess[$i].Name = $bloatwareApp.Name.en
-          }
-          $appsToProcess[$i].Description = $bloatwareApp.Description.$targetLanguage
-          if (-not $appsToProcess[$i].Description) {
-            $appsToProcess[$i].Description = $bloatwareApp.Description.en
-          }
-
-          $appsToProcess[$i].Packages += $package
+      $matchingPackages = [Collections.Generic.List[string]]::new()
+      foreach ($package in $bloatwareApp.Packages) {
+        if ($Packages.Contains($package)) {
+          $matchingPackages.Add($package)
         }
       }
+      if ($matchingPackages.Count -eq 0) { continue }
 
-      if ($found) { $i++ }
+      $name = $bloatwareApp.Name.$targetLanguage
+      if (-not $name) {
+        $name = $bloatwareApp.Name.en
+      }
+      $description = $bloatwareApp.Description.$targetLanguage
+      if (-not $description) {
+        $description = $bloatwareApp.Description.en
+      }
+
+      $appsToProcess.Add(@{
+          Name        = $name
+          Description = $description
+          Packages    = $matchingPackages
+        })
     }
 
     $appsToProcess
