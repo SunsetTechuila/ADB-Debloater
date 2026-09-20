@@ -1,10 +1,16 @@
 <ResourceDictionary
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
   <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
   <Thickness x:Key="ControlBorderThickness">1</Thickness>
+  <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
   <FontFamily x:Key="SymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+  <sys:Double x:Key="ContextMenuShadowBlurRadius">16</sys:Double>
+  <sys:Double x:Key="ContextMenuShadowHorizontalOffset">-16</sys:Double>
+  <sys:Double x:Key="ContextMenuShadowDepth">8</sys:Double>
+  <Thickness x:Key="ContextMenuShadowPadding">16,0,16,24</Thickness>
 
   <Style TargetType="Window">
     <Setter Property="FontFamily" Value="Segoe UI Variable,SegoeUI" />
@@ -268,7 +274,7 @@
   </Style>
 
   <Style TargetType="ToolTip">
-    <Setter Property="Background" Value="{DynamicResource ToolTipBackgroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
     <Setter Property="Padding" Value="8" />
     <Style.Resources>
@@ -286,6 +292,19 @@
     <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
     <Setter Property="Border.CornerRadius" Value="{StaticResource ControlCornerRadius}" />
     <Setter Property="Padding" Value="4,-1,2,0" />
+    <Setter Property="ContextMenuService.HorizontalOffset"
+      Value="{StaticResource ContextMenuShadowHorizontalOffset}" />
+    <Setter Property="ContextMenu">
+      <Setter.Value>
+        <ContextMenu>
+          <MenuItem Icon="&#xE8C6;" InputGestureText="Ctrl+X" Command="ApplicationCommands.Cut" />
+          <MenuItem Icon="&#xE8C8;" InputGestureText="Ctrl+C" Command="ApplicationCommands.Copy" />
+          <MenuItem Icon="&#xE77F;" InputGestureText="Ctrl+V" Command="ApplicationCommands.Paste" />
+          <MenuItem Icon="&#xE7A7;" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo" />
+          <MenuItem InputGestureText="Ctrl+A" Command="ApplicationCommands.SelectAll" />
+        </ContextMenu>
+      </Setter.Value>
+    </Setter>
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="TextBox">
@@ -362,6 +381,131 @@
 
   <Style TargetType="TextBlock">
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+  </Style>
+
+  <Style TargetType="ContextMenu">
+    <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource OverlayBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="MinWidth" Value="120" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ContextMenu">
+          <Border Padding="{StaticResource ContextMenuShadowPadding}">
+            <Border
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              CornerRadius="{StaticResource OverlayCornerRadius}"
+              Padding="{TemplateBinding Padding}">
+              <Border.Effect>
+                <DropShadowEffect
+                  Color="Black"
+                  BlurRadius="{StaticResource ContextMenuShadowBlurRadius}"
+                  Direction="270"
+                  ShadowDepth="{StaticResource ContextMenuShadowDepth}"
+                  Opacity="{DynamicResource OverlayShadowOpacity}" />
+              </Border.Effect>
+              <StackPanel IsItemsHost="True" />
+            </Border>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="MenuItem">
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="MenuItem">
+          <Border
+            Name="MenuItemBorder"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="{StaticResource ControlCornerRadius}"
+            Padding="{TemplateBinding Padding}">
+
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+
+              <Border
+                Name="IconBorder"
+                Grid.Column="0"
+                Width="16"
+                Height="16"
+                Margin="0,0,8,0"
+                Background="Transparent"
+                CornerRadius="2">
+                <TextBlock
+                  Name="Icon"
+                  Text="{TemplateBinding Icon}"
+                  FontFamily="{StaticResource SymbolThemeFontFamily}"
+                  FontSize="{TemplateBinding FontSize}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Foreground="{TemplateBinding Foreground}" />
+              </Border>
+
+              <ContentPresenter
+                Name="HeaderPresenter"
+                Grid.Column="1"
+                ContentSource="Header"
+                VerticalAlignment="Center"
+                TextElement.Foreground="{TemplateBinding Foreground}"
+                TextBlock.FontSize="{TemplateBinding FontSize}" />
+
+              <TextBlock
+                Name="InputGestureText"
+                Grid.Column="2"
+                Margin="38,0,0,0"
+                Text="{TemplateBinding InputGestureText}"
+                Foreground="{DynamicResource InactiveTextBrush}"
+                VerticalAlignment="Center"
+                FontSize="12" />
+            </Grid>
+          </Border>
+
+          <ControlTemplate.Triggers>
+            <Trigger Property="Icon" Value="{x:Null}">
+              <Setter TargetName="IconBorder" Property="Visibility" Value="Hidden" />
+            </Trigger>
+            <Trigger Property="InputGestureText" Value="">
+              <Setter TargetName="InputGestureText" Property="Visibility" Value="Hidden" />
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="True">
+              <Setter TargetName="MenuItemBorder" Property="Background"
+                Value="{DynamicResource ActiveButtonBackgroundBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="HeaderPresenter" Property="TextElement.Foreground"
+                Value="{DynamicResource DisabledTextBrush}" />
+              <Setter TargetName="Icon" Property="Foreground"
+                Value="{DynamicResource DisabledTextBrush}" />
+              <Setter TargetName="InputGestureText" Property="Foreground"
+                Value="{DynamicResource DisabledTextBrush}" />
+            </Trigger>
+            <Trigger Property="Role" Value="TopLevelHeader">
+              <Setter Property="Padding" Value="8,4" />
+            </Trigger>
+            <Trigger Property="Role" Value="TopLevelItem">
+              <Setter Property="Padding" Value="8,4" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
   </Style>
 
   <Style TargetType="ListView">
