@@ -12,7 +12,13 @@ function Set-PlatformTools {
     $AdbFromResources = "$Resources/platform-tools/adb.exe"
   }
   process {
-    $adbFromPATH = (Get-Command -Name 'adb' -ErrorAction 'SilentlyContinue').Source
+    $Parameters = @{
+      Name        = 'adb'
+      CommandType = 'Application'
+      TotalCount  = 1
+      ErrorAction = 'SilentlyContinue'
+    }
+    $adbFromPATH = (Get-Command @Parameters).Source
     if ($adbFromPATH) {
       $Env:adb = $adbFromPATH
       return
@@ -21,10 +27,11 @@ function Set-PlatformTools {
     $Env:adb = $AdbFromResources
 
     $Parameters = @{
-      Path     = $AdbFromResources
-      PathType = 'Leaf'
+      Path        = $AdbFromResources
+      PathType    = 'Leaf'
+      ErrorAction = 'SilentlyContinue'
     }
-    if (-not (Test-Path @Parameters -ErrorAction 'SilentlyContinue')) {
+    if (-not (Test-Path @Parameters)) {
       Get-PlatformTools
     }
   }
@@ -34,25 +41,36 @@ function Get-PlatformTools {
   [CmdletBinding()]
   param()
   begin {
-    $platformToolsArchive = "$Resources/platform-tools.zip"
+    Add-Type -AssemblyName 'System.IO.Compression', 'System.IO.Compression.FileSystem'
+    $platformToolsDirectory = "$Resources/platform-tools"
     $platformToolsDownloadUri = 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip'
+    $requiredFiles = @('adb.exe', 'AdbWinApi.dll', 'AdbWinUsbApi.dll')
   }
   process {
-    $Parameters = @{
-      Uri             = $platformToolsDownloadUri
-      OutFile         = $platformToolsArchive
-      UseBasicParsing = $true
-    }
-    Invoke-WebRequest @Parameters
+    $completed = $false
+    try {
+      $response = [Net.WebRequest]::CreateHttp($platformToolsDownloadUri).GetResponse()
+      $responseStream = $response.GetResponseStream()
+      $archiveStream = [IO.MemoryStream]::new([int]$response.ContentLength)
+      $responseStream.CopyTo($archiveStream)
 
-    $Parameters = @{
-      Path            = $platformToolsArchive
-      DestinationPath = $Resources
-      Force           = $true
-    }
-    Expand-Archive @Parameters
+      [IO.Directory]::CreateDirectory($platformToolsDirectory) > $null
+      $archive = [IO.Compression.ZipArchive]::new($archiveStream)
+      foreach ($file in $requiredFiles) {
+        $entry = $archive.GetEntry("platform-tools/$file")
+        [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, "$platformToolsDirectory/$file", $true)
+      }
 
-    Remove-Item -Path $platformToolsArchive -Force
+      $completed = $true
+    }
+    finally {
+      if ($archive) { $archive.Dispose() }
+      if ($archiveStream) { $archiveStream.Dispose() }
+      if ($response) { $response.Dispose() }
+      if (-not $completed) {
+        Remove-Item -Path $platformToolsDirectory -Recurse -Force -ErrorAction 'SilentlyContinue'
+      }
+    }
   }
 }
 
@@ -97,32 +115,20 @@ function Pair-DeviceOverWiFi {
     [string]$PairingCode
   )
   process {
-    $processStartInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $processStartInfo.FileName = $Env:adb
-    $processStartInfo.Arguments = "pair $IpAddress"
-    $processStartInfo.RedirectStandardInput = $true
-
-
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = $processStartInfo
-    $process.Start()
-
-    $process.StandardInput.WriteLine($PairingCode)
-    $process.StandardInput.Close()
-
-    $process.WaitForExit()
+    .$Env:adb pair $IpAddress $PairingCode
   }
 }
 
 function Get-Devices {
   [CmdletBinding()]
+  [OutputType([hashtable])]
   param()
   process {
-    .$Env:adb devices -l | Select-Object -Skip 1 | ForEach-Object -Process {
-      if ($PSItem.Length -eq 0) { return }
-      $fields = $PSItem.Split([char]::Tab)
+    foreach ($line in .$Env:adb devices -l | Select-Object -Skip 1) {
+      if ($line.Length -eq 0) { continue }
+      $fields = -split $line
 
-      $status = ($fields -match '^(bootloader|device|recovery|sideload|offline|unauthorized){1}$')[0]
+      $status = ($fields -match '^(bootloader|device|recovery|sideload|offline|unauthorized)$')[0]
       if ($status -eq 'device') { $status = 'connected' }
       $model = ($fields -match '^model:\w+$')[0]
       $model = if ($model) { $model.Replace('model:', '').Replace('_', ' ') } else { 'unknown' }
@@ -140,60 +146,50 @@ function Get-Devices {
 
 function Get-InstalledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
   )
   process {
-    .$Env:adb -s $DeviceId shell pm list packages | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
+    (.$Env:adb -s $DeviceId shell pm list packages) -replace '^package:'
   }
 }
 
 function Get-EnabledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
   )
   process {
-    .$Env:adb -s $DeviceId shell pm list packages -e | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
+    (.$Env:adb -s $DeviceId shell pm list packages -e) -replace '^package:'
   }
 }
 
 function Get-DisabledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
   )
   process {
-    .$Env:adb -s $DeviceId shell pm list packages -d | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
+    (.$Env:adb -s $DeviceId shell pm list packages -d) -replace '^package:'
   }
 }
 
 function Get-UninstalledPackages {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([string])]
   param(
     [Parameter(Mandatory)]
     [string]$DeviceId
   )
   process {
-    $allPackages = .$Env:adb -s $DeviceId shell pm list packages -u | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
-    $installedPackages = Get-InstalledPackages -DeviceId $DeviceId
-
-    $allPackages | Where-Object -FilterScript { $PSItem -notin $installedPackages }
+    $command = '{ pm list packages -u; pm list packages; } | sort | uniq -u'
+    (.$Env:adb -s $DeviceId shell $command) -replace '^package:'
   }
 }
 
@@ -201,7 +197,7 @@ function Uninstall-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -214,8 +210,9 @@ function Uninstall-Packages {
           .$Env:adb -s $DeviceId shell pm uninstall $package
         }
         catch { }
-         # `pm uninstall --user 0` uninstalls the system package for the primary user; when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
-         # `am force-stop' is used to ensure that all app processes are terminated
+        # `pm uninstall --user 0` uninstalls the system package for the primary user
+        # when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
+        # `am force-stop' is used to ensure that all app processes are terminated
         .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package"
         Write-Host -Object "Uninstalled $package"
       }
@@ -230,7 +227,7 @@ function Disable-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [string]$DeviceId
   )
@@ -245,7 +242,7 @@ function Disable-Packages {
         # `pm disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
         # `am force-stop' is used to ensure that all app processes are terminated
         # `pm clear` clears all application data
-        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package" 
+        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package"
         Write-Host -Object "Disabled $package"
       }
       catch {
@@ -259,7 +256,7 @@ function Enable-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [string]$DeviceId
   )
@@ -280,7 +277,7 @@ function Reinstall-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [string]$DeviceId
   )
@@ -305,10 +302,10 @@ function Reinstall-Packages {
 
 function Get-AppsToProcess {
   [CmdletBinding()]
-  [OutputType([array])]
+  [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [Parameter(Mandatory)]
     [array]$BloatwareList
@@ -317,38 +314,29 @@ function Get-AppsToProcess {
     $targetLanguage = $PSUICulture.Split('-')[0]
   }
   process {
-    $appsToProcess = @()
-    $i = 0
-
     foreach ($bloatwareApp in $BloatwareList) {
-      $found = $false
-
-      foreach ($package in $Packages) {
-        if ($package -in $bloatwareApp.Packages) {
-          $found = $true
-
-          if (-not $appsToProcess[$i]) {
-            $appsToProcess += @{}
-            $appsToProcess[$i].Packages = @()
-          }
-
-          $appsToProcess[$i].Name = $bloatwareApp.Name.$targetLanguage
-          if (-not $appsToProcess[$i].Name) {
-            $appsToProcess[$i].Name = $bloatwareApp.Name.en
-          }
-          $appsToProcess[$i].Description = $bloatwareApp.Description.$targetLanguage
-          if (-not $appsToProcess[$i].Description) {
-            $appsToProcess[$i].Description = $bloatwareApp.Description.en
-          }
-
-          $appsToProcess[$i].Packages += $package
+      $matchingPackages = foreach ($package in $bloatwareApp.Packages) {
+        if ($Packages.Contains($package)) {
+          $package
         }
       }
+      if (-not $matchingPackages) { continue }
 
-      if ($found) { $i++ }
+      $name = $bloatwareApp.Name.$targetLanguage
+      if (-not $name) {
+        $name = $bloatwareApp.Name.en
+      }
+      $description = $bloatwareApp.Description.$targetLanguage
+      if (-not $description) {
+        $description = $bloatwareApp.Description.en
+      }
+
+      @{
+        Name        = $name
+        Description = $description
+        Packages    = $matchingPackages
+      }
     }
-
-    $appsToProcess
   }
 }
 
