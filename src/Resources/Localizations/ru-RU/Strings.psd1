@@ -1,7 +1,7 @@
 ConvertFrom-StringData -StringData @'
-DeviceRebootInstruction    = Перезагрузитесь в систему.
-DeviceReconnectInstruction = Переподключите устройство.
-DeviceAuthorizeInstruction = Поставьте галочку напротив "Всегда разрешать отладку с этого компьютера" и нажмите "Разрешить".
+DeviceRebootInstruction    = Перезагрузитесь в систему
+DeviceReconnectInstruction = Переподключите устройство
+DeviceAuthorizeInstruction = Поставьте галочку напротив "Всегда разрешать отладку с этого компьютера" и нажмите "Разрешить"
 
 Devices               = Устройства
 ConnectDeviceOverWiFi = Подключить устройство по Wi-Fi
@@ -9,7 +9,7 @@ PairDeviceOverWiFi    = Установить сопряжение с устро�
 RefreshDevicesList    = Обновить список устройств
 
 DeviceModel  = Модель
-DeviceStatus = Статус
+DeviceStatus = Состояние
 DeviceId     = Идентификатор
 
 UninstallApps = Удалить приложения
@@ -22,7 +22,7 @@ EnterPairingCode = Введите шестизначный код сопряже
 OK               = OK
 Cancel           = Отменить
 
-NoPackagesFound = Пакеты не найдены!
+NoPackagesFound = Пакеты не найдены
 
 SelectAll = Выбрать все
 Search    = Поиск
