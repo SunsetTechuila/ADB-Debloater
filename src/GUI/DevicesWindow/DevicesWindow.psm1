@@ -1,4 +1,7 @@
 #Requires -Version 5.1
+
+using module ../Helpers.psm1
+
 $ErrorActionPreference = 'Stop'
 
 ."$PSScriptRoot/../../Paths.ps1"
@@ -48,132 +51,121 @@ function Show-DevicesWindow {
     }
     Set-WindowStyling -Window $Window -NoTopBar -SetWindowMaxHeight
 
-    function Set-Devices {
-      [CmdletBinding()]
-      param()
-      process {
-        $DevicesListView.ItemsSource = @($GetDevices.Invoke() | ForEach-Object -Process {
-            $hint = switch -Regex ($PSItem.Status) {
-              'Offline' {
-                $Localization.DeviceReconnectInstruction
-                break
-              }
-              'Bootloader|Recovery|Sideload' {
-                $Localization.DeviceRebootInstruction
-                break
-              }
-              'Unauthorized' {
-                $Localization.DeviceAuthorizeInstruction
-                break
-              }
-              Default {
-                $null
-              }
-            }
-            $status = $PSItem.Status.Substring(0, 1).ToUpper() + $PSItem.Status.Substring(1).ToLower()
+    $ViewModel = [ViewModel]::new($GetDevices)
 
-            [PSCustomObject]@{
-              Id     = $PSItem.Id
-              Model  = $PSItem.Model
-              Status = $status
-              Hint   = $hint
-            }
-          })
-
-        $DevicesListView.SelectedIndex = 0
-      }
+    $Window.DataContext = [PSCustomObject]@{
+      ViewModel    = $ViewModel
+      Localization = $Localization
     }
 
-    function OnSelectionChange {
-      [CmdletBinding()]
-      param()
-      begin {
-        $selectedItem = $PSItem.Source.SelectedItem
-      }
-      process {
-        $isDeviceConnected = $selectedItem.Status -eq 'Connected'
-
-        @($UninstallButton, $DisableButton, $EnableButton, $ReinstallButton) | ForEach-Object -Process {
-          $PSItem.IsEnabled = $isDeviceConnected
-        }
-      }
-    }
-
-    function Set-Choice {
-      [CmdletBinding()]
-      param()
-      begin {
-        $actionName = $PSItem.Source.Tag
-      }
-      process {
-        $choice.DeviceId = $DevicesListView.SelectedItem.Id
-        $choice.ActionName = $actionName
-        $Window.Close()
-      }
-    }
-
-    function OnConnectButtonClick {
-      [CmdletBinding()]
-      param()
-      process {
-        $ipAddress = Show-ConnectDeviceDialog -ParentWindow $Window
-        if (-not $ipAddress) { return }
-        $ConnectDevice.Invoke($ipAddress)
-        Set-Devices
-      }
-    }
-
-    function OnPairButtonClick {
-      [CmdletBinding()]
-      param()
-      process {
-        $data = Show-PairDeviceDialog -ParentWindow $Window
-        if (-not $data.Count) { return }
-        $PairDevice.Invoke($data.IpAddress, $data.PairingCode)
-      }
-    }
-
-    $DevicesTextBlock.Text = $Localization.Devices
-    $ConnectButton.ToolTip = $Localization.ConnectDeviceOverWiFi
-    $ConnectButton.Add_Click({ OnConnectButtonClick })
-    $PairButton.ToolTip = $Localization.PairDeviceOverWiFi
-    $PairButton.Add_Click({ OnPairButtonClick })
-    $RefreshButton.ToolTip = $Localization.RefreshDevicesList
-    $RefreshButton.Add_Click({ Set-Devices })
-    $RefreshButton.Add_Click({
-        if ([System.Windows.Input.Keyboard]::Modifiers -band 'Alt') {
-          Start-Process 'https://www.youtube.com/watch?v=-dt0d23Lrew'
-        }
-      })
-
-    $UninstallButton.Content = $Localization.UninstallApps
-    $UninstallButton.Tag = 'uninstall'
-    $UninstallButton.Add_Click({ Set-Choice })
-
-    $DisableButton.Content = $Localization.DisableApps
-    $DisableButton.Tag = 'disable'
-    $DisableButton.Add_Click({ Set-Choice })
-
-    $EnableButton.Content = $Localization.EnableApps
-    $EnableButton.Tag = 'enable'
-    $EnableButton.Add_Click({ Set-Choice })
-
-    $ReinstallButton.Content = $Localization.ReinstallApps
-    $ReinstallButton.Tag = 'reinstall'
-    $ReinstallButton.Add_Click({ Set-Choice })
-
-    $DeviceModelColumn.Header = $Localization.DeviceModel
-    $DeviceStatusColumn.Header = $Localization.DeviceStatus
-    $DeviceIdColumn.Header = $Localization.DeviceId
-    $DevicesListView.Add_SelectionChanged({ OnSelectionChange })
-    Set-Devices
-
-    $Window.Add_KeyDown({
-        if ($PSItem.Key -eq 'F5') { Set-Devices }
+    $DevicesListView.add_SelectionChanged({
+        $ViewModel.SetSelectedDevice($DevicesListView.SelectedItem)
+        $ViewModel.OnSelectionChanged()
       })
 
     $Window.ShowDialog() | Out-Null
 
     $choice
+  }
+}
+
+class ViewModel : ObservableObject {
+  $RefreshCommand = [RelayCommand]::new({
+      $ViewModel.RefreshDevices()
+    })
+
+  $PairCommand = [RelayCommand]::new({
+      $data = Show-PairDeviceDialog -ParentWindow $Window
+      if (-not $data.Count) { return }
+      $PairDevice.Invoke($data.IpAddress, $data.PairingCode)
+    })
+
+  $ConnectCommand = [RelayCommand]::new({
+      $ipAddress = Show-ConnectDeviceDialog -ParentWindow $Window
+      if (-not $ipAddress) { return }
+      $ConnectDevice.Invoke($ipAddress)
+      $ViewModel.RefreshDevices()
+    })
+
+  $ChooseActionCommand = [RelayCommand]::new(
+    {
+      param($actionName)
+      $choice.DeviceId = $ViewModel.SelectedDevice.Id
+      $choice.ActionName = $actionName
+      $Window.Close()
+    },
+    {
+      $selectedDevice = $ViewModel.SelectedDevice
+      $selectedDevice -and ($selectedDevice.Status -eq 'Connected')
+    }
+  )
+
+  hidden [Device[]] $Devices
+  hidden [void] SetDevices($value) {
+    $this.SetProperty('Devices', $value)
+  }
+
+  hidden [Device] $SelectedDevice
+  [void] SetSelectedDevice($value) {
+    $this.SetProperty('SelectedDevice', $value)
+  }
+
+  hidden [scriptblock] $GetDevices
+
+  ViewModel($getDevices) {
+    $this.GetDevices = $getDevices
+    $this.RefreshDevices()
+  }
+
+  [void] RefreshDevices() {
+    $this.SetDevices($(
+        foreach ($device in $this.GetDevices.Invoke()) {
+          [Device]::new($device.Id, $device.Model, $device.Status)
+        }
+      ))
+    $this.SetSelectedDevice(
+      $(if ($this.Devices.Count) { $this.Devices[0] })
+    )
+  }
+
+  [void] OnSelectionChanged() {
+    $this.ChooseActionCommand.NotifyCanExecuteChanged()
+  }
+}
+
+class Device {
+  [string] $Id
+
+  [string] $Model
+
+  [string] $Status
+
+  [string] $Hint
+
+  Device(
+    [string] $id,
+    [string] $model,
+    [string] $status
+  ) {
+    $this.Id = $id
+    $this.Model = $model
+    $this.Status = $status.Substring(0, 1).ToUpper() + $status.Substring(1).ToLower()
+    $this.Hint = switch -Regex ($status) {
+      'Offline' {
+        $script:Localization.DeviceReconnectInstruction
+        break
+      }
+      'Bootloader|Recovery|Sideload' {
+        $script:Localization.DeviceRebootInstruction
+        break
+      }
+      'Unauthorized' {
+        $script:Localization.DeviceAuthorizeInstruction
+        break
+      }
+      default {
+        $null
+      }
+    }
   }
 }
