@@ -6,6 +6,10 @@
   SizeToContent="WidthAndHeight"
   MinWidth="650" MinHeight="400">
 
+  <Window.InputBindings>
+    <KeyBinding Key="F5" Command="{Binding ViewModel.RefreshCommand}" />
+  </Window.InputBindings>
+
   <Border Name="ContentBorder">
     <Grid>
       <Grid.RowDefinitions>
@@ -20,20 +24,27 @@
         <StackPanel
           Orientation="Horizontal"
           HorizontalAlignment="Left">
-          <TextBlock Name="DevicesTextBlock"
+          <TextBlock
+            Text="{Binding Localization.Devices}"
             Foreground="{DynamicResource TextBrush}"
             Margin="0,0,16,0" VerticalAlignment="Center" />
-          <Button Name="RefreshButton"
+          <Button
+            Command="{Binding ViewModel.RefreshCommand}"
+            ToolTip="{Binding Localization.RefreshDevicesList}"
             Margin="0,0,8,0"
             Padding="8"
             FontFamily="{DynamicResource SymbolThemeFontFamily}"
             Content="&#xE72C;" />
-          <Button Name="PairButton"
+          <Button
+            Command="{Binding ViewModel.PairCommand}"
+            ToolTip="{Binding Localization.PairDeviceOverWiFi}"
             Margin="0,0,8,0"
             Padding="8"
             FontFamily="{DynamicResource SymbolThemeFontFamily}"
             Content="&#xE703;" />
-          <Button Name="ConnectButton"
+          <Button
+            Command="{Binding ViewModel.ConnectCommand}"
+            ToolTip="{Binding Localization.ConnectDeviceOverWiFi}"
             Margin="0,0,8,0"
             Padding="8"
             FontFamily="{DynamicResource SymbolThemeFontFamily}"
@@ -46,7 +57,10 @@
         BorderBrush="{DynamicResource ControlBorderBrush}"
         BorderThickness="{DynamicResource ControlBorderThickness}"
         CornerRadius="{DynamicResource ControlCornerRadius}">
-        <ListView Name="DevicesListView" SelectionMode="Single">
+        <ListView Name="DevicesListView"
+          ItemsSource="{Binding ViewModel.Devices}"
+          SelectedItem="{Binding ViewModel.SelectedDevice}"
+          SelectionMode="Single">
           <ListView.ItemContainerStyle>
             <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItem}">
               <Setter Property="ToolTip" Value="{Binding Hint}" />
@@ -54,9 +68,9 @@
           </ListView.ItemContainerStyle>
           <ListView.View>
             <GridView>
-              <GridViewColumn x:Name="DeviceModelColumn"
+              <GridViewColumn Header="{Binding Localization.DeviceModel}"
                 DisplayMemberBinding="{Binding Model}" />
-              <GridViewColumn x:Name="DeviceStatusColumn">
+              <GridViewColumn Header="{Binding Localization.DeviceStatus}">
                 <GridViewColumn.CellTemplate>
                   <DataTemplate>
                     <TextBlock Text="{Binding Status}">
@@ -73,7 +87,7 @@
                   </DataTemplate>
                 </GridViewColumn.CellTemplate>
               </GridViewColumn>
-              <GridViewColumn x:Name="DeviceIdColumn"
+              <GridViewColumn Header="{Binding Localization.DeviceId}"
                 DisplayMemberBinding="{Binding Id}" />
             </GridView>
           </ListView.View>
@@ -90,22 +104,30 @@
           <ColumnDefinition Width="8" />
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Button Name="UninstallButton"
+        <Button
           Grid.Column="0"
-          HorizontalAlignment="Stretch"
-          IsEnabled="False" />
-        <Button Name="DisableButton"
+          Content="{Binding Localization.UninstallApps}"
+          Command="{Binding ViewModel.ChooseActionCommand}"
+          CommandParameter="uninstall"
+          HorizontalAlignment="Stretch" />
+        <Button
           Grid.Column="2"
-          HorizontalAlignment="Stretch"
-          IsEnabled="False" />
-        <Button Name="EnableButton"
+          Content="{Binding Localization.DisableApps}"
+          Command="{Binding ViewModel.ChooseActionCommand}"
+          CommandParameter="disable"
+          HorizontalAlignment="Stretch" />
+        <Button
           Grid.Column="4"
-          HorizontalAlignment="Stretch"
-          IsEnabled="False" />
-        <Button Name="ReinstallButton"
+          Content="{Binding Localization.EnableApps}"
+          Command="{Binding ViewModel.ChooseActionCommand}"
+          CommandParameter="enable"
+          HorizontalAlignment="Stretch" />
+        <Button
           Grid.Column="6"
-          HorizontalAlignment="Stretch"
-          IsEnabled="False" />
+          Content="{Binding Localization.ReinstallApps}"
+          Command="{Binding ViewModel.ChooseActionCommand}"
+          CommandParameter="reinstall"
+          HorizontalAlignment="Stretch" />
       </Grid>
     </Grid>
   </Border>
