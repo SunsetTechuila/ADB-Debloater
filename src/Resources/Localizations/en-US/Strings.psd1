@@ -1,7 +1,7 @@
 ConvertFrom-StringData -StringData @'
-DeviceRebootInstruction    = Please reboot your device into system.
-DeviceReconnectInstruction = Please reconnect your device.
-DeviceAuthorizeInstruction = Please select the checkbox "Always allow from this computer" and press "Allow".
+DeviceRebootInstruction    = Reboot your device into system.
+DeviceReconnectInstruction = Reconnect your device.
+DeviceAuthorizeInstruction = Select the checkbox "Always allow from this computer" and press "Allow".
 
 Devices               = Devices
 ConnectDeviceOverWiFi = Connect device over Wi-Fi

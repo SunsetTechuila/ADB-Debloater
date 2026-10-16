@@ -9,7 +9,7 @@ PairDeviceOverWiFi    = Установить сопряжение с устро�
 RefreshDevicesList    = Обновить список устройств
 
 DeviceModel  = Модель
-DeviceStatus = Статус
+DeviceStatus = Состояние
 DeviceId     = Идентификатор
 
 UninstallApps = Удалить приложения
