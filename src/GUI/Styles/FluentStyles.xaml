@@ -282,6 +282,15 @@
         <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
       </Style>
     </Style.Resources>
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}" Value="">
+        <Setter Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}"
+        Value="{x:Null}">
+        <Setter Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+    </Style.Triggers>
   </Style>
 
   <Style TargetType="TextBox">
