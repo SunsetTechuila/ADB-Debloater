@@ -19,6 +19,8 @@
     <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
   </Style>
 
+  <!--#region Focus-->
+
   <Style x:Key="DefaultControlFocusVisualStyle">
     <Setter Property="Control.Template">
       <Setter.Value>
@@ -47,6 +49,10 @@
       </Setter.Value>
     </Setter>
   </Style>
+
+  <!--#endregion-->
+
+  <!--#region Scroll-->
 
   <Style TargetType="RepeatButton">
     <Setter Property="Template">
@@ -149,6 +155,8 @@
       </Setter.Value>
     </Setter>
   </Style>
+
+  <!--#endregion-->
 
   <Style TargetType="CheckBox">
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -293,6 +301,8 @@
     </Style.Triggers>
   </Style>
 
+  <!--#region Text-->
+
   <Style TargetType="TextBox">
     <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -391,6 +401,8 @@
   <Style TargetType="TextBlock">
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
   </Style>
+
+  <!--#region Menu-->
 
   <Style TargetType="ContextMenu">
     <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}" />
@@ -516,6 +528,11 @@
       </Setter.Value>
     </Setter>
   </Style>
+
+  <!--#endregion Menu-->
+  <!--#endregion Text-->
+
+  <!--#region List-->
 
   <Style TargetType="ListView">
     <Setter Property="BorderThickness" Value="0" />
@@ -647,6 +664,10 @@
     </Setter>
   </Style>
 
+  <!--#endregion-->
+
+  <!--#region Grid-->
+
   <Style x:Key="GridViewColumnHeaderGripper" TargetType="Thumb">
     <Setter Property="Canvas.Right" Value="-9" />
     <Setter Property="Width" Value="18" />
@@ -742,5 +763,7 @@
       </Setter.Value>
     </Setter>
   </Style>
+
+  <!--#endregion-->
 
 </ResourceDictionary>
