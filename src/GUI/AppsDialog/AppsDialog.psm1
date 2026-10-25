@@ -52,19 +52,20 @@ function Show-AppsDialog {
       ActionLabel  = $Localization.$ActionName
     }
 
-    $Window.AppsListView.add_SelectionChanged({ $ViewModel.OnSelectionChanged() })
-
-    $searchDebounceTimer = [Windows.Threading.DispatcherTimer]::new()
-    $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(150)
-    $searchDebounceTimer.add_Tick({
-        $searchDebounceTimer.Stop()
-        $ViewModel.FilterApps($Window.SearchBox.Text)
+    $Window.AppsListView.add_SelectionChanged({
+        # When scrolling or filtering, VirtualizingStackPanel generates or recycles ListViewItem containers
+        # while ItemContainerGenerator.Status is 'GeneratingContainers'.
+        # Syncing a recycled container's IsSelected binding to the newly bound AppItem raises SelectionChanged
+        # even though no AppItem selection state actually changed.
+        if ($Window.AppsListView.ItemContainerGenerator.Status -ne 'ContainersGenerated') {
+          return
+        }
+        $ViewModel.OnSelectionChanged()
       })
 
     $OnSearchTextChanged = {
       param($eventSender)
-      $searchDebounceTimer.Stop()
-      $searchDebounceTimer.Start()
+      $ViewModel.FilterApps($eventSender.Text)
     }
     $Window.SearchBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.Search }
     $Window.SearchBox.Add_TextChanged($OnSearchTextChanged)
@@ -109,6 +110,12 @@ class ViewModel : ObservableObject {
       $ViewModel.IsTogglingSelection = $true
 
       $targetState = -not $ViewModel.SelectAllState
+      if (-not $targetState) {
+        # Off-screen items have no realized ListViewItem container, so SetIsSelected($false) only
+        # updates the AppItem model and cannot notify ListView via the container's TwoWay binding.
+        # Clearing SelectedItems prevents ListView from re-selecting those items when scrolled back into view.
+        $Window.AppsListView.SelectedItems.Clear()
+      }
       $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($targetState) })
 
       $ViewModel.IsTogglingSelection = $false

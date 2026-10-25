@@ -95,7 +95,9 @@
           ItemsSource="{Binding ViewModel.FilteredAppItems}"
           ItemTemplate="{StaticResource AppItemTemplate}"
           SelectionMode="Multiple"
-          ScrollViewer.CanContentScroll="False"
+          VirtualizingPanel.IsVirtualizing="True"
+          VirtualizingPanel.VirtualizationMode="Recycling"
+          VirtualizingPanel.ScrollUnit="Pixel"
           ScrollViewer.VerticalScrollBarVisibility="Auto"
           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
           Padding="1">
