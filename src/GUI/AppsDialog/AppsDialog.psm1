@@ -134,7 +134,7 @@ class ViewModel : ObservableObject {
     $appItemsCollection = [Collections.ObjectModel.ObservableCollection[AppItem]]::new($appItems)
     $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItemsCollection)
 
-    $this.FilteredAppItems.Filter = $this.FilterAppItem
+    $this.FilteredAppItems.Filter = { param($appItem) $this.FilterAppItem($appItem) }
 
     $this.FilteredAppItems.add_CollectionChanged({
         $ViewModel.ToggleFilteredAppItemsSelectionCommand.NotifyCanExecuteChanged()

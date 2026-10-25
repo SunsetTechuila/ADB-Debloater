@@ -18,8 +18,17 @@ Add-Type -AssemblyName 'PresentationFramework'
   'DevicesDialog',
   'MessageDialog'
 ) | ForEach-Object -Process {
+  $path = Get-Variable -Name $PSItem -ValueOnly
+  # PowerShell 5 resolves the dialogs' relative `using module ../Helpers.psm1` against the current directory,
+  # so the modules are parsed from a dialog folder rather than from wherever the script was launched
+  Push-Location (Split-Path -Path $path)
   Remove-Module -Name $PSItem -Force -ErrorAction 'SilentlyContinue'
-  Import-Module -Name (Get-Variable -Name $PSItem -ValueOnly) -DisableNameChecking
+  try {
+    Import-Module -Name $path -DisableNameChecking
+  }
+  finally {
+    Pop-Location
+  }
 }
 
 $Parameters = @{
