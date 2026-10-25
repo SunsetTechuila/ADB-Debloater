@@ -24,14 +24,7 @@ function Show-ConnectDeviceDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    [xml]$xaml = Get-Content -Path "$PSScriptRoot/ConnectDeviceDialog.xaml"
-    $xaml = Add-FluentStyles -Xaml $xaml
-    $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml)
-    $Window = [Windows.Markup.XamlReader]::Load($reader)
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
-      Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
-    }
-    Set-WindowStyling -Window $Window -HideCloseButton
+    $Window = Initialize-Window -Path "$PSScriptRoot/ConnectDeviceDialog.xaml" -HideCloseButton
 
     function Set-OkButtonState {
       [CmdletBinding()]
@@ -41,8 +34,8 @@ function Show-ConnectDeviceDialog {
         $ipV6Regex = '^(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?:]:(?:[1-9]\d{0,4}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))$'
       }
       process {
-        $inputText = $IpAdressBox.Text
-        $OkButton.IsEnabled = ($inputText -match $ipV4Regex) -or ($inputText -match $ipV6Regex)
+        $inputText = $Window.IpAdressBox.Text
+        $Window.OkButton.IsEnabled = ($inputText -match $ipV4Regex) -or ($inputText -match $ipV6Regex)
       }
     }
 
@@ -50,23 +43,23 @@ function Show-ConnectDeviceDialog {
       [CmdletBinding()]
       param()
       process {
-        $script:ipAddress = $IpAdressBox.Text
+        $script:ipAddress = $Window.IpAdressBox.Text
         $Window.Close()
       }
     }
 
-    $IpAdressBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterIpAddress }
-    $IpAdressBox.Add_TextChanged({ Set-OkButtonState })
+    $Window.IpAdressBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterIpAddress }
+    $Window.IpAdressBox.Add_TextChanged({ Set-OkButtonState })
 
-    $OkButton.Content = $Localization.Ok
-    $OkButton.Add_Click({ OnOkButtonClick })
-    $CancelButton.Content = $Localization.Cancel
-    $CancelButton.Add_Click({ $Window.Close() })
+    $Window.OkButton.Content = $Localization.Ok
+    $Window.OkButton.Add_Click({ OnOkButtonClick })
+    $Window.CancelButton.Content = $Localization.Cancel
+    $Window.CancelButton.Add_Click({ $Window.Close() })
 
     $Window.Add_KeyDown({
         switch -Exact ($PSItem.Key) {
           'Enter' {
-            if ($OkButton.IsEnabled) { OnOkButtonClick }
+            if ($Window.OkButton.IsEnabled) { OnOkButtonClick }
             break
           }
           'Escape' {

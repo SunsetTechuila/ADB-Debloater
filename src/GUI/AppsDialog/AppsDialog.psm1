@@ -37,14 +37,7 @@ function Show-AppsDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    [xml]$xaml = Get-Content -Path "$PSScriptRoot/AppsDialog.xaml"
-    $xaml = Add-FluentStyles -Xaml $xaml
-    $reader = (New-Object -TypeName 'Xml.XmlNodeReader' -ArgumentList $xaml)
-    $Window = [Windows.Markup.XamlReader]::Load($reader)
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
-      Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
-    }
-    Set-WindowStyling -Window $Window -NoTopBar -SetWindowMaxHeight
+    $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml" -NoTopBar -SetWindowMaxHeight
 
     $appItems = @(
       foreach ($app in $Apps) {
@@ -59,13 +52,13 @@ function Show-AppsDialog {
       ActionLabel  = $Localization.$ActionName
     }
 
-    $AppsListView.add_SelectionChanged({ $ViewModel.OnSelectionChanged() })
+    $Window.AppsListView.add_SelectionChanged({ $ViewModel.OnSelectionChanged() })
 
     $searchDebounceTimer = [Windows.Threading.DispatcherTimer]::new()
     $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(150)
     $searchDebounceTimer.add_Tick({
         $searchDebounceTimer.Stop()
-        $ViewModel.FilterApps($SearchBox.Text)
+        $ViewModel.FilterApps($Window.SearchBox.Text)
       })
 
     $OnSearchTextChanged = {
@@ -73,8 +66,8 @@ function Show-AppsDialog {
       $searchDebounceTimer.Stop()
       $searchDebounceTimer.Start()
     }
-    $SearchBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.Search }
-    $SearchBox.Add_TextChanged($OnSearchTextChanged)
+    $Window.SearchBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.Search }
+    $Window.SearchBox.Add_TextChanged($OnSearchTextChanged)
 
     $Window.Add_ContentRendered({
         # prevents the window from resizing on search

@@ -42,14 +42,7 @@ function Show-DevicesWindow {
   process {
     $choice = @{}
 
-    [xml]$xaml = Get-Content -Path "$PSScriptRoot/DevicesWindow.xaml"
-    $xaml = Add-FluentStyles -Xaml $xaml
-    $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml)
-    $Window = [Windows.Markup.XamlReader]::Load($reader)
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
-      Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
-    }
-    Set-WindowStyling -Window $Window -NoTopBar -SetWindowMaxHeight
+    $Window = Initialize-Window -Path "$PSScriptRoot/DevicesWindow.xaml" -NoTopBar -SetWindowMaxHeight
 
     $ViewModel = [ViewModel]::new($GetDevices)
 
@@ -58,8 +51,8 @@ function Show-DevicesWindow {
       Localization = $Localization
     }
 
-    $DevicesListView.add_SelectionChanged({
-        $ViewModel.SetSelectedDevice($DevicesListView.SelectedItem)
+    $Window.DevicesListView.add_SelectionChanged({
+        $ViewModel.SetSelectedDevice($Window.DevicesListView.SelectedItem)
         $ViewModel.OnSelectionChanged()
       })
 

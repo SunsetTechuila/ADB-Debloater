@@ -178,6 +178,47 @@ function Add-FluentStyles {
   }
 }
 
+function Initialize-Window {
+  [CmdletBinding()]
+  [OutputType([System.Windows.Window])]
+  param (
+    [Parameter(Mandatory)]
+    [string]$Path,
+
+    [switch]$NoTopBar,
+
+    [switch]$SetWindowMaxHeight,
+
+    [switch]$HideCloseButton
+  )
+  begin {
+    Add-Type -AssemblyName 'PresentationFramework'
+  }
+  process {
+    [xml]$xaml = Get-Content -Path $Path
+    $xaml = Add-FluentStyles -Xaml $xaml
+    $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml
+    $Window = [Windows.Markup.XamlReader]::Load($reader)
+
+    $namedNodes = $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]")
+    foreach ($namedNode in $namedNodes) {
+      $control = $Window.FindName($namedNode.Name)
+      if ($null -eq $control) { continue }
+      Add-Member -InputObject $Window -NotePropertyName $namedNode.Name -NotePropertyValue $control
+    }
+
+    $Parameters = @{
+      Window             = $Window
+      NoTopBar           = $NoTopBar
+      SetWindowMaxHeight = $SetWindowMaxHeight
+      HideCloseButton    = $HideCloseButton
+    }
+    Set-WindowStyling @Parameters
+
+    $Window
+  }
+}
+
 #endregion
 
 #region Window Attributes

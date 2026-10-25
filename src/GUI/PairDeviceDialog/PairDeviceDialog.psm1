@@ -24,14 +24,7 @@ function Show-PairDeviceDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    [xml]$xaml = Get-Content -Path "$PSScriptRoot/PairDeviceDialog.xaml"
-    $xaml = Add-FluentStyles -Xaml $xaml
-    $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml)
-    $Window = [Windows.Markup.XamlReader]::Load($reader)
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
-      Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
-    }
-    Set-WindowStyling -Window $Window -HideCloseButton
+    $Window = Initialize-Window -Path "$PSScriptRoot/PairDeviceDialog.xaml" -HideCloseButton
 
     function Set-OkButtonState {
       [CmdletBinding()]
@@ -42,9 +35,9 @@ function Show-PairDeviceDialog {
         $pairingCodeRegex = '^\d{6}$'
       }
       process {
-        $ipAddressInput = $IpAdressBox.Text
-        $pairingCodeInput = $PairingCodeBox.Text
-        $OkButton.IsEnabled = (($ipAddressInput -match $ipV4Regex) -or ($ipAddressInput -match $ipV6Regex)) -and ($pairingCodeInput -match $pairingCodeRegex)
+        $ipAddressInput = $Window.IpAdressBox.Text
+        $pairingCodeInput = $Window.PairingCodeBox.Text
+        $Window.OkButton.IsEnabled = (($ipAddressInput -match $ipV4Regex) -or ($ipAddressInput -match $ipV6Regex)) -and ($pairingCodeInput -match $pairingCodeRegex)
       }
     }
 
@@ -52,27 +45,27 @@ function Show-PairDeviceDialog {
       [CmdletBinding()]
       param()
       process {
-        $script:ipAddress = $IpAdressBox.Text
-        $script:pairingCode = $PairingCodeBox.Text
+        $script:ipAddress = $Window.IpAdressBox.Text
+        $script:pairingCode = $Window.PairingCodeBox.Text
         $Window.Close()
       }
     }
 
-    $IpAdressBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterIpAddress }
-    $IpAdressBox.Add_TextChanged({ Set-OkButtonState })
+    $Window.IpAdressBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterIpAddress }
+    $Window.IpAdressBox.Add_TextChanged({ Set-OkButtonState })
 
-    $PairingCodeBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterPairingCode }
-    $PairingCodeBox.Add_TextChanged({ Set-OkButtonState })
+    $Window.PairingCodeBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterPairingCode }
+    $Window.PairingCodeBox.Add_TextChanged({ Set-OkButtonState })
 
-    $OkButton.Content = $Localization.Ok
-    $OkButton.Add_Click({ OnOkButtonClick })
-    $CancelButton.Content = $Localization.Cancel
-    $CancelButton.Add_Click({ $Window.Close() })
+    $Window.OkButton.Content = $Localization.Ok
+    $Window.OkButton.Add_Click({ OnOkButtonClick })
+    $Window.CancelButton.Content = $Localization.Cancel
+    $Window.CancelButton.Add_Click({ $Window.Close() })
 
     $Window.Add_KeyDown({
         switch -Exact ($PSItem.Key) {
           'Enter' {
-            if ($OkButton.IsEnabled) { OnOkButtonClick }
+            if ($Window.OkButton.IsEnabled) { OnOkButtonClick }
             break
           }
           'Escape' {
