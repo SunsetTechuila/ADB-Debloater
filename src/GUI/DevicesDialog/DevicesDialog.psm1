@@ -23,7 +23,7 @@ $Parameters = @{
 }
 Import-LocalizedData @Parameters
 
-function Show-DevicesWindow {
+function Show-DevicesDialog {
   [CmdletBinding()]
   [OutputType([hashtable])]
   param(
@@ -42,7 +42,7 @@ function Show-DevicesWindow {
   process {
     $choice = @{}
 
-    $Window = Initialize-Window -Path "$PSScriptRoot/DevicesWindow.xaml" -NoTopBar -SetWindowMaxHeight
+    $Window = Initialize-Window -Path "$PSScriptRoot/DevicesDialog.xaml" -NoTopBar -SetWindowMaxHeight
 
     $ViewModel = [ViewModel]::new($GetDevices)
 
