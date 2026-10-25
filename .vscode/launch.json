@@ -7,9 +7,17 @@
       "script": "${workspaceFolder}/src/Debloater.ps1 -Dev",
       "createTemporaryIntegratedConsole": true,
     },
-    // use to see the error when the script crashes the terminal
+    // use these to see the error when the script crashes the terminal
+    // and also to validate compatibility with a given PowerShell version
     {
-      "name": "Launch Debloater - Crash-Safe (PowerShell 7)",
+      "name": "Launch Debloater - PowerShell 5 (Crash-Safe)",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "powershell.exe -ExecutionPolicy Bypass -File \"${workspaceFolder}/src/Debloater.ps1\" -Dev",
+      "createTemporaryIntegratedConsole": true,
+    },
+    {
+      "name": "Launch Debloater - PowerShell 7 (Crash-Safe)",
       "type": "PowerShell",
       "request": "launch",
       "script": "pwsh.exe -ExecutionPolicy Bypass -File \"${workspaceFolder}/src/Debloater.ps1\" -Dev",
