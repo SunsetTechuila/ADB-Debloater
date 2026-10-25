@@ -26,18 +26,11 @@ function Show-MessageDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    [xml]$xaml = Get-Content -Path "$PSScriptRoot/MessageDialog.xaml"
-    $xaml = Add-FluentStyles -Xaml $xaml
-    $reader = (New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml)
-    $Window = [Windows.Markup.XamlReader]::Load($reader)
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
-      Set-Variable -Name ($PSItem.Name) -Value $Window.FindName($PSItem.Name)
-    }
-    Set-WindowStyling -Window $Window -HideCloseButton
+    $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCloseButton
 
-    $OkButton.Content = $Localization.Ok
-    $OkButton.Add_Click({ $Window.Close() })
-    $MessageBlock.Text = $Message
+    $Window.OkButton.Content = $Localization.Ok
+    $Window.OkButton.Add_Click({ $Window.Close() })
+    $Window.MessageBlock.Text = $Message
 
     $Window.Add_KeyDown({
         if ($PSItem.Key -eq 'Enter') { $Window.Close() }
