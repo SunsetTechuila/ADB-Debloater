@@ -15,7 +15,7 @@ Add-Type -AssemblyName 'PresentationFramework'
 @(
   'Functions',
   'AppsDialog',
-  'DevicesWindow',
+  'DevicesDialog',
   'MessageDialog'
 ) | ForEach-Object -Process {
   Remove-Module -Name $PSItem -Force -ErrorAction 'SilentlyContinue'
@@ -42,7 +42,7 @@ do {
     ConnectDevice = ${function:Connect-DeviceOverWiFi}
     PairDevice    = ${function:Pair-DeviceOverWiFi}
   }
-  $choice = Show-DevicesWindow @Parameters
+  $choice = Show-DevicesDialog @Parameters
   if ($choice.Count -eq 0) { 
     break
   }
