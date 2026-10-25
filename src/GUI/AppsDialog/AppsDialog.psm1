@@ -52,7 +52,16 @@ function Show-AppsDialog {
       ActionLabel  = $Localization.$ActionName
     }
 
-    $Window.AppsListView.add_SelectionChanged({ $ViewModel.OnSelectionChanged() })
+    $Window.AppsListView.add_SelectionChanged({
+        # When scrolling or filtering, VirtualizingStackPanel generates or recycles ListViewItem containers
+        # while ItemContainerGenerator.Status is 'GeneratingContainers'.
+        # Syncing a recycled container's IsSelected binding to the newly bound AppItem raises SelectionChanged
+        # even though no AppItem selection state actually changed.
+        if ($Window.AppsListView.ItemContainerGenerator.Status -ne 'ContainersGenerated') {
+          return
+        }
+        $ViewModel.OnSelectionChanged()
+      })
 
     $searchDebounceTimer = [Windows.Threading.DispatcherTimer]::new()
     $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(150)
@@ -110,12 +119,14 @@ class ViewModel : ObservableObject {
     {
       $ViewModel.IsTogglingSelection = $true
 
-      if ($ViewModel.SelectAllState) {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($false) })
+      $targetState = -not $ViewModel.SelectAllState
+      if (-not $targetState) {
+        # Off-screen items have no realized ListViewItem container, so SetIsSelected($false) only
+        # updates the AppItem model and cannot notify ListView via the container's TwoWay binding.
+        # Clearing SelectedItems prevents ListView from re-selecting those items when scrolled back into view.
+        $Window.AppsListView.SelectedItems.Clear()
       }
-      else {
-        $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($true) })
-      }
+      $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($targetState) })
 
       $ViewModel.IsTogglingSelection = $false
       $ViewModel.OnSelectionChanged()
