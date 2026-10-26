@@ -28,7 +28,7 @@ function Show-AppsDialog {
     [scriptblock]$Action,
 
     [Parameter(Mandatory)]
-    [array]$Apps,
+    [hashtable[]]$Apps,
 
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -39,11 +39,9 @@ function Show-AppsDialog {
   process {
     $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml" -NoTopBar -SetWindowMaxHeight
 
-    $appItems = @(
-      foreach ($app in $Apps) {
-        [AppItem]::new($app.Name, $app.Packages, $app.Description)
-      }
-    )
+    $appItems = foreach ($app in $Apps) {
+      [AppItem]::new($app.Name, $app.Packages, $app.Description)
+    }
     $ViewModel = [ViewModel]::new($appItems)
 
     $Window.DataContext = [PSCustomObject]@{
@@ -116,7 +114,9 @@ class ViewModel : ObservableObject {
         # Clearing SelectedItems prevents ListView from re-selecting those items when scrolled back into view.
         $Window.AppsListView.SelectedItems.Clear()
       }
-      $ViewModel.FilteredAppItems.ForEach({ $PSItem.SetIsSelected($targetState) })
+      foreach ($appItem in $ViewModel.FilteredAppItems) {
+        $appItem.SetIsSelected($targetState)
+      }
 
       $ViewModel.IsTogglingSelection = $false
       $ViewModel.OnSelectionChanged()
@@ -138,28 +138,17 @@ class ViewModel : ObservableObject {
   hidden $IsTogglingSelection = $false
 
   ViewModel([AppItem[]] $appItems) {
-    $appItemsCollection = [Collections.ObjectModel.ObservableCollection[AppItem]]::new($appItems)
-    $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItemsCollection)
-
+    $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItems)
     $this.FilteredAppItems.Filter = { param($appItem) $this.FilterAppItem($appItem) }
-
     $this.FilteredAppItems.add_CollectionChanged({
         $ViewModel.ToggleFilteredAppItemsSelectionCommand.NotifyCanExecuteChanged()
         $ViewModel.UpdateSelectAllState()
       })
-
-    $this.UpdateSelectAllState()
   }
 
   [void] FilterApps([string] $text) {
     $this.SearchText = $text.ToLower()
     $this.FilteredAppItems.Refresh()
-  }
-
-  [void] OnSelectionChanged() {
-    if ($this.IsTogglingSelection) { return }
-    $this.ActionCommand.NotifyCanExecuteChanged()
-    $this.UpdateSelectAllState()
   }
 
   hidden [bool] FilterAppItem($appItem) {
@@ -174,28 +163,31 @@ class ViewModel : ObservableObject {
     }
   }
 
+  [void] OnSelectionChanged() {
+    if ($this.IsTogglingSelection) { return }
+    $this.ActionCommand.NotifyCanExecuteChanged()
+    $this.UpdateSelectAllState()
+  }
+
   hidden [void] UpdateSelectAllState() {
-    if ($this.FilteredAppItems.Count.Equals(0)) {
-      $this.SetSelectAllState($false)
-      return
-    }
+    $hasSelected = $false
+    $hasUnselected = $false
 
-    $selectedItemsCount = 0
-    $totalItemsCount = 0
     foreach ($appItem in $this.FilteredAppItems) {
-      $totalItemsCount += 1
-      if ($appItem.IsSelected) { $selectedItemsCount += 1 }
+      if ($appItem.IsSelected) {
+        $hasSelected = $true
+      }
+      else {
+        $hasUnselected = $true
+      }
+
+      if ($hasSelected -and $hasUnselected) {
+        $this.SetSelectAllState($null)
+        return
+      }
     }
 
-    if ($selectedItemsCount.Equals(0)) {
-      $this.SetSelectAllState($false)
-    }
-    elseif ($selectedItemsCount.Equals($totalItemsCount)) {
-      $this.SetSelectAllState($true)
-    }
-    else {
-      $this.SetSelectAllState($null)
-    }
+    $this.SetSelectAllState($hasSelected)
   }
 }
 
@@ -204,7 +196,7 @@ class AppItem : ObservableObject {
 
   [string[]] $Packages
 
-  $IsSelected = $false
+  [bool] $IsSelected
   [void] SetIsSelected($value) {
     $this.SetProperty('IsSelected', $value)
   }

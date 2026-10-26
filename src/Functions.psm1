@@ -12,7 +12,13 @@ function Set-PlatformTools {
     $AdbFromResources = "$Resources/platform-tools/adb.exe"
   }
   process {
-    $adbFromPATH = (Get-Command -Name 'adb' -ErrorAction 'SilentlyContinue').Source
+    $Parameters = @{
+      Name = 'adb'
+      CommandType = 'Application'
+      TotalCount = 1
+      ErrorAction = 'SilentlyContinue'
+    }
+    $adbFromPATH = (Get-Command @Parameters).Source
     if ($adbFromPATH) {
       $Env:adb = $adbFromPATH
       return
@@ -23,8 +29,9 @@ function Set-PlatformTools {
     $Parameters = @{
       Path     = $AdbFromResources
       PathType = 'Leaf'
+      ErrorAction = 'SilentlyContinue'
     }
-    if (-not (Test-Path @Parameters -ErrorAction 'SilentlyContinue')) {
+    if (-not (Test-Path @Parameters)) {
       Get-PlatformTools
     }
   }
@@ -119,11 +126,11 @@ function Get-Devices {
   [OutputType([hashtable])]
   param()
   process {
-    .$Env:adb devices -l | Select-Object -Skip 1 | ForEach-Object -Process {
-      if ($PSItem.Length -eq 0) { return }
-      $fields = $PSItem.Split([char]::Tab)
+    foreach ($line in .$Env:adb devices -l | Select-Object -Skip 1) {
+      if ($line.Length -eq 0) { continue }
+      $fields = -split $line
 
-      $status = ($fields -match '^(bootloader|device|recovery|sideload|offline|unauthorized){1}$')[0]
+      $status = ($fields -match '^(bootloader|device|recovery|sideload|offline|unauthorized)$')[0]
       if ($status -eq 'device') { $status = 'connected' }
       $model = ($fields -match '^model:\w+$')[0]
       $model = if ($model) { $model.Replace('model:', '').Replace('_', ' ') } else { 'unknown' }
@@ -147,9 +154,7 @@ function Get-InstalledPackages {
     [string]$DeviceId
   )
   process {
-    .$Env:adb -s $DeviceId shell pm list packages | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
+    (.$Env:adb -s $DeviceId shell pm list packages) -replace '^package:'
   }
 }
 
@@ -161,9 +166,7 @@ function Get-EnabledPackages {
     [string]$DeviceId
   )
   process {
-    .$Env:adb -s $DeviceId shell pm list packages -e | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
+    (.$Env:adb -s $DeviceId shell pm list packages -e) -replace '^package:'
   }
 }
 
@@ -175,9 +178,7 @@ function Get-DisabledPackages {
     [string]$DeviceId
   )
   process {
-    .$Env:adb -s $DeviceId shell pm list packages -d | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
+    (.$Env:adb -s $DeviceId shell pm list packages -d) -replace '^package:'
   }
 }
 
@@ -189,12 +190,9 @@ function Get-UninstalledPackages {
     [string]$DeviceId
   )
   process {
-    $allPackages = .$Env:adb -s $DeviceId shell pm list packages -u | ForEach-Object -Process {
-      $PSItem.Replace('package:', '')
-    }
+    $allPackages = (.$Env:adb -s $DeviceId shell pm list packages -u) -replace '^package:'
     $installedPackages = Get-InstalledPackages -DeviceId $DeviceId
-
-    $allPackages | Where-Object -FilterScript { $PSItem -notin $installedPackages }
+    [Linq.Enumerable]::Except([string[]]$allPackages, [string[]]$installedPackages)
   }
 }
 
@@ -202,7 +200,7 @@ function Uninstall-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [Parameter(Mandatory)]
     [string]$DeviceId
@@ -231,7 +229,7 @@ function Disable-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [string]$DeviceId
   )
@@ -260,7 +258,7 @@ function Enable-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [string]$DeviceId
   )
@@ -281,7 +279,7 @@ function Reinstall-Packages {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [string]$DeviceId
   )
@@ -309,7 +307,7 @@ function Get-AppsToProcess {
   [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
-    [array]$Packages,
+    [string[]]$Packages,
 
     [Parameter(Mandatory)]
     [array]$BloatwareList
@@ -318,16 +316,13 @@ function Get-AppsToProcess {
     $targetLanguage = $PSUICulture.Split('-')[0]
   }
   process {
-    $appsToProcess = [Collections.Generic.List[hashtable]]::new()
-
     foreach ($bloatwareApp in $BloatwareList) {
-      $matchingPackages = [Collections.Generic.List[string]]::new()
-      foreach ($package in $bloatwareApp.Packages) {
+      $matchingPackages = foreach ($package in $bloatwareApp.Packages) {
         if ($Packages.Contains($package)) {
-          $matchingPackages.Add($package)
+          $package
         }
       }
-      if ($matchingPackages.Count -eq 0) { continue }
+      if (-not $matchingPackages) { continue }
 
       $name = $bloatwareApp.Name.$targetLanguage
       if (-not $name) {
@@ -338,14 +333,12 @@ function Get-AppsToProcess {
         $description = $bloatwareApp.Description.en
       }
 
-      $appsToProcess.Add(@{
-          Name        = $name
-          Description = $description
-          Packages    = $matchingPackages
-        })
+      @{
+        Name        = $name
+        Description = $description
+        Packages    = $matchingPackages
+      }
     }
-
-    $appsToProcess
   }
 }
 

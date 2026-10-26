@@ -8,28 +8,6 @@
 
   <Window.Resources>
     <ResourceDictionary>
-      <DataTemplate x:Key="AppItemTemplate">
-        <StackPanel
-          Margin="11,0,0,0"
-          Orientation="Horizontal"
-          VerticalAlignment="Center">
-          <TextBlock Text="{Binding Name}" />
-          <ContentControl
-            Name="HelpIcon"
-            Style="{DynamicResource HelpIcon}"
-            Margin="8,0,0,0"
-            ToolTip="{Binding HelpMessage}" />
-        </StackPanel>
-        <DataTemplate.Triggers>
-          <DataTrigger Binding="{Binding HelpMessage}" Value="">
-            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
-          </DataTrigger>
-          <DataTrigger Binding="{Binding HelpMessage}" Value="{x:Null}">
-            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
-          </DataTrigger>
-        </DataTemplate.Triggers>
-      </DataTemplate>
-
       <Style x:Key="HelpIcon" TargetType="ContentControl">
         <Setter Property="Template">
           <Setter.Value>
@@ -38,7 +16,7 @@
                 Width="18"
                 Height="18"
                 CornerRadius="999"
-                Background="{DynamicResource ControlBorderBrush}"
+                Background="{StaticResource ControlBorderBrush}"
                 ToolTip="{TemplateBinding ToolTip}"
                 ToolTipService.InitialShowDelay="0"
                 ToolTipService.Placement="Right"
@@ -47,15 +25,37 @@
                   Text="&#xE897;"
                   FontSize="10"
                   FontWeight="Bold"
-                  Foreground="{DynamicResource TextBrush}"
+                  Foreground="{StaticResource TextBrush}"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
-                  FontFamily="{DynamicResource SymbolThemeFontFamily}" />
+                  FontFamily="{StaticResource SymbolThemeFontFamily}" />
               </Border>
             </ControlTemplate>
           </Setter.Value>
         </Setter>
       </Style>
+
+      <DataTemplate x:Key="AppItemTemplate">
+        <StackPanel
+          Margin="11,0,0,0"
+          Orientation="Horizontal"
+          VerticalAlignment="Center">
+          <TextBlock Text="{Binding Name, Mode=OneTime}" />
+          <ContentControl
+            Name="HelpIcon"
+            Style="{StaticResource HelpIcon}"
+            Margin="8,0,0,0"
+            ToolTip="{Binding HelpMessage, Mode=OneTime}" />
+        </StackPanel>
+        <DataTemplate.Triggers>
+          <DataTrigger Binding="{Binding HelpMessage, Mode=OneTime}" Value="">
+            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
+          </DataTrigger>
+          <DataTrigger Binding="{Binding HelpMessage, Mode=OneTime}" Value="{x:Null}">
+            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
+          </DataTrigger>
+        </DataTemplate.Triggers>
+      </DataTemplate>
     </ResourceDictionary>
   </Window.Resources>
 
@@ -104,7 +104,7 @@
           <ListView.ItemContainerStyle>
             <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItemStyle}">
               <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-              <Setter Property="ToolTip" Value="{Binding PackagesString}" />
+              <Setter Property="ToolTip" Value="{Binding PackagesString, Mode=OneTime}" />
             </Style>
           </ListView.ItemContainerStyle>
           <ListView.InputBindings>

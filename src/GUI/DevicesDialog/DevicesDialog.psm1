@@ -40,8 +40,6 @@ function Show-DevicesDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $choice = @{}
-
     $Window = Initialize-Window -Path "$PSScriptRoot/DevicesDialog.xaml" -NoTopBar -SetWindowMaxHeight
 
     $ViewModel = [ViewModel]::new($GetDevices)
@@ -52,13 +50,15 @@ function Show-DevicesDialog {
     }
 
     $Window.DevicesListView.add_SelectionChanged({
-        $ViewModel.SetSelectedDevice($Window.DevicesListView.SelectedItem)
         $ViewModel.OnSelectionChanged()
       })
 
-    $Window.ShowDialog() | Out-Null
-
-    $choice
+    if ($Window.ShowDialog()) {
+      @{
+        DeviceId   = $ViewModel.SelectedDevice.Id
+        ActionName = $ViewModel.SelectedActionName
+      }
+    }
   }
 }
 
@@ -69,8 +69,7 @@ class ViewModel : ObservableObject {
 
   $PairCommand = [RelayCommand]::new({
       $data = Show-PairDeviceDialog -ParentWindow $Window
-      if (-not $data.Count) { return }
-      $PairDevice.Invoke($data.IpAddress, $data.PairingCode)
+      if ($data) { $PairDevice.Invoke($data.IpAddress, $data.PairingCode) }
     })
 
   $ConnectCommand = [RelayCommand]::new({
@@ -83,9 +82,8 @@ class ViewModel : ObservableObject {
   $ChooseActionCommand = [RelayCommand]::new(
     {
       param($actionName)
-      $choice.DeviceId = $ViewModel.SelectedDevice.Id
-      $choice.ActionName = $actionName
-      $Window.Close()
+      $ViewModel.SelectedActionName = $actionName
+      $Window.DialogResult = $true
     },
     {
       $selectedDevice = $ViewModel.SelectedDevice
@@ -102,6 +100,8 @@ class ViewModel : ObservableObject {
   [void] SetSelectedDevice($value) {
     $this.SetProperty('SelectedDevice', $value)
   }
+
+  hidden [string] $SelectedActionName
 
   hidden [scriptblock] $GetDevices
 

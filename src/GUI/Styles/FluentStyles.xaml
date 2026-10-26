@@ -583,7 +583,7 @@
               <CheckBox
                 Name="CheckBox"
                 Margin="0"
-                IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListViewItem}, Path=IsSelected, Mode=TwoWay}"
+                IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSelected, Mode=TwoWay}"
                 Focusable="False"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"

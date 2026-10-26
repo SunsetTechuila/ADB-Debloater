@@ -21,7 +21,7 @@ function Show-PairDeviceDialog {
   [CmdletBinding()]
   [OutputType([hashtable])]
   param(
-    [System.Windows.Window] $ParentWindow
+    [Windows.Window] $ParentWindow
   )
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
@@ -43,12 +43,12 @@ function Show-PairDeviceDialog {
     $Window.PairingCodeBox.Add_TextChanged({ $ViewModel.SetPairingCode($Window.PairingCodeBox.Text) })
 
     if ($ParentWindow) { $Window.Owner = $ParentWindow }
-    $Window.ShowDialog() | Out-Null
 
-    if ((-not $ViewModel.IpAddress) -or (-not $ViewModel.PairingCode)) { return }
-    @{
-      IpAddress   = $ViewModel.IpAddress
-      PairingCode = $ViewModel.PairingCode
+    if ($Window.ShowDialog()) {
+      @{
+        IpAddress   = $ViewModel.IpAddress
+        PairingCode = $ViewModel.PairingCode
+      }
     }
   }
 }
@@ -56,10 +56,10 @@ function Show-PairDeviceDialog {
 class ViewModel : ObservableObject {
   $OkCommand = [RelayCommand]::new(
     {
-      $Window.Close()
+      $Window.DialogResult = $true
     },
     {
-      $ViewModel.areInputsValid()
+      $ViewModel.AreInputsValid()
     }
   )
 
@@ -84,10 +84,10 @@ class ViewModel : ObservableObject {
   hidden $IpV4Regex = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):(?:[1-9]\d{0,4}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$'
   hidden $IpV6Regex = '^(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?:]:(?:[1-9]\d{0,4}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))$'
   hidden $PairingCodeRegex = '^\d{6}$'
-  hidden [bool] areInputsValid() {
+  hidden [bool] AreInputsValid() {
     return (
-      (($this.IpAddress -match $this.IpV4Regex) -or ($this.IpAddress -match $this.IpV6Regex)) -and
-      ($this.PairingCode -match $this.PairingCodeRegex)
+      ($this.PairingCode -match $this.PairingCodeRegex) -and
+      (($this.IpAddress -match $this.IpV4Regex) -or ($this.IpAddress -match $this.IpV6Regex))
     )
   }
 }

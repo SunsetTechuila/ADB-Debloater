@@ -9,7 +9,7 @@ function Set-WindowStyling {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)]
-    [System.Windows.Window]$Window,
+    [Windows.Window]$Window,
 
     [switch]$NoTopBar,
 
@@ -47,6 +47,7 @@ function Set-WindowStyling {
     }
 
     $Window.Add_Loaded({ param($Window) $Window.Activate() })
+    $Window.Add_Closed({ param($Window) $Window.DataContext = $null })
 
     if ($HideCloseButton) {
       $Window.Add_SourceInitialized({ param($Window) Hide-CloseButton -Window $Window })
@@ -62,51 +63,52 @@ function Set-WindowMaxHeight {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Window] $Window
+    [Windows.Window] $Window
   )
   process {
     $Window.Add_StateChanged({
         param ($Window)
         if ($Window.WindowState -eq 'Maximized') {
           # makes the window content take the whole window space
-          $Window.MaxHeight = (Get-MaximizedScreenHeight) + 20
+          $Window.MaxHeight = (Get-ActiveScreenWorkingAreaHeight -Window $Window) + 20
         }
         else {
           # keeps the window within the screen borders when SizeToContent set to (WidthAnd)Height
-          $Window.MaxHeight = Get-MaximizedScreenHeight
+          $Window.MaxHeight = Get-ActiveScreenWorkingAreaHeight -Window $Window
         }
       })
-    $Window.MaxHeight = Get-MaximizedScreenHeight
+    $Window.MaxHeight = Get-ActiveScreenWorkingAreaHeight -Window $Window
   }
 }
 
 function Get-ContentBorderAdjustedThickness {
   [CmdletBinding()]
+  [OutputType([Windows.Thickness])]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Thickness] $TargetThickness,
+    [Windows.Thickness] $TargetThickness,
 
     [Parameter(Mandatory)]
-    [System.Windows.WindowState]$WindowState
+    [Windows.WindowState]$WindowState
   )
   process {
     if ($WindowState -eq 'Maximized') {
       # window border thickness decreases when window is maximized
-      "
-        $($TargetThickness.Left + 8),
-        $($TargetThickness.Top + 8),
-        $($TargetThickness.Right + 8),
-        $($TargetThickness.Bottom + 8)
-      "
+      [Windows.Thickness]::new(
+        $TargetThickness.Left + 8,
+        $TargetThickness.Top + 8,
+        $TargetThickness.Right + 8,
+        $TargetThickness.Bottom + 8
+      )
     }
     else {
       # window border thickness decreases when WindowChrome.GlassFrameThickness is set to -1
-      "
-        $($TargetThickness.Left + 4),
-        $($TargetThickness.Top + 1),
-        $($TargetThickness.Right + 4),
-        $($TargetThickness.Bottom + 4)
-      "
+      [Windows.Thickness]::new(
+        $TargetThickness.Left + 4,
+        $TargetThickness.Top + 1,
+        $TargetThickness.Right + 4,
+        $TargetThickness.Bottom + 4
+      )
     }
   }
 }
@@ -115,7 +117,7 @@ function Set-ContentBorderThickness {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Controls.Border] $Border,
+    [Windows.Controls.Border] $Border,
 
     [switch] $NoTopBar
   )
@@ -124,12 +126,12 @@ function Set-ContentBorderThickness {
     $windowDraggableBorderHeight = 24
   }
   process {
-    $Border.BorderThickness = "
+    $Border.BorderThickness = [Windows.Thickness]::new(
       $defaultBorderThickness,
       $(if ($NoTopBar) { $windowDraggableBorderHeight } else { $defaultBorderThickness }),
       $defaultBorderThickness,
       $defaultBorderThickness
-    "
+    )
   }
 }
 
@@ -145,7 +147,7 @@ function Add-FluentStyles {
     $accentColor = Get-SystemAccentColor -Variant $accentVariant
     $colorStylesPath = if ($systemTheme -eq 'dark') { $DarkStyles } else { $LightStyles }
 
-    [xml]$colorStyles = Get-Content -Path $colorStylesPath
+    [xml]$colorStyles = Get-Content -Path $colorStylesPath -Raw
     $colorStyles.ResourceDictionary.SolidColorBrush[0].Color = $accentColor
   }
   process {
@@ -163,7 +165,7 @@ function Add-FluentStyles {
     }
     
     $mergedDictionaries = $Xaml.CreateElement('ResourceDictionary.MergedDictionaries', $xmlNS)
-    $resourceDictionary.AppendChild($mergedDictionaries) | Out-Null
+    $resourceDictionary.PrependChild($mergedDictionaries) | Out-Null
 
     $fluentResourceDictionary = $Xaml.CreateElement('ResourceDictionary', $xmlNS)
     $sourceAttribute = $Xaml.CreateAttribute('Source')
@@ -180,7 +182,7 @@ function Add-FluentStyles {
 
 function Initialize-Window {
   [CmdletBinding()]
-  [OutputType([System.Windows.Window])]
+  [OutputType([Windows.Window])]
   param (
     [Parameter(Mandatory)]
     [string]$Path,
@@ -195,12 +197,12 @@ function Initialize-Window {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    [xml]$xaml = Get-Content -Path $Path
+    [xml]$xaml = Get-Content -Path $Path -Raw
     $xaml = Add-FluentStyles -Xaml $xaml
     $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml
     $Window = [Windows.Markup.XamlReader]::Load($reader)
 
-    $namedNodes = $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]")
+    $namedNodes = $xaml.SelectNodes("//*[@Name]")
     foreach ($namedNode in $namedNodes) {
       $control = $Window.FindName($namedNode.Name)
       if ($null -eq $control) { continue }
@@ -227,7 +229,7 @@ function Set-MicaBackdrop {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Window] $Window
+    [Windows.Window] $Window
   )
   begin {
     $systemBackdropType = 38
@@ -263,7 +265,7 @@ function Set-ImmersiveDarkMode {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Window] $Window
+    [Windows.Window] $Window
   )
   begin {
     $useImmersiveDarkMode = 20
@@ -309,33 +311,33 @@ function Get-SystemAccentColor {
       Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
       Name = 'AccentPalette'
     }
-    $accentPalette = Get-ItemPropertyValue @Parameters
   }
   process {
-    $accentColor = if ($Variant -eq 'light') {
-      $accentPalette[4..6]
-    }
-    else {
-      $accentPalette[16..18]
-    }
-
-    '#' + ( -join ($accentColor | ForEach-Object {
-          $channel = '{0:X}' -f $PSItem
-          if ($channel.Length -eq 1) { $channel = "0$channel" }
-          $channel
-        }))
+    $accentPalette = Get-ItemPropertyValue @Parameters
+    '#{0:X2}{1:X2}{2:X2}' -f $(
+      if ($Variant -eq 'light') {
+        $accentPalette[4], $accentPalette[5], $accentPalette[6]
+      }
+      else {
+        $accentPalette[16], $accentPalette[17], $accentPalette[18]
+      }
+    )
   }
 }
 
-function Get-MaximizedScreenHeight {
+function Get-ActiveScreenWorkingAreaHeight {
   [CmdletBinding()]
   [OutputType([int])]
-  param ()
+  param (
+    [Parameter(Mandatory)]
+    [Windows.Window] $Window
+  )
   begin {
     Add-Type -AssemblyName 'System.Windows.Forms'
   }
   process {
-    [System.Windows.Forms.Screen]::FromHandle((Get-Process -Id $PID).MainWindowHandle).WorkingArea.Height
+    $windowHandle = ([Windows.Interop.WindowInteropHelper]::new($Window)).Handle
+    [Windows.Forms.Screen]::FromHandle($windowHandle).WorkingArea.Height
   }
 }
 
@@ -347,7 +349,7 @@ function Set-DwmWindowAttribute {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [System.Windows.Window] $Window,
+    [Windows.Window] $Window,
 
     [Parameter(Mandatory)]
     [int] $Attribute,
@@ -356,9 +358,10 @@ function Set-DwmWindowAttribute {
     [int] $Value
   )
   begin {
-    $referensedAssemblies = @('PresentationFramework', 'System.Xaml', 'WindowsBase')
-    if ($PSVersionTable.PSVersion.Major -eq 5) { $referensedAssemblies += 'PresentationCore' }
-    Add-Type -ReferencedAssemblies $referensedAssemblies -TypeDefinition @'
+    if (-not ('DWM' -as [type])) {
+      $referensedAssemblies = @('PresentationFramework', 'WindowsBase')
+      if ($PSVersionTable.PSVersion.Major -eq 5) { $referensedAssemblies += 'PresentationCore', 'System.Xaml' }
+      Add-Type -ReferencedAssemblies $referensedAssemblies -TypeDefinition @'
 using System;
 using System.Windows;
 using System.Windows.Interop;
@@ -379,6 +382,7 @@ public class DWM {
   }
 }
 '@
+    }
   }
   process {
     [DWM]::SetWindowAttribute($Window, $Attribute, $Value)
@@ -390,7 +394,7 @@ function Test-DwmBackdropApiAvailability {
   [OutputType([bool])]
   param()
   process {
-    [System.Environment]::OSVersion.Version.Build -ge 22523
+    [Environment]::OSVersion.Version.Build -ge 22523
   }
 }
 
@@ -399,7 +403,7 @@ function Test-DwmImmersiveDarkModeApiAvailability {
   [OutputType([bool])]
   param()
   process {
-    [System.Environment]::OSVersion.Version.Build -ge 19041
+    [Environment]::OSVersion.Version.Build -ge 19041
   }
 }
 
@@ -409,12 +413,13 @@ function Hide-CloseButton {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)]
-    [System.Windows.Window]$Window
+    [Windows.Window]$Window
   )
   begin {
-    $referensedAssemblies = @('PresentationFramework', 'System.Xaml', 'WindowsBase')
-    if ($PSVersionTable.PSVersion.Major -eq 5) { $referensedAssemblies += 'PresentationCore' }
-    Add-Type -ReferencedAssemblies $referensedAssemblies -TypeDefinition @'
+    if (-not ('WinApi' -as [type])) {
+      $referensedAssemblies = @('PresentationFramework', 'WindowsBase')
+      if ($PSVersionTable.PSVersion.Major -eq 5) { $referensedAssemblies += 'PresentationCore', 'System.Xaml' }
+      Add-Type -ReferencedAssemblies $referensedAssemblies -TypeDefinition @'
 using System;
 using System.Windows;
 using System.Windows.Interop;
@@ -443,6 +448,7 @@ public class WinApi {
   }
 }
 '@
+    }
   }
   process {
     [WinApi]::RemoveCloseButton($Window)
@@ -452,7 +458,7 @@ public class WinApi {
 
 #region MVVM
 
-class ObservableObject : ComponentModel.INotifyPropertyChanged {
+class ObservableObject : ComponentModel.INotifyPropertyChanged, ComponentModel.INotifyPropertyChanging {
   hidden [ComponentModel.PropertyChangedEventHandler] $PropertyChanged
 
   hidden [ComponentModel.PropertyChangingEventHandler] $PropertyChanging
@@ -486,12 +492,7 @@ class ObservableObject : ComponentModel.INotifyPropertyChanged {
   }
 
   [bool] SetProperty([string] $propertyName, $newValue) {
-    $currentValue = $this.$propertyName
-
-    if (
-      (($null -eq $currentValue) -and ($null -eq $newValue)) -or 
-      (($null -ne $currentValue) -and ($currentValue.Equals($newValue)))
-    ) {
+    if ([object]::Equals($this.$propertyName, $newValue)) {
       return $false
     }
 

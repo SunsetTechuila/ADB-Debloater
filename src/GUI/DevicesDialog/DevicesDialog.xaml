@@ -26,37 +26,37 @@
           HorizontalAlignment="Left">
           <TextBlock
             Text="{Binding Localization.Devices}"
-            Foreground="{DynamicResource TextBrush}"
+            Foreground="{StaticResource TextBrush}"
             Margin="0,0,16,0" VerticalAlignment="Center" />
           <Button
             Command="{Binding ViewModel.RefreshCommand}"
             ToolTip="{Binding Localization.RefreshDevicesList}"
             Margin="0,0,8,0"
             Padding="8"
-            FontFamily="{DynamicResource SymbolThemeFontFamily}"
+            FontFamily="{StaticResource SymbolThemeFontFamily}"
             Content="&#xE72C;" />
           <Button
             Command="{Binding ViewModel.PairCommand}"
             ToolTip="{Binding Localization.PairDeviceOverWiFi}"
             Margin="0,0,8,0"
             Padding="8"
-            FontFamily="{DynamicResource SymbolThemeFontFamily}"
+            FontFamily="{StaticResource SymbolThemeFontFamily}"
             Content="&#xE703;" />
           <Button
             Command="{Binding ViewModel.ConnectCommand}"
             ToolTip="{Binding Localization.ConnectDeviceOverWiFi}"
             Margin="0,0,8,0"
             Padding="8"
-            FontFamily="{DynamicResource SymbolThemeFontFamily}"
+            FontFamily="{StaticResource SymbolThemeFontFamily}"
             Content="&#xE710;" />
         </StackPanel>
       </Grid>
 
       <Border Grid.Row="2"
-        Background="{DynamicResource BackgroundElevatedBrush}"
-        BorderBrush="{DynamicResource ControlBorderBrush}"
-        BorderThickness="{DynamicResource ControlBorderThickness}"
-        CornerRadius="{DynamicResource ControlCornerRadius}">
+        Background="{StaticResource BackgroundElevatedBrush}"
+        BorderBrush="{StaticResource ControlBorderBrush}"
+        BorderThickness="{StaticResource ControlBorderThickness}"
+        CornerRadius="{StaticResource ControlCornerRadius}">
         <ListView Name="DevicesListView"
           ItemsSource="{Binding ViewModel.Devices}"
           SelectedItem="{Binding ViewModel.SelectedDevice}"
@@ -78,7 +78,7 @@
                         <Style TargetType="TextBlock">
                           <Style.Triggers>
                             <DataTrigger Binding="{Binding Status}" Value="Connected">
-                              <Setter Property="Foreground" Value="{DynamicResource GreenBrush}" />
+                              <Setter Property="Foreground" Value="{StaticResource GreenBrush}" />
                             </DataTrigger>
                           </Style.Triggers>
                         </Style>
