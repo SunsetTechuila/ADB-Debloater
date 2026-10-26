@@ -52,7 +52,7 @@ do {
     PairDevice    = ${function:Pair-DeviceOverWiFi}
   }
   $choice = Show-DevicesDialog @Parameters
-  if (-not $choice) { 
+  if (-not $choice) {
     break
   }
   $actionName = $choice.ActionName

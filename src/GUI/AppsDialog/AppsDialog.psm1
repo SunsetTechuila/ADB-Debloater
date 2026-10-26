@@ -202,7 +202,7 @@ class AppItem : ObservableObject {
   }
 
   [string] $HelpMessage
-  
+
   hidden [string] $PackagesString
 
   AppItem(

@@ -163,7 +163,7 @@ function Add-FluentStyles {
     else {
       $resourceDictionary = $windowResources.SelectSingleNode("*[local-name()='ResourceDictionary']")
     }
-    
+
     $mergedDictionaries = $Xaml.CreateElement('ResourceDictionary.MergedDictionaries', $xmlNS)
     $resourceDictionary.PrependChild($mergedDictionaries) | Out-Null
 
@@ -499,7 +499,7 @@ class ObservableObject : ComponentModel.INotifyPropertyChanged, ComponentModel.I
     $this.OnPropertyChanging($propertyName)
     $this.$propertyName = $newValue
     $this.OnPropertyChanged($propertyName)
-    
+
     return $true
   }
 
@@ -513,7 +513,7 @@ class ObservableObject : ComponentModel.INotifyPropertyChanged, ComponentModel.I
     $this.OnPropertyChanging($propertyName)
     $this.$propertyName = $newValue
     $this.OnPropertyChanged($propertyName)
-    
+
     return $true
   }
 }

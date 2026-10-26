@@ -244,7 +244,7 @@ function Disable-Packages {
         # `pm disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
         # `am force-stop' is used to ensure that all app processes are terminated
         # `pm clear` clears all application data
-        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package" 
+        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package"
         Write-Host -Object "Disabled $package"
       }
       catch {
