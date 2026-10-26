@@ -516,6 +516,20 @@ class ObservableObject : ComponentModel.INotifyPropertyChanged, ComponentModel.I
 
     return $true
   }
+
+  # Calling SetProperty in a loop over a large collection is slow in PowerShell due to per-call method overhead.
+  # Use this overload when updating items bound to a virtualized control,
+  # where off-screen items have no realized container subscribed to PropertyChanged/PropertyChanging.
+  static [void] SetProperty([Collections.IEnumerable] $items, [string] $propertyName, $newValue) {
+    foreach ($item in $items) {
+      if ($item.PropertyChanged -or $item.PropertyChanging) {
+        $item.SetProperty($propertyName, $newValue)
+      }
+      else {
+        $item.$propertyName = $newValue
+      }
+    }
+  }
 }
 
 class RelayCommand : Windows.Input.ICommand {

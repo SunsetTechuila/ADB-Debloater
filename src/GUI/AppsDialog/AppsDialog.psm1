@@ -109,14 +109,12 @@ class ViewModel : ObservableObject {
 
       $targetState = -not $ViewModel.SelectAllState
       if (-not $targetState) {
-        # Off-screen items have no realized ListViewItem container, so SetIsSelected($false) only
+        # Off-screen items have no realized ListViewItem container, so SetProperty('IsSelected', $false) only
         # updates the AppItem model and cannot notify ListView via the container's TwoWay binding.
         # Clearing SelectedItems prevents ListView from re-selecting those items when scrolled back into view.
         $Window.AppsListView.SelectedItems.Clear()
       }
-      foreach ($appItem in $ViewModel.FilteredAppItems) {
-        $appItem.SetIsSelected($targetState)
-      }
+      [ObservableObject]::SetProperty($ViewModel.FilteredAppItems, 'IsSelected', $targetState)
 
       $ViewModel.IsTogglingSelection = $false
       $ViewModel.OnSelectionChanged()
@@ -197,9 +195,6 @@ class AppItem : ObservableObject {
   [string[]] $Packages
 
   [bool] $IsSelected
-  [void] SetIsSelected($value) {
-    $this.SetProperty('IsSelected', $value)
-  }
 
   [string] $HelpMessage
 
