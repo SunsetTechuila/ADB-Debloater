@@ -39,9 +39,7 @@ function Show-AppsDialog {
   process {
     $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml" -NoTopBar -SetWindowMaxHeight
 
-    $appItems = foreach ($app in $Apps) {
-      [AppItem]::new($app.Name, $app.Packages, $app.Description)
-    }
+    $appItems = New-AppItems -Apps $Apps
     $ViewModel = [ViewModel]::new($appItems)
 
     $Window.DataContext = [PSCustomObject]@{
@@ -131,33 +129,29 @@ class ViewModel : ObservableObject {
     $this.SetProperty('SelectAllState', $value)
   }
 
-  hidden [string] $SearchText
-
   hidden $IsTogglingSelection = $false
 
   ViewModel([AppItem[]] $appItems) {
     $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItems)
-    $this.FilteredAppItems.Filter = { param($appItem) $this.FilterAppItem($appItem) }
     $this.FilteredAppItems.add_CollectionChanged({
         $ViewModel.ToggleFilteredAppItemsSelectionCommand.NotifyCanExecuteChanged()
         $ViewModel.UpdateSelectAllState()
       })
   }
 
-  [void] FilterApps([string] $text) {
-    $this.SearchText = $text.ToLower()
-    $this.FilteredAppItems.Refresh()
-  }
-
-  hidden [bool] FilterAppItem($appItem) {
-    if ([string]::IsNullOrEmpty($this.SearchText)) {
-      return $true
+  [void] FilterApps([string] $searchText) {
+    if ([string]::IsNullOrEmpty($searchText)) {
+      $this.FilteredAppItems.Filter = $null
+    }
+    elseif ($null -eq $this.FilteredAppItems.Filter) {
+      $this.FilteredAppItems.Filter = {
+        param($appItem)
+        ($appItem.Name.IndexOf($searchText, [StringComparison]::OrdinalIgnoreCase) -ge 0) -or
+        ($appItem.Packages -contains $searchText)
+      }
     }
     else {
-      return (
-        ($appItem.Name.ToLower().Contains($this.SearchText)) -or
-        ($appItem.Packages.Contains($this.SearchText))
-      )
+      $this.FilteredAppItems.Refresh()
     }
   }
 
@@ -199,15 +193,25 @@ class AppItem : ObservableObject {
   [string] $HelpMessage
 
   hidden [string] $PackagesString
+}
 
-  AppItem(
-    [string] $name,
-    [string[]] $packages,
-    [string] $helpMessage
-  ) {
-    $this.Name = $name
-    $this.Packages = $packages
-    $this.HelpMessage = $helpMessage
-    $this.PackagesString = ($packages -join "`n")
+# Defining a constructor or static factory method on AppItem causes PowerShell to emit a scriptblock
+# wrapper into AppItem's default constructor, adding noticeable overhead when creating a large collection.
+function New-AppItems {
+  [CmdletBinding()]
+  [OutputType([AppItem[]])]
+  param (
+    [Parameter(Mandatory)]
+    [hashtable[]]$Apps
+  )
+  process {
+    foreach ($app in $Apps) {
+      $appItem = [AppItem]::new()
+      $appItem.Name = $app.Name
+      $appItem.Packages = $app.Packages
+      $appItem.HelpMessage = $app.Description
+      $appItem.PackagesString = $app.Packages -join "`n"
+      $appItem
+    }
   }
 }
