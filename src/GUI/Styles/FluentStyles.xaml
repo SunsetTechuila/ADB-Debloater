@@ -310,7 +310,9 @@
     <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}" />
     <Setter Property="BorderThickness" Value="{StaticResource ControlBorderThickness}" />
     <Setter Property="Border.CornerRadius" Value="{StaticResource ControlCornerRadius}" />
-    <Setter Property="Padding" Value="4,-1,2,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Padding" Value="5,0,5,1" />
+    <Setter Property="Cursor" Value="IBeam" />
     <Setter Property="ContextMenuService.HorizontalOffset"
       Value="{StaticResource ContextMenuShadowHorizontalOffset}" />
     <Setter Property="ContextMenu">
@@ -333,19 +335,18 @@
               Background="{TemplateBinding Background}"
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}"
-              CornerRadius="{TemplateBinding Border.CornerRadius}"
-              Padding="{TemplateBinding Padding}">
+              CornerRadius="{TemplateBinding Border.CornerRadius}">
               <ScrollViewer
                 Name="PART_ContentHost"
-                VerticalAlignment="Center"
                 TextElement.Foreground="{TemplateBinding Foreground}" />
             </Border>
             <TextBlock
               Name="PlaceholderText"
               Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
               Foreground="{DynamicResource InactiveTextBrush}"
-              VerticalAlignment="Center"
-              Margin="8,0,0,0"
+              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+              Margin="3,0"
+              Padding="{TemplateBinding Padding}"
               IsHitTestVisible="False">
               <TextBlock.Style>
                 <Style TargetType="TextBlock">
@@ -374,7 +375,8 @@
               Name="AccentBorder"
               BorderBrush="{DynamicResource ControlBorderBrush}"
               BorderThickness="{StaticResource ControlBorderThickness}"
-              CornerRadius="{TemplateBinding Border.CornerRadius}" />
+              CornerRadius="{TemplateBinding Border.CornerRadius}"
+              IsHitTestVisible="False" />
           </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsFocused" Value="True">
