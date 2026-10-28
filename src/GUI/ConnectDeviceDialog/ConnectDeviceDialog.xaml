@@ -12,6 +12,11 @@
     <WindowChrome GlassFrameThickness="-1" />
   </WindowChrome.WindowChrome>
 
+  <Window.InputBindings>
+    <KeyBinding Key="Enter" Command="{Binding ViewModel.OkCommand}" />
+    <KeyBinding Key="Escape" Command="{Binding ViewModel.CancelCommand}" />
+  </Window.InputBindings>
+
   <Border Name="ContentBorder">
     <Grid>
       <Grid.RowDefinitions>
@@ -29,12 +34,13 @@
           <ColumnDefinition Width="8" />
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Button Name="OkButton"
-          Grid.Column="0"
-          HorizontalAlignment="Stretch"
-          IsEnabled="False" />
-        <Button Name="CancelButton"
-          Grid.Column="2"
+        <Button Grid.Column="0"
+          Content="{Binding Localization.Ok}"
+          Command="{Binding ViewModel.OkCommand}"
+          HorizontalAlignment="Stretch" />
+        <Button Grid.Column="2"
+          Content="{Binding Localization.Cancel}"
+          Command="{Binding ViewModel.CancelCommand}"
           HorizontalAlignment="Stretch" />
       </Grid>
     </Grid>
