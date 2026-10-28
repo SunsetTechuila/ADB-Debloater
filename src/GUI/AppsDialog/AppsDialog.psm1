@@ -82,7 +82,7 @@ class ViewModel : ObservableObject {
     {
       $selectedPackages = [Collections.Generic.HashSet[string]]::new()
 
-      foreach ($appItem in $ViewModel.FilteredAppItems.SourceCollection) {
+      foreach ($appItem in $ViewModel.AppItems) {
         if ($appItem.IsSelected) {
           $selectedPackages.UnionWith($appItem.Packages)
         }
@@ -92,7 +92,7 @@ class ViewModel : ObservableObject {
       $Action.Invoke($selectedPackages, $DeviceId)
     },
     {
-      foreach ($appItem in $ViewModel.FilteredAppItems.SourceCollection) {
+      foreach ($appItem in $ViewModel.AppItems) {
         if ($appItem.IsSelected) {
           return $true
         }
@@ -122,7 +122,15 @@ class ViewModel : ObservableObject {
     }
   )
 
-  hidden [ComponentModel.ICollectionView] $FilteredAppItems
+  hidden [AppItem[]] $AppItems
+
+  hidden [AppItem[]] $FilteredAppItems
+  hidden [void] SetFilteredAppItems($value) {
+    if ($this.SetProperty('FilteredAppItems', $value)) {
+      $this.ToggleFilteredAppItemsSelectionCommand.NotifyCanExecuteChanged()
+      $this.UpdateSelectAllState()
+    }
+  }
 
   hidden [Nullable[bool]] $SelectAllState = $false
   hidden [void] SetSelectAllState($value) {
@@ -132,27 +140,29 @@ class ViewModel : ObservableObject {
   hidden $IsTogglingSelection = $false
 
   ViewModel([AppItem[]] $appItems) {
-    $this.FilteredAppItems = [Windows.Data.CollectionViewSource]::GetDefaultView($appItems)
-    $this.FilteredAppItems.add_CollectionChanged({
-        $ViewModel.ToggleFilteredAppItemsSelectionCommand.NotifyCanExecuteChanged()
-        $ViewModel.UpdateSelectAllState()
-      })
+    $this.AppItems = $appItems
+    $this.FilteredAppItems = $appItems
   }
 
   [void] FilterApps([string] $searchText) {
     if ([string]::IsNullOrEmpty($searchText)) {
-      $this.FilteredAppItems.Filter = $null
+      $this.SetFilteredAppItems($this.AppItems)
+      return
     }
-    elseif ($null -eq $this.FilteredAppItems.Filter) {
-      $this.FilteredAppItems.Filter = {
-        param($appItem)
-        ($appItem.Name.IndexOf($searchText, [StringComparison]::OrdinalIgnoreCase) -ge 0) -or
-        ($appItem.Packages -contains $searchText)
-      }
-    }
-    else {
-      $this.FilteredAppItems.Refresh()
-    }
+
+    $escapedSearchText = [regex]::Escape($searchText)
+    $this.SetFilteredAppItems(
+      @(
+        foreach ($appItem in $this.AppItems) {
+          if (
+            ($appItem.Name -match $escapedSearchText) -or
+            ($appItem.Packages -contains $searchText)
+          ) {
+            $appItem
+          }
+        }
+      )
+    )
   }
 
   [void] OnSelectionChanged() {
