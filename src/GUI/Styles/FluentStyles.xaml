@@ -193,7 +193,11 @@
                       Foreground="{DynamicResource BackgroundBrush}"
                       FontFamily="{StaticResource SymbolThemeFontFamily}"
                       Visibility="Collapsed"
-                      Text="&#xE73E;" />
+                      Text="&#xE73E;">
+                      <TextBlock.Clip>
+                        <RectangleGeometry />
+                      </TextBlock.Clip>
+                    </TextBlock>
                     <Rectangle
                       Name="IndeterminateBar"
                       Width="8"
@@ -218,7 +222,30 @@
                 Value="{DynamicResource AccentBrush}" />
               <Setter TargetName="StrokeBorder" Property="BorderBrush"
                 Value="{DynamicResource AccentBrush}" />
+              <Trigger.EnterActions>
+                <BeginStoryboard Name="RevealStoryboard">
+                  <Storyboard>
+                    <RectAnimationUsingKeyFrames
+                      Storyboard.TargetName="ControlIcon"
+                      Storyboard.TargetProperty="Clip.Rect">
+                      <DiscreteRectKeyFrame KeyTime="0" Value="0,0,1.4,14" />
+                      <SplineRectKeyFrame
+                        KeyTime="0:0:0.317"
+                        KeySpline="0,0,0,1"
+                        Value="0,0,13,14" />
+                    </RectAnimationUsingKeyFrames>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
             </Trigger>
+            <!-- Skips the animation when a checked CheckBox is newly created -->
+            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+              <SkipStoryboardToFill BeginStoryboardName="RevealStoryboard" />
+            </EventTrigger>
+            <!-- Skips the animation when a virtualized container is recycled for an already-selected item -->
+            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+              <SkipStoryboardToFill BeginStoryboardName="RevealStoryboard" />
+            </EventTrigger>
             <Trigger Property="IsChecked" Value="{x:Null}">
               <Setter TargetName="ControlIcon" Property="Visibility" Value="Collapsed" />
               <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Visible" />
@@ -582,10 +609,12 @@
                 RadiusX="2"
                 RadiusY="2"
                 Visibility="Collapsed" />
+              <!-- Tag Raises Binding.TargetUpdated on CheckBox after IsChecked updates when a virtualized ListViewItem container is recycled -->
               <CheckBox
                 Name="CheckBox"
                 Margin="0"
                 IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSelected, Mode=TwoWay}"
+                Tag="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DataContext, NotifyOnTargetUpdated=True}"
                 Focusable="False"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
