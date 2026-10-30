@@ -8,27 +8,21 @@
   ShowInTaskbar="False"
   ResizeMode="NoResize">
 
-  <WindowChrome.WindowChrome>
-    <WindowChrome GlassFrameThickness="-1" />
-  </WindowChrome.WindowChrome>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
 
-  <Border Name="ContentBorder">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0"
+      Orientation="Horizontal"
+      HorizontalAlignment="Center">
+      <TextBlock Grid.Row="0" Name="MessageBlock"
+        FontSize="18"
+        Height="Auto" Width="Auto" />
+    </StackPanel>
 
-      <StackPanel Grid.Row="0"
-        Orientation="Horizontal"
-        HorizontalAlignment="Center">
-        <TextBlock Grid.Row="0" Name="MessageBlock"
-          FontSize="18"
-          Height="Auto" Width="Auto" />
-      </StackPanel>
-
-      <Button Name="OkButton" Grid.Row="2" />
-    </Grid>
-  </Border>
+    <Button Name="OkButton" Grid.Row="2" />
+  </Grid>
 </Window>

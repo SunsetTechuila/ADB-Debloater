@@ -59,68 +59,66 @@
     </ResourceDictionary>
   </Window.Resources>
 
-  <Border Name="ContentBorder">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="24" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="12" />
-        <RowDefinition Height="*" />
-        <RowDefinition Height="12" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="24" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
 
-      <Grid Name="TopBarElement" Grid.Row="0" Margin="0,0,140,0">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition MaxWidth="500" />
-        </Grid.ColumnDefinitions>
-        <TextBox Name="SearchBox" Height="32" />
-      </Grid>
-
-      <CheckBox Grid.Row="2"
-        Content="{Binding Localization.SelectAll}"
-        Command="{Binding ViewModel.ToggleFilteredAppItemsSelectionCommand}"
-        IsThreeState="True"
-        IsChecked="{Binding ViewModel.SelectAllState, Mode=OneWay}">
-        <CheckBox.LayoutTransform>
-          <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
-        </CheckBox.LayoutTransform>
-      </CheckBox>
-
-      <Border Grid.Row="4"
-        Background="{StaticResource BackgroundElevatedBrush}"
-        BorderBrush="{StaticResource ControlBorderBrush}"
-        BorderThickness="{StaticResource ControlBorderThickness}"
-        CornerRadius="{StaticResource ControlCornerRadius}">
-        <ListView Name="AppsListView"
-          ItemsSource="{Binding ViewModel.FilteredAppItems}"
-          ItemTemplate="{StaticResource AppItemTemplate}"
-          SelectionMode="Multiple"
-          VirtualizingPanel.IsVirtualizing="True"
-          VirtualizingPanel.VirtualizationMode="Recycling"
-          VirtualizingPanel.ScrollUnit="Pixel"
-          ScrollViewer.VerticalScrollBarVisibility="Auto"
-          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-          Padding="1">
-          <ListView.ItemContainerStyle>
-            <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItemStyle}">
-              <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-              <Setter Property="ToolTip" Value="{Binding PackagesString, Mode=OneTime}" />
-            </Style>
-          </ListView.ItemContainerStyle>
-          <ListView.InputBindings>
-            <KeyBinding Key="A" Modifiers="Control"
-              Command="{Binding ViewModel.ToggleFilteredAppItemsSelectionCommand}" />
-          </ListView.InputBindings>
-        </ListView>
-      </Border>
-
-      <Button Grid.Row="6"
-        Content="{Binding ActionLabel}"
-        Command="{Binding ViewModel.ActionCommand}"
-        Padding="8"
-        HorizontalAlignment="Stretch" />
+    <Grid Name="TopBarElement" Grid.Row="0" Margin="0,0,140,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition MaxWidth="500" />
+      </Grid.ColumnDefinitions>
+      <TextBox Name="SearchBox" Height="32" />
     </Grid>
-  </Border>
+
+    <CheckBox Grid.Row="2"
+      Content="{Binding Localization.SelectAll}"
+      Command="{Binding ViewModel.ToggleFilteredAppItemsSelectionCommand}"
+      IsThreeState="True"
+      IsChecked="{Binding ViewModel.SelectAllState, Mode=OneWay}">
+      <CheckBox.LayoutTransform>
+        <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
+      </CheckBox.LayoutTransform>
+    </CheckBox>
+
+    <Border Grid.Row="4"
+      Background="{StaticResource BackgroundElevatedBrush}"
+      BorderBrush="{StaticResource ControlBorderBrush}"
+      BorderThickness="{StaticResource ControlBorderThickness}"
+      CornerRadius="{StaticResource ControlCornerRadius}">
+      <ListView Name="AppsListView"
+        ItemsSource="{Binding ViewModel.FilteredAppItems}"
+        ItemTemplate="{StaticResource AppItemTemplate}"
+        SelectionMode="Multiple"
+        VirtualizingPanel.IsVirtualizing="True"
+        VirtualizingPanel.VirtualizationMode="Recycling"
+        VirtualizingPanel.ScrollUnit="Pixel"
+        ScrollViewer.VerticalScrollBarVisibility="Auto"
+        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+        Padding="1">
+        <ListView.ItemContainerStyle>
+          <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItemStyle}">
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="ToolTip" Value="{Binding PackagesString, Mode=OneTime}" />
+          </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.InputBindings>
+          <KeyBinding Key="A" Modifiers="Control"
+            Command="{Binding ViewModel.ToggleFilteredAppItemsSelectionCommand}" />
+        </ListView.InputBindings>
+      </ListView>
+    </Border>
+
+    <Button Grid.Row="6"
+      Content="{Binding ActionLabel}"
+      Command="{Binding ViewModel.ActionCommand}"
+      Padding="8"
+      HorizontalAlignment="Stretch" />
+  </Grid>
 </Window>

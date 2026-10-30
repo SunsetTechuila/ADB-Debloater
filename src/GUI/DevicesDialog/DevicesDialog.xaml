@@ -10,124 +10,122 @@
     <KeyBinding Key="F5" Command="{Binding ViewModel.RefreshCommand}" />
   </Window.InputBindings>
 
-  <Border Name="ContentBorder">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="12" />
-        <RowDefinition Height="*" />
-        <RowDefinition Height="12" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
 
-      <StackPanel Name="TopBarElement"
-        Grid.Row="0"
-        Orientation="Horizontal"
-        HorizontalAlignment="Left">
-        <TextBlock
-          Text="{Binding Localization.Devices}"
-          Foreground="{StaticResource TextBrush}"
-          Margin="0,0,16,0" VerticalAlignment="Center" />
-        <Button
-          Command="{Binding ViewModel.RefreshCommand}"
-          ToolTip="{Binding Localization.RefreshDevicesList}"
-          Margin="0,0,8,0"
-          Padding="8"
-          FontFamily="{StaticResource SymbolThemeFontFamily}"
-          Content="&#xE72C;" />
-        <Button
-          Command="{Binding ViewModel.PairCommand}"
-          ToolTip="{Binding Localization.PairDeviceOverWiFi}"
-          Margin="0,0,8,0"
-          Padding="8"
-          FontFamily="{StaticResource SymbolThemeFontFamily}"
-          Content="&#xE703;" />
-        <Button
-          Command="{Binding ViewModel.ConnectCommand}"
-          ToolTip="{Binding Localization.ConnectDeviceOverWiFi}"
-          Margin="0,0,8,0"
-          Padding="8"
-          FontFamily="{StaticResource SymbolThemeFontFamily}"
-          Content="&#xE710;" />
-      </StackPanel>
+    <StackPanel Name="TopBarElement"
+      Grid.Row="0"
+      Orientation="Horizontal"
+      HorizontalAlignment="Left">
+      <TextBlock
+        Text="{Binding Localization.Devices}"
+        Foreground="{StaticResource TextBrush}"
+        Margin="0,0,16,0" VerticalAlignment="Center" />
+      <Button
+        Command="{Binding ViewModel.RefreshCommand}"
+        ToolTip="{Binding Localization.RefreshDevicesList}"
+        Margin="0,0,8,0"
+        Padding="8"
+        FontFamily="{StaticResource SymbolThemeFontFamily}"
+        Content="&#xE72C;" />
+      <Button
+        Command="{Binding ViewModel.PairCommand}"
+        ToolTip="{Binding Localization.PairDeviceOverWiFi}"
+        Margin="0,0,8,0"
+        Padding="8"
+        FontFamily="{StaticResource SymbolThemeFontFamily}"
+        Content="&#xE703;" />
+      <Button
+        Command="{Binding ViewModel.ConnectCommand}"
+        ToolTip="{Binding Localization.ConnectDeviceOverWiFi}"
+        Margin="0,0,8,0"
+        Padding="8"
+        FontFamily="{StaticResource SymbolThemeFontFamily}"
+        Content="&#xE710;" />
+    </StackPanel>
 
-      <Border Grid.Row="2"
-        Background="{StaticResource BackgroundElevatedBrush}"
-        BorderBrush="{StaticResource ControlBorderBrush}"
-        BorderThickness="{StaticResource ControlBorderThickness}"
-        CornerRadius="{StaticResource ControlCornerRadius}">
-        <ListView Name="DevicesListView"
-          ItemsSource="{Binding ViewModel.Devices}"
-          SelectedItem="{Binding ViewModel.SelectedDevice}"
-          SelectionMode="Single">
-          <ListView.ItemContainerStyle>
-            <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItem}">
-              <Setter Property="ToolTip" Value="{Binding Hint}" />
-            </Style>
-          </ListView.ItemContainerStyle>
-          <ListView.View>
-            <GridView>
-              <GridViewColumn Header="{Binding Localization.DeviceModel}"
-                DisplayMemberBinding="{Binding Model}" />
-              <GridViewColumn Header="{Binding Localization.DeviceStatus}">
-                <GridViewColumn.CellTemplate>
-                  <DataTemplate>
-                    <TextBlock Text="{Binding Status}">
-                      <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                          <Style.Triggers>
-                            <DataTrigger Binding="{Binding Status}" Value="Connected">
-                              <Setter Property="Foreground" Value="{StaticResource GreenBrush}" />
-                            </DataTrigger>
-                          </Style.Triggers>
-                        </Style>
-                      </TextBlock.Style>
-                    </TextBlock>
-                  </DataTemplate>
-                </GridViewColumn.CellTemplate>
-              </GridViewColumn>
-              <GridViewColumn Header="{Binding Localization.DeviceId}"
-                DisplayMemberBinding="{Binding Id}" />
-            </GridView>
-          </ListView.View>
-        </ListView>
-      </Border>
+    <Border Grid.Row="2"
+      Background="{StaticResource BackgroundElevatedBrush}"
+      BorderBrush="{StaticResource ControlBorderBrush}"
+      BorderThickness="{StaticResource ControlBorderThickness}"
+      CornerRadius="{StaticResource ControlCornerRadius}">
+      <ListView Name="DevicesListView"
+        ItemsSource="{Binding ViewModel.Devices}"
+        SelectedItem="{Binding ViewModel.SelectedDevice}"
+        SelectionMode="Single">
+        <ListView.ItemContainerStyle>
+          <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItem}">
+            <Setter Property="ToolTip" Value="{Binding Hint}" />
+          </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.View>
+          <GridView>
+            <GridViewColumn Header="{Binding Localization.DeviceModel}"
+              DisplayMemberBinding="{Binding Model}" />
+            <GridViewColumn Header="{Binding Localization.DeviceStatus}">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Status}">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding Status}" Value="Connected">
+                            <Setter Property="Foreground" Value="{StaticResource GreenBrush}" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            <GridViewColumn Header="{Binding Localization.DeviceId}"
+              DisplayMemberBinding="{Binding Id}" />
+          </GridView>
+        </ListView.View>
+      </ListView>
+    </Border>
 
-      <Grid Grid.Row="4">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Button
-          Grid.Column="0"
-          Content="{Binding Localization.UninstallApps}"
-          Command="{Binding ViewModel.ChooseActionCommand}"
-          CommandParameter="uninstall"
-          HorizontalAlignment="Stretch" />
-        <Button
-          Grid.Column="2"
-          Content="{Binding Localization.DisableApps}"
-          Command="{Binding ViewModel.ChooseActionCommand}"
-          CommandParameter="disable"
-          HorizontalAlignment="Stretch" />
-        <Button
-          Grid.Column="4"
-          Content="{Binding Localization.EnableApps}"
-          Command="{Binding ViewModel.ChooseActionCommand}"
-          CommandParameter="enable"
-          HorizontalAlignment="Stretch" />
-        <Button
-          Grid.Column="6"
-          Content="{Binding Localization.ReinstallApps}"
-          Command="{Binding ViewModel.ChooseActionCommand}"
-          CommandParameter="reinstall"
-          HorizontalAlignment="Stretch" />
-      </Grid>
+    <Grid Grid.Row="4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="8" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="8" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="8" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Button
+        Grid.Column="0"
+        Content="{Binding Localization.UninstallApps}"
+        Command="{Binding ViewModel.ChooseActionCommand}"
+        CommandParameter="uninstall"
+        HorizontalAlignment="Stretch" />
+      <Button
+        Grid.Column="2"
+        Content="{Binding Localization.DisableApps}"
+        Command="{Binding ViewModel.ChooseActionCommand}"
+        CommandParameter="disable"
+        HorizontalAlignment="Stretch" />
+      <Button
+        Grid.Column="4"
+        Content="{Binding Localization.EnableApps}"
+        Command="{Binding ViewModel.ChooseActionCommand}"
+        CommandParameter="enable"
+        HorizontalAlignment="Stretch" />
+      <Button
+        Grid.Column="6"
+        Content="{Binding Localization.ReinstallApps}"
+        Command="{Binding ViewModel.ChooseActionCommand}"
+        CommandParameter="reinstall"
+        HorizontalAlignment="Stretch" />
     </Grid>
-  </Border>
+  </Grid>
 </Window>

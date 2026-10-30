@@ -26,7 +26,7 @@ function Show-MessageDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCloseButton
+    $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCaptionButtons
 
     $Window.OkButton.Content = $Localization.Ok
     $Window.OkButton.Add_Click({ $Window.Close() })

@@ -12,12 +12,132 @@
   <sys:Double x:Key="ContextMenuShadowDepth">8</sys:Double>
   <Thickness x:Key="ContextMenuShadowPadding">16,0,16,24</Thickness>
 
+  <!--#region Window-->
+
+  <Style x:Key="CaptionButton" TargetType="Button">
+    <Setter Property="Width" Value="46" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border Background="{TemplateBinding Background}">
+            <ContentPresenter
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <DataTrigger
+              Binding="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=IsActive}"
+              Value="False">
+              <Setter Property="Foreground" Value="{DynamicResource InactiveTextBrush}" />
+            </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter Property="Background"
+                Value="{DynamicResource ActiveCaptionButtonBackgroundBrush}" />
+              <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter Property="Background"
+                Value="{DynamicResource PressedCaptionButtonBackgroundBrush}" />
+              <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="CloseCaptionButton" TargetType="Button" BasedOn="{StaticResource CaptionButton}">
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Background" Value="{DynamicResource ActiveCloseButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+      </Trigger>
+      <Trigger Property="IsPressed" Value="True">
+        <Setter Property="Background" Value="{DynamicResource PressedCloseButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
   <Style TargetType="Window">
     <Setter Property="FontFamily" Value="Segoe UI Variable,SegoeUI" />
     <Setter Property="FontSize" Value="16" />
     <Setter Property="SnapsToDevicePixels" Value="True" />
     <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
+    <!-- 12 = 13 + (-1) from WindowChrome.GlassFrameThickness -->
+    <Setter Property="Padding" Value="13" />
+    <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Window">
+          <Border
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            WindowChrome.IsHitTestVisibleInChrome="False">
+            <AdornerDecorator>
+              <Grid>
+                <ContentPresenter Margin="{TemplateBinding Padding}" />
+                <Border
+                  Name="CaptionButtons"
+                  Background="Transparent"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  WindowChrome.IsHitTestVisibleInChrome="True">
+                  <StackPanel Orientation="Horizontal">
+                    <Button
+                      Name="MinimizeButton"
+                      Style="{StaticResource CaptionButton}"
+                      Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                      Content="&#xE921;" />
+                    <Button
+                      Name="MaximizeRestoreButton"
+                      Style="{StaticResource CaptionButton}"
+                      Command="{x:Static SystemCommands.MaximizeWindowCommand}"
+                      Content="&#xE922;" />
+                    <Button
+                      Name="CloseButton"
+                      Style="{StaticResource CloseCaptionButton}"
+                      Command="{x:Static SystemCommands.CloseWindowCommand}"
+                      Content="&#xE8BB;" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </AdornerDecorator>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="ResizeMode" Value="NoResize">
+              <Setter TargetName="CaptionButtons" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="ResizeMode" Value="CanMinimize">
+              <Setter TargetName="MaximizeRestoreButton" Property="IsEnabled" Value="False" />
+            </Trigger>
+            <Trigger Property="WindowState" Value="Maximized">
+              <!-- Window border thickness decreases when maximized -->
+              <Setter Property="Padding" Value="20" />
+              <Setter TargetName="CaptionButtons" Property="Margin" Value="0,8,0,0" />
+              <Setter TargetName="CaptionButtons" Property="Padding" Value="0,0,8,0" />
+              <Setter TargetName="MaximizeRestoreButton" Property="Content" Value="&#xE923;" />
+              <Setter TargetName="MaximizeRestoreButton" Property="Command"
+                Value="{x:Static SystemCommands.RestoreWindowCommand}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
   </Style>
+
+  <!--#endregion-->
 
   <!--#region Focus-->
 

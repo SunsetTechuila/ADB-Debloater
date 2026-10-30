@@ -5,55 +5,53 @@ $ErrorActionPreference = 'Stop'
 
 #region Window
 
-function Set-WindowStyling {
+function Initialize-Window {
   [CmdletBinding()]
-  param(
+  [OutputType([Windows.Window])]
+  param (
     [Parameter(Mandatory)]
-    [Windows.Window]$Window,
+    [string]$Path,
 
     [switch]$SetWindowMaxHeight,
 
-    [switch]$HideCloseButton
+    [switch]$HideCaptionButtons
   )
   begin {
-    $shouldSetMicaBackdrop = Test-DwmBackdropApiAvailability
-    $shouldSetImmersiveDarkMode = Test-DwmImmersiveDarkModeApiAvailability
+    Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $ContentBorder = $Window.FindName('ContentBorder')
+    [xml]$xaml = Get-Content -Path $Path -Raw
+    $xaml = Add-FluentStyles -Xaml $xaml
+    $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml
+    $Window = [Windows.Markup.XamlReader]::Load($reader)
 
-    if ($shouldSetMicaBackdrop) {
-      Set-MicaBackdrop -Window $Window
-      Set-ContentBorderThickness -Border $ContentBorder
-
-      $targetBorderThickness = $ContentBorder.BorderThickness
-      $adjustBorderThicknessScript = {
-        $Parameters = @{
-          TargetThickness = $targetBorderThickness
-          WindowState     = $Window.WindowState
-        }
-        $ContentBorder.BorderThickness = Get-ContentBorderAdjustedThickness @Parameters
-      }.GetNewClosure()
-      $Window.Add_StateChanged($adjustBorderThicknessScript)
-      $adjustBorderThicknessScript.Invoke()
-    }
-    else {
-      Set-ContentBorderThickness -Border $ContentBorder
-      if ($shouldSetImmersiveDarkMode) {
-        $Window.Add_Loaded({ param($Window) Set-ImmersiveDarkMode -Window $Window })
-      }
+    $namedNodes = $xaml.SelectNodes('//*[@Name]')
+    foreach ($namedNode in $namedNodes) {
+      $control = $Window.FindName($namedNode.Name)
+      if ($null -eq $control) { continue }
+      Add-Member -InputObject $Window -NotePropertyName $namedNode.Name -NotePropertyValue $control
     }
 
+    Set-WindowChrome -Window $Window
+
+    # Bring the window to the foreground
     $Window.Add_Loaded({ param($Window) $Window.Activate() })
+
     $Window.Add_Closed({ param($Window) $Window.DataContext = $null })
 
-    if ($HideCloseButton) {
-      $Window.Add_SourceInitialized({ param($Window) Hide-CloseButton -Window $Window })
+    if (Test-DwmBackdropApiAvailability) {
+      $Window.Add_SourceInitialized({ param($Window) Set-MicaBackdrop -Window $Window })
+    }
+
+    if ($HideCaptionButtons) {
+      $Window.Add_SourceInitialized({ param($Window) Hide-CaptionButtons -Window $Window })
     }
 
     if ($SetWindowMaxHeight) {
       Set-WindowMaxHeight -Window $Window
     }
+
+    $Window
   }
 }
 
@@ -76,57 +74,6 @@ function Set-WindowMaxHeight {
         }
       })
     $Window.MaxHeight = Get-ActiveScreenWorkingAreaHeight -Window $Window
-  }
-}
-
-function Get-ContentBorderAdjustedThickness {
-  [CmdletBinding()]
-  [OutputType([Windows.Thickness])]
-  param (
-    [Parameter(Mandatory)]
-    [Windows.Thickness] $TargetThickness,
-
-    [Parameter(Mandatory)]
-    [Windows.WindowState]$WindowState
-  )
-  process {
-    if ($WindowState -eq 'Maximized') {
-      # window border thickness decreases when window is maximized
-      [Windows.Thickness]::new(
-        $TargetThickness.Left + 8,
-        $TargetThickness.Top + 8,
-        $TargetThickness.Right + 8,
-        $TargetThickness.Bottom + 8
-      )
-    }
-    else {
-      # window border thickness decreases when WindowChrome.GlassFrameThickness is set to -1
-      [Windows.Thickness]::new(
-        $TargetThickness.Left + 4,
-        $TargetThickness.Top + 1,
-        $TargetThickness.Right + 4,
-        $TargetThickness.Bottom + 4
-      )
-    }
-  }
-}
-
-function Set-ContentBorderThickness {
-  [CmdletBinding()]
-  param (
-    [Parameter(Mandatory)]
-    [Windows.Controls.Border] $Border
-  )
-  begin {
-    $defaultBorderThickness = 12
-  }
-  process {
-    $Border.BorderThickness = [Windows.Thickness]::new(
-      $defaultBorderThickness,
-      $defaultBorderThickness,
-      $defaultBorderThickness,
-      $defaultBorderThickness
-    )
   }
 }
 
@@ -175,47 +122,55 @@ function Add-FluentStyles {
   }
 }
 
-function Initialize-Window {
+function Set-WindowChrome {
   [CmdletBinding()]
-  [OutputType([Windows.Window])]
   param (
     [Parameter(Mandatory)]
-    [string]$Path,
-
-    [switch]$SetWindowMaxHeight,
-
-    [switch]$HideCloseButton
+    [Windows.Window] $Window
   )
   begin {
-    Add-Type -AssemblyName 'PresentationFramework'
+    $commandBindings = @(
+      [Windows.Input.CommandBinding]::new(
+        [Windows.SystemCommands]::MinimizeWindowCommand,
+        { param($Window) [Windows.SystemCommands]::MinimizeWindow($Window) }
+      ),
+      [Windows.Input.CommandBinding]::new(
+        [Windows.SystemCommands]::MaximizeWindowCommand,
+        { param($Window) [Windows.SystemCommands]::MaximizeWindow($Window) }
+      ),
+      [Windows.Input.CommandBinding]::new(
+        [Windows.SystemCommands]::RestoreWindowCommand,
+        { param($Window) [Windows.SystemCommands]::RestoreWindow($Window) }
+      ),
+      [Windows.Input.CommandBinding]::new(
+        [Windows.SystemCommands]::CloseWindowCommand,
+        { param($Window) [Windows.SystemCommands]::CloseWindow($Window) }
+      )
+    )
   }
   process {
-    [xml]$xaml = Get-Content -Path $Path -Raw
-    $xaml = Add-FluentStyles -Xaml $xaml
-    $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml
-    $Window = [Windows.Markup.XamlReader]::Load($reader)
+    $Window.CommandBindings.AddRange($commandBindings)
 
-    $namedNodes = $xaml.SelectNodes("//*[@Name]")
-    foreach ($namedNode in $namedNodes) {
-      $control = $Window.FindName($namedNode.Name)
-      if ($null -eq $control) { continue }
-      Add-Member -InputObject $Window -NotePropertyName $namedNode.Name -NotePropertyValue $control
+    $WindowChrome = [Windows.Shell.WindowChrome]::GetWindowChrome($Window)
+    if (-not $WindowChrome) {
+      $WindowChrome = [Windows.Shell.WindowChrome]::new()
     }
 
-    $Parameters = @{
-      Window             = $Window
-      SetWindowMaxHeight = $SetWindowMaxHeight
-      HideCloseButton    = $HideCloseButton
-    }
-    Set-WindowStyling @Parameters
+    $WindowChrome.GlassFrameThickness = '-1'
+    $WindowChrome.UseAeroCaptionButtons = $false
+    if ($Window.ResizeMode -eq 'NoResize') { $WindowChrome.ResizeBorderThickness = 0 }
 
-    $Window
+    $Window.Add_Loaded(
+      {
+        if ($Window.TopBarElement) {
+          $WindowChrome.CaptionHeight = $Window.TopBarElement.ActualHeight + $Window.Padding.Top
+        }
+        Hide-NativeCaptionButtons -Window $Window
+        [Windows.Shell.WindowChrome]::SetWindowChrome($Window, $WindowChrome)
+      }.GetNewClosure()
+    )
   }
 }
-
-#endregion
-
-#region Window Attributes
 
 function Set-MicaBackdrop {
   [CmdletBinding()]
@@ -224,55 +179,78 @@ function Set-MicaBackdrop {
     [Windows.Window] $Window
   )
   begin {
+    $useImmersiveDarkMode = 20
+    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
+
     $systemBackdropType = 38
     $micaBackdrop = 2
   }
   process {
+    Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $useDarkMode
+    Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
     $Window.Background = 'Transparent'
-
-    $Window.Add_SourceInitialized(
-      {
-        Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
-        Set-ImmersiveDarkMode -Window $Window
-      }.GetNewClosure()
-    )
-
-    $WindowChrome = [Windows.Shell.WindowChrome]::GetWindowChrome($Window)
-    if (-not $WindowChrome) {
-      $WindowChrome = [Windows.Shell.WindowChrome]::new()
-    }
-    $WindowChrome.GlassFrameThickness = '-1'
-    # fixes close button right margin
-    $WindowChrome.NonClientFrameEdges = 'Bottom, Left, Right'
-
-    $Window.Add_Loaded(
-      {
-        if ($Window.TopBarElement) {
-          $WindowChrome.CaptionHeight = $Window.TopBarElement.ActualHeight + $Window.ContentBorder.BorderThickness.Top
-          [Windows.Shell.WindowChrome]::SetIsHitTestVisibleInChrome($Window.TopBarElement, $true)
-        }
-        [Windows.Shell.WindowChrome]::SetWindowChrome($Window, $WindowChrome)
-      }.GetNewClosure()
-    )
   }
 }
 
-function Set-ImmersiveDarkMode {
+function Hide-CaptionButtons {
   [CmdletBinding()]
-  param (
+  param(
     [Parameter(Mandatory)]
-    [Windows.Window] $Window
+    [Windows.Window]$Window
+  )
+  process {
+    $captionButtons = $Window.Template.FindName('CaptionButtons', $Window)
+    $captionButtons.Visibility = 'Collapsed'
+  }
+}
+
+function Hide-NativeCaptionButtons {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)]
+    [Windows.Window]$Window
   )
   begin {
-    $useImmersiveDarkMode = 20
-    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
+    if (-not ('WinApi' -as [type])) {
+      $referensedAssemblies = @('PresentationFramework', 'WindowsBase')
+      if ($PSVersionTable.PSVersion.Major -eq 5) { $referensedAssemblies += 'PresentationCore', 'System.Xaml' }
+      Add-Type -ReferencedAssemblies $referensedAssemblies -TypeDefinition @'
+using System;
+using System.Windows;
+using System.Windows.Interop;
+using System.Runtime.InteropServices;
+
+public class WinApi {
+  private const int GWL_STYLE = -16;
+  private const int WS_SYSMENU = 0x80000;
+
+  [DllImport("user32.dll", SetLastError = true)]
+  private static extern int GetWindowLong(
+    IntPtr hWnd,
+    int nIndex
+  );
+
+  [DllImport("user32.dll")]
+  private static extern int SetWindowLong(
+    IntPtr hWnd,
+    int nIndex,
+    int dwNewLong
+  );
+
+  public static void HideNativeCaptionButtons(Window window) {
+    IntPtr windowPtr = new WindowInteropHelper(window).Handle;
+    SetWindowLong(windowPtr, GWL_STYLE, GetWindowLong(windowPtr, GWL_STYLE) & ~WS_SYSMENU);
+  }
+}
+'@
+    }
   }
   process {
-    Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $useDarkMode
+    [WinApi]::HideNativeCaptionButtons($Window)
   }
 }
 
-#endregion Window Attributes
+#endregion
 
 #region System
 
@@ -394,63 +372,7 @@ function Test-DwmBackdropApiAvailability {
   }
 }
 
-function Test-DwmImmersiveDarkModeApiAvailability {
-  [CmdletBinding()]
-  [OutputType([bool])]
-  param()
-  process {
-    [Environment]::OSVersion.Version.Build -ge 19041
-  }
-}
-
 #endregion
-
-function Hide-CloseButton {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory)]
-    [Windows.Window]$Window
-  )
-  begin {
-    if (-not ('WinApi' -as [type])) {
-      $referensedAssemblies = @('PresentationFramework', 'WindowsBase')
-      if ($PSVersionTable.PSVersion.Major -eq 5) { $referensedAssemblies += 'PresentationCore', 'System.Xaml' }
-      Add-Type -ReferencedAssemblies $referensedAssemblies -TypeDefinition @'
-using System;
-using System.Windows;
-using System.Windows.Interop;
-using System.Runtime.InteropServices;
-
-public class WinApi {
-  private const int GWL_STYLE = -16;
-  private const int WS_SYSMENU = 0x80000;
-
-  [DllImport("user32.dll", SetLastError = true)]
-  private static extern int GetWindowLong(
-    IntPtr hWnd,
-    int nIndex
-  );
-
-  [DllImport("user32.dll")]
-  private static extern int SetWindowLong(
-    IntPtr hWnd,
-    int nIndex,
-    int dwNewLong
-  );
-
-  public static void RemoveCloseButton(Window window) {
-    IntPtr windowPtr = new WindowInteropHelper(window).Handle;
-    SetWindowLong(windowPtr, GWL_STYLE, GetWindowLong(windowPtr, GWL_STYLE) & ~WS_SYSMENU);
-  }
-}
-'@
-    }
-  }
-  process {
-    [WinApi]::RemoveCloseButton($Window)
-    $Window.UpdateLayout()
-  }
-}
 
 #region MVVM
 

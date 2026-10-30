@@ -27,7 +27,7 @@ function Show-PairDeviceDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/PairDeviceDialog.xaml" -HideCloseButton
+    $Window = Initialize-Window -Path "$PSScriptRoot/PairDeviceDialog.xaml" -HideCaptionButtons
 
     $ViewModel = [ViewModel]::new()
 
