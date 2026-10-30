@@ -2,47 +2,41 @@
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   WindowStartupLocation="CenterOwner"
-  MinWidth="350" MinHeight="108"
-  MaxWidth="350" MaxHeight="108"
+  Width="350"
+  SizeToContent="Height"
   Topmost="True"
   ShowInTaskbar="False"
   ResizeMode="NoResize">
-
-  <WindowChrome.WindowChrome>
-    <WindowChrome GlassFrameThickness="-1" />
-  </WindowChrome.WindowChrome>
 
   <Window.InputBindings>
     <KeyBinding Key="Enter" Command="{Binding ViewModel.OkCommand}" />
     <KeyBinding Key="Escape" Command="{Binding ViewModel.CancelCommand}" />
   </Window.InputBindings>
 
-  <Border Name="ContentBorder">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="12" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
 
-      <TextBox Grid.Row="0" Name="IpAdressBox"
-        Height="32" Width="Auto" />
+    <TextBox Grid.Row="0" Name="IpAdressBox"
+      Height="32" Width="Auto" />
 
-      <Grid Grid.Row="2">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Button Grid.Column="0"
-          Content="{Binding Localization.Ok}"
-          Command="{Binding ViewModel.OkCommand}"
-          HorizontalAlignment="Stretch" />
-        <Button Grid.Column="2"
-          Content="{Binding Localization.Cancel}"
-          Command="{Binding ViewModel.CancelCommand}"
-          HorizontalAlignment="Stretch" />
-      </Grid>
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="8" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Button Grid.Column="0"
+        Content="{Binding Localization.Ok}"
+        Command="{Binding ViewModel.OkCommand}"
+        HorizontalAlignment="Stretch" />
+      <Button Grid.Column="2"
+        Content="{Binding Localization.Cancel}"
+        Command="{Binding ViewModel.CancelCommand}"
+        HorizontalAlignment="Stretch" />
     </Grid>
-  </Border>
+  </Grid>
 </Window>
