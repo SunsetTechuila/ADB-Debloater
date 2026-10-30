@@ -11,8 +11,6 @@ function Set-WindowStyling {
     [Parameter(Mandatory)]
     [Windows.Window]$Window,
 
-    [switch]$NoTopBar,
-
     [switch]$SetWindowMaxHeight,
 
     [switch]$HideCloseButton
@@ -26,7 +24,7 @@ function Set-WindowStyling {
 
     if ($shouldSetMicaBackdrop) {
       Set-MicaBackdrop -Window $Window
-      Set-ContentBorderThickness -Border $ContentBorder -NoTopBar:$NoTopBar
+      Set-ContentBorderThickness -Border $ContentBorder
 
       $targetBorderThickness = $ContentBorder.BorderThickness
       $adjustBorderThicknessScript = {
@@ -120,18 +118,15 @@ function Set-ContentBorderThickness {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [Windows.Controls.Border] $Border,
-
-    [switch] $NoTopBar
+    [Windows.Controls.Border] $Border
   )
   begin {
     $defaultBorderThickness = 12
-    $windowDraggableBorderHeight = 24
   }
   process {
     $Border.BorderThickness = [Windows.Thickness]::new(
       $defaultBorderThickness,
-      $(if ($NoTopBar) { $windowDraggableBorderHeight } else { $defaultBorderThickness }),
+      $defaultBorderThickness,
       $defaultBorderThickness,
       $defaultBorderThickness
     )
@@ -190,8 +185,6 @@ function Initialize-Window {
     [Parameter(Mandatory)]
     [string]$Path,
 
-    [switch]$NoTopBar,
-
     [switch]$SetWindowMaxHeight,
 
     [switch]$HideCloseButton
@@ -214,7 +207,6 @@ function Initialize-Window {
 
     $Parameters = @{
       Window             = $Window
-      NoTopBar           = $NoTopBar
       SetWindowMaxHeight = $SetWindowMaxHeight
       HideCloseButton    = $HideCloseButton
     }
@@ -258,6 +250,10 @@ function Set-MicaBackdrop {
 
     $Window.Add_Loaded(
       {
+        if ($Window.TopBarElement) {
+          $WindowChrome.CaptionHeight = $Window.TopBarElement.ActualHeight + $Window.ContentBorder.BorderThickness.Top
+          [Windows.Shell.WindowChrome]::SetIsHitTestVisibleInChrome($Window.TopBarElement, $true)
+        }
         [Windows.Shell.WindowChrome]::SetWindowChrome($Window, $WindowChrome)
       }.GetNewClosure()
     )
