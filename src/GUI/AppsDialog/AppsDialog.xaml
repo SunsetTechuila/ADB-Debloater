@@ -16,7 +16,7 @@
                 Width="18"
                 Height="18"
                 CornerRadius="999"
-                Background="{StaticResource ControlBorderBrush}"
+                Background="{DynamicResource ControlBorderBrush}"
                 ToolTip="{TemplateBinding ToolTip}"
                 ToolTipService.InitialShowDelay="0"
                 ToolTipService.Placement="Right"
@@ -25,7 +25,7 @@
                   Text="&#xE897;"
                   FontSize="10"
                   FontWeight="Bold"
-                  Foreground="{StaticResource TextBrush}"
+                  Foreground="{DynamicResource TextBrush}"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   FontFamily="{StaticResource SymbolThemeFontFamily}" />
@@ -88,8 +88,8 @@
     </CheckBox>
 
     <Border Grid.Row="4"
-      Background="{StaticResource BackgroundElevatedBrush}"
-      BorderBrush="{StaticResource ControlBorderBrush}"
+      Background="{DynamicResource BackgroundElevatedBrush}"
+      BorderBrush="{DynamicResource ControlBorderBrush}"
       BorderThickness="{StaticResource ControlBorderThickness}"
       CornerRadius="{StaticResource ControlCornerRadius}">
       <ListView Name="AppsListView"

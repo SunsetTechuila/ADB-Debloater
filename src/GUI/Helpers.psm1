@@ -33,12 +33,18 @@ function Initialize-Window {
     }
 
     Set-WindowChrome -Window $Window
+    Set-ColorStyles -Window $Window
+
+    $Window.Add_SourceInitialized({ param($Window) Sync-WindowTheme -Window $Window })
 
     # Bring the window to the foreground
     $Window.Add_Loaded({ param($Window) $Window.Activate() })
 
     $Window.Add_Closed({ param($Window) $Window.DataContext = $null })
 
+    if (Test-DwmImmersiveDarkModeApiAvailability) {
+      $Window.Add_SourceInitialized({ param($Window) Set-ImmersiveDarkMode -Window $Window })
+    }
     if (Test-DwmBackdropApiAvailability) {
       $Window.Add_SourceInitialized({ param($Window) Set-MicaBackdrop -Window $Window })
     }
@@ -83,15 +89,6 @@ function Add-FluentStyles {
     [Parameter(Mandatory)]
     [xml]$Xaml
   )
-  begin {
-    $systemTheme = Get-SystemTheme
-    $accentVariant = if ($systemTheme -eq 'dark') { 'light' } else { 'dark' }
-    $accentColor = Get-SystemAccentColor -Variant $accentVariant
-    $colorStylesPath = if ($systemTheme -eq 'dark') { $DarkStyles } else { $LightStyles }
-
-    [xml]$colorStyles = Get-Content -Path $colorStylesPath -Raw
-    $colorStyles.ResourceDictionary.SolidColorBrush[0].Color = $accentColor
-  }
   process {
     $xmlNS = $Xaml.DocumentElement.NamespaceURI
 
@@ -115,10 +112,59 @@ function Add-FluentStyles {
     $fluentResourceDictionary.Attributes.Append($sourceAttribute) | Out-Null
     $mergedDictionaries.AppendChild($fluentResourceDictionary) | Out-Null
 
-    $importedColorStyles = $Xaml.ImportNode($colorStyles.ResourceDictionary, $true)
-    $mergedDictionaries.AppendChild($importedColorStyles) | Out-Null
-
     $Xaml
+  }
+}
+
+function Set-ColorStyles {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory)]
+    [Windows.Window] $Window
+  )
+  process {
+    $systemTheme = Get-SystemTheme
+    $accentVariant = if ($systemTheme -eq 'dark') { 'light' } else { 'dark' }
+    $accentColor = Get-SystemAccentColor -Variant $accentVariant
+    $colorStylesPath = if ($systemTheme -eq 'dark') { $DarkStyles } else { $LightStyles }
+
+    [xml]$colorStyles = Get-Content -Path $colorStylesPath -Raw
+    $colorStyles.ResourceDictionary.SolidColorBrush[0].Color = $accentColor
+    $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $colorStyles
+    $colorResourceDictionary = [Windows.Markup.XamlReader]::Load($reader)
+
+    $mergedDictionaries = $Window.Resources.MergedDictionaries
+    if ($Window.ColorResourceDictionary) {
+      $mergedDictionaries.Remove($Window.ColorResourceDictionary) | Out-Null
+    }
+    $mergedDictionaries.Add($colorResourceDictionary)
+    Add-Member -InputObject $Window -NotePropertyName 'ColorResourceDictionary' -NotePropertyValue $colorResourceDictionary -Force
+  }
+}
+
+function Sync-WindowTheme {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory)]
+    [Windows.Window] $Window
+  )
+  process {
+    $hwndSource = [Windows.Interop.HwndSource]::FromVisual($Window)
+    $hwndSource.AddHook({
+        param($hwnd, $message, $wParam, $lParam, $handled)
+        $settingChangeMessage = 0x001A
+        if (
+          ($message -eq $settingChangeMessage) -and
+          ([Runtime.InteropServices.Marshal]::PtrToStringAuto($lParam) -eq 'ImmersiveColorSet')
+        ) {
+          $window = [Windows.Interop.HwndSource]::FromHwnd($hwnd).RootVisual
+          Set-ColorStyles -Window $window
+          if (Test-DwmImmersiveDarkModeApiAvailability) {
+            Set-ImmersiveDarkMode -Window $window
+          }
+        }
+        [IntPtr]::Zero
+      })
   }
 }
 
@@ -179,16 +225,27 @@ function Set-MicaBackdrop {
     [Windows.Window] $Window
   )
   begin {
-    $useImmersiveDarkMode = 20
-    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
-
     $systemBackdropType = 38
     $micaBackdrop = 2
   }
   process {
-    Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $useDarkMode
     Set-DwmWindowAttribute -Window $Window -Attribute $systemBackdropType -Value $micaBackdrop
     $Window.Background = 'Transparent'
+  }
+}
+
+function Set-ImmersiveDarkMode {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory)]
+    [Windows.Window] $Window
+  )
+  begin {
+    $useImmersiveDarkMode = 20
+    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
+  }
+  process {
+    Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $useDarkMode
   }
 }
 
@@ -369,6 +426,15 @@ function Test-DwmBackdropApiAvailability {
   param()
   process {
     [Environment]::OSVersion.Version.Build -ge 22523
+  }
+}
+
+function Test-DwmImmersiveDarkModeApiAvailability {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param()
+  process {
+    [Environment]::OSVersion.Version.Build -ge 19041
   }
 }
 
