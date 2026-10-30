@@ -26,7 +26,7 @@ function Show-ConnectDeviceDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/ConnectDeviceDialog.xaml" -HideCloseButton
+    $Window = Initialize-Window -Path "$PSScriptRoot/ConnectDeviceDialog.xaml" -HideCaptionButtons
 
     $ViewModel = [ViewModel]::new()
 
