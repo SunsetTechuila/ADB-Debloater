@@ -25,7 +25,7 @@
       HorizontalAlignment="Left">
       <TextBlock
         Text="{Binding Localization.Devices}"
-        Foreground="{StaticResource TextBrush}"
+        Foreground="{DynamicResource TextBrush}"
         Margin="0,0,16,0" VerticalAlignment="Center" />
       <Button
         Command="{Binding ViewModel.RefreshCommand}"
@@ -51,8 +51,8 @@
     </StackPanel>
 
     <Border Grid.Row="2"
-      Background="{StaticResource BackgroundElevatedBrush}"
-      BorderBrush="{StaticResource ControlBorderBrush}"
+      Background="{DynamicResource BackgroundElevatedBrush}"
+      BorderBrush="{DynamicResource ControlBorderBrush}"
       BorderThickness="{StaticResource ControlBorderThickness}"
       CornerRadius="{StaticResource ControlCornerRadius}">
       <ListView Name="DevicesListView"
@@ -76,7 +76,7 @@
                       <Style TargetType="TextBlock">
                         <Style.Triggers>
                           <DataTrigger Binding="{Binding Status}" Value="Connected">
-                            <Setter Property="Foreground" Value="{StaticResource GreenBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource GreenBrush}" />
                           </DataTrigger>
                         </Style.Triggers>
                       </Style>
