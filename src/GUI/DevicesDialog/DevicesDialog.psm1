@@ -40,7 +40,7 @@ function Show-DevicesDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/DevicesDialog.xaml" -NoTopBar -SetWindowMaxHeight
+    $Window = Initialize-Window -Path "$PSScriptRoot/DevicesDialog.xaml" -SetWindowMaxHeight
 
     $ViewModel = [ViewModel]::new($GetDevices)
 

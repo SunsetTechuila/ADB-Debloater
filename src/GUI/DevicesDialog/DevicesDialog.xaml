@@ -20,37 +20,36 @@
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <Grid Grid.Row="0">
-        <StackPanel
-          Orientation="Horizontal"
-          HorizontalAlignment="Left">
-          <TextBlock
-            Text="{Binding Localization.Devices}"
-            Foreground="{StaticResource TextBrush}"
-            Margin="0,0,16,0" VerticalAlignment="Center" />
-          <Button
-            Command="{Binding ViewModel.RefreshCommand}"
-            ToolTip="{Binding Localization.RefreshDevicesList}"
-            Margin="0,0,8,0"
-            Padding="8"
-            FontFamily="{StaticResource SymbolThemeFontFamily}"
-            Content="&#xE72C;" />
-          <Button
-            Command="{Binding ViewModel.PairCommand}"
-            ToolTip="{Binding Localization.PairDeviceOverWiFi}"
-            Margin="0,0,8,0"
-            Padding="8"
-            FontFamily="{StaticResource SymbolThemeFontFamily}"
-            Content="&#xE703;" />
-          <Button
-            Command="{Binding ViewModel.ConnectCommand}"
-            ToolTip="{Binding Localization.ConnectDeviceOverWiFi}"
-            Margin="0,0,8,0"
-            Padding="8"
-            FontFamily="{StaticResource SymbolThemeFontFamily}"
-            Content="&#xE710;" />
-        </StackPanel>
-      </Grid>
+      <StackPanel Name="TopBarElement"
+        Grid.Row="0"
+        Orientation="Horizontal"
+        HorizontalAlignment="Left">
+        <TextBlock
+          Text="{Binding Localization.Devices}"
+          Foreground="{StaticResource TextBrush}"
+          Margin="0,0,16,0" VerticalAlignment="Center" />
+        <Button
+          Command="{Binding ViewModel.RefreshCommand}"
+          ToolTip="{Binding Localization.RefreshDevicesList}"
+          Margin="0,0,8,0"
+          Padding="8"
+          FontFamily="{StaticResource SymbolThemeFontFamily}"
+          Content="&#xE72C;" />
+        <Button
+          Command="{Binding ViewModel.PairCommand}"
+          ToolTip="{Binding Localization.PairDeviceOverWiFi}"
+          Margin="0,0,8,0"
+          Padding="8"
+          FontFamily="{StaticResource SymbolThemeFontFamily}"
+          Content="&#xE703;" />
+        <Button
+          Command="{Binding ViewModel.ConnectCommand}"
+          ToolTip="{Binding Localization.ConnectDeviceOverWiFi}"
+          Margin="0,0,8,0"
+          Padding="8"
+          FontFamily="{StaticResource SymbolThemeFontFamily}"
+          Content="&#xE710;" />
+      </StackPanel>
 
       <Border Grid.Row="2"
         Background="{StaticResource BackgroundElevatedBrush}"

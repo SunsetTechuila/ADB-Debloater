@@ -37,7 +37,7 @@ function Show-AppsDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml" -NoTopBar -SetWindowMaxHeight
+    $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml" -SetWindowMaxHeight
 
     $appItems = New-AppItems -Apps $Apps
     $ViewModel = [ViewModel]::new($appItems)
