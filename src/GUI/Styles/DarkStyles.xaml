@@ -19,5 +19,9 @@
   <sys:Double x:Key="OverlayShadowOpacity">0.3</sys:Double>
   <SolidColorBrush x:Key="CheckBoxBorderBrush" Color="#999999" />
   <SolidColorBrush x:Key="GreenBrush" Color="#6CCB5F" />
+  <SolidColorBrush x:Key="ActiveCaptionButtonBackgroundBrush" Color="#FFFFFF" Opacity="0.085" />
+  <SolidColorBrush x:Key="PressedCaptionButtonBackgroundBrush" Color="#FFFFFF" Opacity="0.04" />
+  <SolidColorBrush x:Key="ActiveCloseButtonBackgroundBrush" Color="#C42B1C" />
+  <SolidColorBrush x:Key="PressedCloseButtonBackgroundBrush" Color="#C42B1C" Opacity="0.9" />
 
 </ResourceDictionary>
