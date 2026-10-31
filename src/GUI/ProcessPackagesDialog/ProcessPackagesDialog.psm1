@@ -5,8 +5,7 @@ $ErrorActionPreference = 'Stop'
 ."$PSScriptRoot/../../Paths.ps1"
 ."$PSScriptRoot/../Paths.ps1"
 
-Remove-Module -Name 'ProgressDialog' -Force -ErrorAction 'SilentlyContinue'
-Import-Module -Name $ProgressDialog -DisableNameChecking
+Import-Module -Name $ProgressDialog -Force -DisableNameChecking
 
 $Parameters = @{
   BindingVariable = 'Localization'

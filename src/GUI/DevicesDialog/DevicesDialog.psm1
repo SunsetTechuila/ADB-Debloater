@@ -7,14 +7,8 @@ $ErrorActionPreference = 'Stop'
 ."$PSScriptRoot/../../Paths.ps1"
 ."$PSScriptRoot/../Paths.ps1"
 
-@(
-  'Helpers',
-  'ConnectDeviceDialog'
-  'PairDeviceDialog'
-) | ForEach-Object -Process {
-  Remove-Module -Name $PSItem -Force -ErrorAction 'SilentlyContinue'
-  Import-Module -Name (Get-Variable -Name $PSItem -ValueOnly) -DisableNameChecking
-}
+$modules = @('Helpers', 'ConnectDeviceDialog', 'PairDeviceDialog')
+Import-Module -Name (Get-Variable -Name $modules -ValueOnly) -Force -DisableNameChecking
 
 $Parameters = @{
   BindingVariable = 'Localization'

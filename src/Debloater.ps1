@@ -23,9 +23,8 @@ Add-Type -AssemblyName 'PresentationFramework'
   # PowerShell 5 resolves the dialogs' relative `using module ../Helpers.psm1` against the current directory,
   # so the modules are parsed from a dialog folder rather than from wherever the script was launched
   Push-Location (Split-Path -Path $path)
-  Remove-Module -Name $PSItem -Force -ErrorAction 'SilentlyContinue'
   try {
-    Import-Module -Name $path -DisableNameChecking
+    Import-Module -Name $path -Force -DisableNameChecking
   }
   finally {
     Pop-Location

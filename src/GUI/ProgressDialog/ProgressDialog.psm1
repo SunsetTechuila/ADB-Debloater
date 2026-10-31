@@ -7,8 +7,7 @@ $ErrorActionPreference = 'Stop'
 ."$PSScriptRoot/../../Paths.ps1"
 ."$PSScriptRoot/../Paths.ps1"
 
-Remove-Module -Name 'Helpers' -Force -ErrorAction 'SilentlyContinue'
-Import-Module -Name $Helpers -DisableNameChecking
+Import-Module -Name $Helpers -Force -DisableNameChecking
 
 $Parameters = @{
   BindingVariable = 'Localization'
