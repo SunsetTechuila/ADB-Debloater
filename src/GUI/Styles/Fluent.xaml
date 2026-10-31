@@ -1,0 +1,28 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+  <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+  <Thickness x:Key="ControlBorderThickness">1</Thickness>
+  <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
+  <FontFamily x:Key="SymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+  <sys:Double x:Key="ContextMenuShadowBlurRadius">16</sys:Double>
+  <sys:Double x:Key="ContextMenuShadowHorizontalOffset">-16</sys:Double>
+  <sys:Double x:Key="ContextMenuShadowDepth">8</sys:Double>
+  <Thickness x:Key="ContextMenuShadowPadding">16,0,16,24</Thickness>
+
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="Fluent/Button.xaml" />
+    <ResourceDictionary Source="Fluent/CheckBox.xaml" />
+    <ResourceDictionary Source="Fluent/Focus.xaml" />
+    <ResourceDictionary Source="Fluent/Grid.xaml" />
+    <ResourceDictionary Source="Fluent/ListView.xaml" />
+    <ResourceDictionary Source="Fluent/Menu.xaml" />
+    <ResourceDictionary Source="Fluent/Scroll.xaml" />
+    <ResourceDictionary Source="Fluent/Text.xaml" />
+    <ResourceDictionary Source="Fluent/ToolTip.xaml" />
+    <ResourceDictionary Source="Fluent/Window.xaml" />
+  </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>
