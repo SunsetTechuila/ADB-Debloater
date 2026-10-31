@@ -1,0 +1,110 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Style TargetType="TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+  </Style>
+
+  <Style TargetType="TextBox">
+    <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource ControlBorderThickness}" />
+    <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Padding" Value="5,0,5,1" />
+    <Setter Property="Cursor" Value="IBeam" />
+    <Setter Property="ContextMenuService.HorizontalOffset"
+      Value="{DynamicResource ContextMenuShadowHorizontalOffset}" />
+
+    <Setter Property="ContextMenu">
+      <Setter.Value>
+        <ContextMenu>
+          <MenuItem Icon="&#xE8C6;" InputGestureText="Ctrl+X" Command="ApplicationCommands.Cut" />
+          <MenuItem Icon="&#xE8C8;" InputGestureText="Ctrl+C" Command="ApplicationCommands.Copy" />
+          <MenuItem Icon="&#xE77F;" InputGestureText="Ctrl+V" Command="ApplicationCommands.Paste" />
+          <MenuItem Icon="&#xE7A7;" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo" />
+          <MenuItem InputGestureText="Ctrl+A" Command="ApplicationCommands.SelectAll" />
+        </ContextMenu>
+      </Setter.Value>
+    </Setter>
+
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="TextBox">
+          <Grid>
+            <Border
+              Name="ContentBorder"
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              CornerRadius="{TemplateBinding Border.CornerRadius}">
+              <ScrollViewer
+                Name="PART_ContentHost"
+                TextElement.Foreground="{TemplateBinding Foreground}" />
+            </Border>
+            <TextBlock
+              Name="PlaceholderText"
+              Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
+              Foreground="{DynamicResource InactiveTextBrush}"
+              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+              Margin="3,0"
+              Padding="{TemplateBinding Padding}"
+              IsHitTestVisible="False">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                  <Style.Triggers>
+                    <DataTrigger
+                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text.Length}"
+                      Value="0">
+                      <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger
+                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
+                      Value="">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger
+                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
+                      Value="{x:Null}">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+            <Border
+              Name="AccentBorder"
+              BorderBrush="{DynamicResource ControlBorderBrush}"
+              BorderThickness="{DynamicResource ControlBorderThickness}"
+              CornerRadius="{TemplateBinding Border.CornerRadius}"
+              IsHitTestVisible="False" />
+          </Grid>
+
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+              <Setter TargetName="AccentBorder" Property="BorderThickness" Value="0,0,0,2" />
+              <Setter TargetName="AccentBorder" Property="BorderBrush"
+                Value="{DynamicResource AccentBrush}" />
+              <Setter TargetName="ContentBorder" Property="Background"
+                Value="{DynamicResource BackgroundBrush}" />
+            </Trigger>
+
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseOver" Value="True" />
+                <Condition Property="IsFocused" Value="False" />
+              </MultiTrigger.Conditions>
+              <Setter TargetName="ContentBorder" Property="Background"
+                Value="{DynamicResource ActiveButtonBackgroundBrush}" />
+            </MultiTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+</ResourceDictionary>

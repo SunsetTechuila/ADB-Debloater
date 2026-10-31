@@ -1,0 +1,146 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Style TargetType="ListView">
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+  </Style>
+
+  <Style x:Key="FluentListViewItemStyle" TargetType="ListViewItem">
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="MinWidth" Value="88" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Margin" Value="0,0,0,2" />
+    <Setter Property="Padding" Value="16,0,12,0" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="OverridesDefaultStyle" Value="True" />
+    <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultCollectionFocusVisualStyle}" />
+
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ListBoxItem">
+          <Border
+            Name="Border"
+            Margin="0"
+            Padding="0"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="{TemplateBinding Border.CornerRadius}">
+            <Grid>
+              <ContentPresenter
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+              <Rectangle
+                Name="ActiveRectangle"
+                Width="3"
+                Height="16"
+                Margin="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Fill="{DynamicResource AccentBrush}"
+                RadiusX="2"
+                RadiusY="2"
+                Visibility="Collapsed" />
+              <!-- Tag Raises Binding.TargetUpdated on CheckBox after IsChecked updates when a virtualized ListViewItem container is recycled -->
+              <CheckBox
+                Name="CheckBox"
+                Margin="0"
+                IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSelected, Mode=TwoWay}"
+                Tag="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DataContext, NotifyOnTargetUpdated=True}"
+                Focusable="False"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Visibility="Collapsed" />
+            </Grid>
+          </Border>
+
+          <ControlTemplate.Triggers>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsEnabled" Value="True" />
+                <Condition Property="IsMouseOver" Value="True" />
+              </MultiTrigger.Conditions>
+              <Setter TargetName="Border" Property="Background"
+                Value="{DynamicResource DisabledButtonBackgroundBrush}" />
+            </MultiTrigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Border"
+                Property="TextElement.Foreground" Value="{DynamicResource DisabledTextBrush}" />
+            </Trigger>
+
+            <Trigger Property="IsSelected" Value="True">
+              <Setter TargetName="Border" Property="Background"
+                Value="{DynamicResource ButtonBackgroundBrush}" />
+              <Setter TargetName="ActiveRectangle" Property="Visibility" Value="Visible" />
+            </Trigger>
+
+            <DataTrigger
+              Binding="{Binding RelativeSource={RelativeSource AncestorType=ListView}, Path=SelectionMode}"
+              Value="Multiple">
+              <Setter TargetName="CheckBox" Property="Visibility" Value="Visible" />
+              <Setter TargetName="Border" Property="Padding" Value="10,0,0,0" />
+              <Setter TargetName="ActiveRectangle" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style BasedOn="{StaticResource FluentListViewItemStyle}" TargetType="ListViewItem" />
+
+  <Style x:Key="FluentListViewItem" TargetType="ListViewItem">
+    <Setter Property="Padding" Value="4,1" />
+    <Setter Property="HorizontalContentAlignment"
+      Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+    <Setter Property="VerticalContentAlignment"
+      Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    <Setter Property="OverridesDefaultStyle" Value="True" />
+    <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultCollectionFocusVisualStyle}" />
+
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ListViewItem">
+          <Border x:Name="Bd"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            Background="{TemplateBinding Background}"
+            Padding="{TemplateBinding Padding}"
+            Border.CornerRadius="{TemplateBinding Border.CornerRadius}">
+            <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Bd"
+                Property="Background" Value="{DynamicResource DisabledButtonBackgroundBrush}" />
+            </Trigger>
+
+            <Trigger Property="IsSelected" Value="True">
+              <Setter TargetName="Bd"
+                Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+            </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Bd"
+                Property="TextElement.Foreground" Value="{DynamicResource DisabledTextBrush}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+</ResourceDictionary>
