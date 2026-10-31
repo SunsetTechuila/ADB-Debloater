@@ -20,8 +20,14 @@ function Initialize-Window {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
+    if (-not [Windows.Application]::Current) {
+      $application = [Windows.Application]::new()
+      $application.ShutdownMode = 'OnExplicitShutdown'
+      Add-FluentStyles
+      Set-ColorStyles
+    }
+
     [xml]$xaml = Get-Content -Path $Path -Raw
-    $xaml = Add-FluentStyles -Xaml $xaml
     $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml
     $Window = [Windows.Markup.XamlReader]::Load($reader)
 
@@ -33,7 +39,6 @@ function Initialize-Window {
     }
 
     Set-WindowChrome -Window $Window
-    Set-ColorStyles -Window $Window
 
     $Window.Add_SourceInitialized({ param($Window) Sync-WindowTheme -Window $Window })
 
@@ -85,43 +90,19 @@ function Set-WindowMaxHeight {
 
 function Add-FluentStyles {
   [CmdletBinding()]
-  param (
-    [Parameter(Mandatory)]
-    [xml]$Xaml
-  )
+  param ()
   process {
-    $xmlNS = $Xaml.DocumentElement.NamespaceURI
+    $reader = [Xml.XmlReader]::Create($FluentStyles)
+    $fluentResourceDictionary = [Windows.Markup.XamlReader]::Load($reader)
+    $reader.Close()
 
-    $windowResources = $Xaml.DocumentElement.SelectSingleNode("*[local-name()='Window.Resources']", $Xaml.CreateNavigator().NamespaceManager)
-    if (-not $windowResources) {
-      $windowResources = $Xaml.CreateElement('Window.Resources', $xmlNS)
-      $resourceDictionary = $Xaml.CreateElement('ResourceDictionary', $xmlNS)
-      $windowResources.AppendChild($resourceDictionary) | Out-Null
-      $Xaml.DocumentElement.PrependChild($windowResources) | Out-Null
-    }
-    else {
-      $resourceDictionary = $windowResources.SelectSingleNode("*[local-name()='ResourceDictionary']")
-    }
-
-    $mergedDictionaries = $Xaml.CreateElement('ResourceDictionary.MergedDictionaries', $xmlNS)
-    $resourceDictionary.PrependChild($mergedDictionaries) | Out-Null
-
-    $fluentResourceDictionary = $Xaml.CreateElement('ResourceDictionary', $xmlNS)
-    $sourceAttribute = $Xaml.CreateAttribute('Source')
-    $sourceAttribute.Value = $FluentStyles
-    $fluentResourceDictionary.Attributes.Append($sourceAttribute) | Out-Null
-    $mergedDictionaries.AppendChild($fluentResourceDictionary) | Out-Null
-
-    $Xaml
+    [Windows.Application]::Current.Resources.MergedDictionaries.Add($fluentResourceDictionary)
   }
 }
 
 function Set-ColorStyles {
   [CmdletBinding()]
-  param (
-    [Parameter(Mandatory)]
-    [Windows.Window] $Window
-  )
+  param ()
   process {
     $appTargetTheme = Get-AppTargetTheme
     $accentVariant = if ($appTargetTheme -eq 'dark') { 'light' } else { 'dark' }
@@ -133,12 +114,13 @@ function Set-ColorStyles {
     $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $colorStyles
     $colorResourceDictionary = [Windows.Markup.XamlReader]::Load($reader)
 
-    $mergedDictionaries = $Window.Resources.MergedDictionaries
-    if ($Window.ColorResourceDictionary) {
-      $mergedDictionaries.Remove($Window.ColorResourceDictionary) | Out-Null
+    $application = [Windows.Application]::Current
+    $mergedDictionaries = $application.Resources.MergedDictionaries
+    if ($application.Properties.ColorResourceDictionary) {
+      $mergedDictionaries.Remove($application.Properties.ColorResourceDictionary) | Out-Null
     }
     $mergedDictionaries.Add($colorResourceDictionary)
-    Add-Member -InputObject $Window -NotePropertyName 'ColorResourceDictionary' -NotePropertyValue $colorResourceDictionary -Force
+    $application.Properties.ColorResourceDictionary = $colorResourceDictionary
   }
 }
 
@@ -158,7 +140,7 @@ function Sync-WindowTheme {
           ([Runtime.InteropServices.Marshal]::PtrToStringAuto($lParam) -eq 'ImmersiveColorSet')
         ) {
           $window = [Windows.Interop.HwndSource]::FromHwnd($hwnd).RootVisual
-          Set-ColorStyles -Window $window
+          Set-ColorStyles
           if (Test-DwmImmersiveDarkModeApiAvailability) {
             Set-ImmersiveDarkMode -Window $window
           }
