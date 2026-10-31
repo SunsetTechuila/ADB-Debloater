@@ -19,19 +19,14 @@ Import-LocalizedData @Parameters
 
 function Show-AppsDialog {
   [CmdletBinding()]
+  [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
     [ValidateSet('uninstall', 'disable', 'enable', 'reinstall')]
     [string]$ActionName,
 
     [Parameter(Mandatory)]
-    [scriptblock]$Action,
-
-    [Parameter(Mandatory)]
-    [hashtable[]]$Apps,
-
-    [Parameter(Mandatory)]
-    [string]$DeviceId
+    [hashtable[]]$Apps
   )
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
@@ -73,23 +68,23 @@ function Show-AppsDialog {
         $Window.Height = $Window.ActualHeight + 1
       })
 
-    $Window.ShowDialog() | Out-Null
+    if ($Window.ShowDialog()) {
+      foreach ($appItem in $ViewModel.AppItems) {
+        if ($appItem.IsSelected) {
+          @{
+            Name     = $appItem.Name
+            Packages = $appItem.Packages
+          }
+        }
+      }
+    }
   }
 }
 
 class ViewModel : ObservableObject {
   $ActionCommand = [RelayCommand]::new(
     {
-      $selectedPackages = [Collections.Generic.HashSet[string]]::new()
-
-      foreach ($appItem in $ViewModel.AppItems) {
-        if ($appItem.IsSelected) {
-          $selectedPackages.UnionWith($appItem.Packages)
-        }
-      }
-
-      $Window.Close()
-      $Action.Invoke($selectedPackages, $DeviceId)
+      $Window.DialogResult = $true
     },
     {
       foreach ($appItem in $ViewModel.AppItems) {

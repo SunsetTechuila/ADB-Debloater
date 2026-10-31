@@ -6,6 +6,8 @@ $DevicesDialog = "$GUI/DevicesDialog/DevicesDialog.psm1"
 $ConnectDeviceDialog = "$GUI/ConnectDeviceDialog/ConnectDeviceDialog.psm1"
 $PairDeviceDialog = "$GUI/PairDeviceDialog/PairDeviceDialog.psm1"
 $MessageDialog = "$GUI/MessageDialog/MessageDialog.psm1"
+$ProgressDialog = "$GUI/ProgressDialog/ProgressDialog.psm1"
+$ProcessPackagesDialog = "$GUI/ProcessPackagesDialog/ProcessPackagesDialog.psm1"
 
 $Resources = "$PSScriptRoot/Resources"
 $Localizations = "$Resources/Localizations"

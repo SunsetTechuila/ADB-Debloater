@@ -1,0 +1,36 @@
+<Window
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  Title="ADB Debloater"
+  WindowStartupLocation="CenterScreen"
+  Width="500"
+  SizeToContent="Height"
+  ResizeMode="NoResize">
+
+  <Window.InputBindings>
+    <KeyBinding Key="Escape" Command="{Binding ViewModel.CancelCommand}" />
+  </Window.InputBindings>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0"
+      Text="{Binding ViewModel.Message}"
+      TextTrimming="CharacterEllipsis" />
+
+    <ProgressBar Grid.Row="2"
+      Maximum="{Binding ViewModel.MaxProgress, Mode=OneTime}"
+      Value="{Binding ViewModel.Progress, Mode=OneWay}" />
+
+    <Button Grid.Row="4"
+      Content="{Binding Localization.Cancel}"
+      Command="{Binding ViewModel.CancelCommand}"
+      HorizontalAlignment="Stretch" />
+  </Grid>
+</Window>

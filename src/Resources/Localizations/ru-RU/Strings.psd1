@@ -1,7 +1,7 @@
 ConvertFrom-StringData -StringData @'
-DeviceRebootInstruction    = Перезагрузитесь в систему.
-DeviceReconnectInstruction = Переподключите устройство.
-DeviceAuthorizeInstruction = Поставьте галочку напротив "Всегда разрешать отладку с этого компьютера" и нажмите "Разрешить".
+DeviceRebootInstruction    = Перезагрузитесь в систему
+DeviceReconnectInstruction = Переподключите устройство
+DeviceAuthorizeInstruction = Поставьте галочку напротив "Всегда разрешать отладку с этого компьютера" и нажмите "Разрешить"
 
 Devices               = Устройства
 ConnectDeviceOverWiFi = Подключить устройство по Wi-Fi
@@ -22,7 +22,7 @@ EnterPairingCode = Введите шестизначный код сопряже
 OK               = OK
 Cancel           = Отменить
 
-NoPackagesFound = Пакеты не найдены!
+NoPackagesFound = Пакеты не найдены
 
 SelectAll = Выбрать все
 Search    = Поиск
@@ -30,4 +30,14 @@ Uninstall = Удалить
 Disable   = Отключить
 Enable    = Включить
 Reinstall = Переустановить
+
+Uninstalling = Удаление
+Disabling    = Отключение
+Enabling     = Включение
+Reinstalling = Переустановка
+
+FailedToUninstall = Не удалось удалить
+FailedToDisable   = Не удалось отключить
+FailedToEnable    = Не удалось включить
+FailedToReinstall = Не удалось переустановить
 '@

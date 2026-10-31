@@ -26,17 +26,22 @@ function Show-MessageDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCaptionButtons
+    $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -SetWindowMaxHeight -HideCaptionButtons
 
     $Window.OkButton.Content = $Localization.Ok
     $Window.OkButton.Add_Click({ $Window.Close() })
     $Window.MessageBlock.Text = $Message
 
     $Window.Add_KeyDown({
-        if ($PSItem.Key -eq 'Enter') { $Window.Close() }
+        if (($PSItem.Key -eq 'Enter') -or ($PSItem.Key -eq 'Escape')) {
+          $Window.Close()
+        }
       })
 
-    if ($ParentWindow) { $Window.Owner = $ParentWindow }
+    if ($ParentWindow) {
+      $Window.Owner = $ParentWindow
+      $Window.WindowStartupLocation = 'CenterOwner'
+    }
     $Window.ShowDialog() | Out-Null
   }
 }

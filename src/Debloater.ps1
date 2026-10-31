@@ -16,7 +16,8 @@ Add-Type -AssemblyName 'PresentationFramework'
   'Functions',
   'AppsDialog',
   'DevicesDialog',
-  'MessageDialog'
+  'MessageDialog',
+  'ProcessPackagesDialog'
 ) | ForEach-Object -Process {
   $path = Get-Variable -Name $PSItem -ValueOnly
   # PowerShell 5 resolves the dialogs' relative `using module ../Helpers.psm1` against the current directory,
@@ -102,11 +103,32 @@ do {
 
   $Parameters = @{
     ActionName = $actionName
-    Action     = $chosenAction
     Apps       = $appsToProcess
+  }
+  $selectedApps = Show-AppsDialog @Parameters
+  if (-not $selectedApps) {
+    continue
+  }
+
+  $Parameters = @{
+    ActionName = $actionName
+    Action     = $chosenAction
+    Apps       = $selectedApps
     DeviceId   = $deviceId
   }
-  Show-AppsDialog @Parameters
+  $failedPackages = Show-ProcessPackagesDialog @Parameters
+  if ($failedPackages) {
+    $failedActionMessage = switch -Exact ($actionName) {
+      'uninstall' { "$($Localization.FailedToUninstall):"; break }
+      'disable'   { "$($Localization.FailedToDisable):"; break }
+      'enable'    { "$($Localization.FailedToEnable):"; break }
+      'reinstall' { "$($Localization.FailedToReinstall):"; break }
+    }
+    $failedPackagesList = foreach ($failedPackage in $failedPackages) {
+      "$($failedPackage.Package) ($($failedPackage.AppName))"
+    }
+    Show-MessageDialog -Message "$failedActionMessage`n`n$($failedPackagesList -join "`n")"
+  }
 } while ($true)
 
 if (-not $Dev) {

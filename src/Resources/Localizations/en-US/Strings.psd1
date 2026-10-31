@@ -1,7 +1,7 @@
 ConvertFrom-StringData -StringData @'
-DeviceRebootInstruction    = Reboot your device into system.
-DeviceReconnectInstruction = Reconnect your device.
-DeviceAuthorizeInstruction = Select the checkbox "Always allow from this computer" and press "Allow".
+DeviceRebootInstruction    = Reboot your device into system
+DeviceReconnectInstruction = Reconnect your device
+DeviceAuthorizeInstruction = Select the checkbox "Always allow from this computer" and press "Allow"
 
 Devices               = Devices
 ConnectDeviceOverWiFi = Connect device over Wi-Fi
@@ -22,7 +22,7 @@ EnterPairingCode = Enter six-digit pairing code
 OK               = OK
 Cancel           = Cancel
 
-NoPackagesFound = No packages found!
+NoPackagesFound = No packages found
 
 SelectAll = Select all
 Search    = Search
@@ -30,4 +30,14 @@ Uninstall = Uninstall
 Disable   = Disable
 Enable    = Enable
 Reinstall = Reinstall
+
+Uninstalling = Uninstalling
+Disabling    = Disabling
+Enabling     = Enabling
+Reinstalling = Reinstalling
+
+FailedToUninstall = Failed to uninstall
+FailedToDisable   = Failed to disable
+FailedToEnable    = Failed to enable
+FailedToReinstall = Failed to reinstall
 '@
