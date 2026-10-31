@@ -560,3 +560,161 @@ class RelayCommand : Windows.Input.ICommand {
 }
 
 #endregion
+
+#region Background Task
+
+class BackgroundTask {
+  hidden [Threading.CancellationTokenSource] $CancellationTokenSource
+
+  hidden [PowerShell] $Runner
+
+  hidden [IAsyncResult] $Invocation
+
+  hidden [hashtable] $UiSync
+
+  BackgroundTask([hashtable] $parameters) {
+    $operation = $parameters.Operation
+    $argumentList = $parameters.ArgumentList
+    if (-not $argumentList) { $argumentList = @() }
+    $onProgress = $parameters.OnProgress
+    $onFinished = $parameters.OnFinished
+
+    $this.CancellationTokenSource = [Threading.CancellationTokenSource]::new()
+    $this.UiSync = @{ PendingOperation = $null }
+
+    $initialSessionState = [Management.Automation.Runspaces.InitialSessionState]::CreateDefault()
+    if ($operation.Module) {
+      $initialSessionState.ImportPSModule($operation.Module.Path)
+    }
+
+    $dispatcher = [Windows.Threading.Dispatcher]::CurrentDispatcher
+    $onProgressAction = [Action[object]]$onProgress
+    $onFinishedAction = [Action[object]]$onFinished
+
+    $this.Runner = [PowerShell]::Create($initialSessionState).AddScript({
+        param(
+          $moduleName,
+          $operation,
+          $argumentList,
+          $cancellationToken,
+          $dispatcher,
+          $onProgressAction,
+          $onFinishedAction,
+          $uiSync
+        )
+        $ErrorActionPreference = 'Stop'
+        $PSDefaultParameterValues['*:CancellationToken'] = $cancellationToken
+
+        function Invoke-UiOperation {
+          param(
+            [Parameter(Mandatory)]
+            [Action[object]]$Callback,
+
+            [object]$Argument
+          )
+          $dispatcherOperation = $null
+
+          [Threading.Monitor]::Enter($uiSync)
+          try {
+            if ($cancellationToken.IsCancellationRequested) {
+              return $false
+            }
+            $dispatcherOperation = $dispatcher.BeginInvoke('Normal', $Callback, $Argument)
+            $uiSync.PendingOperation = $dispatcherOperation
+          }
+          finally {
+            [Threading.Monitor]::Exit($uiSync)
+          }
+
+          try {
+            $dispatcherOperation.Task.Wait($cancellationToken)
+          }
+          catch [OperationCanceledException] {
+            $dispatcherOperation.Abort() > $null
+            return $false
+          }
+          finally {
+            [Threading.Monitor]::Enter($uiSync)
+            $uiSync.PendingOperation = $null
+            [Threading.Monitor]::Exit($uiSync)
+          }
+
+          $true
+        }
+
+        # Rebind to this background runspace so it can run independently
+        $scriptBlock = if ($moduleName) {
+          $module = Get-Module -Name $moduleName
+          & $module { $PSDefaultParameterValues['*:CancellationToken'] = $cancellationToken }
+          # Bind to its module's scope so it can access module-scoped variables and functions
+          $module.NewBoundScriptBlock($operation)
+        }
+        else {
+          [scriptblock]::Create($operation)
+        }
+
+        try {
+          if ($onProgressAction) {
+            & $scriptBlock @argumentList | ForEach-Object -Process {
+              if (-not (Invoke-UiOperation -Callback $onProgressAction -Argument $PSItem)) {
+                exit
+              }
+            }
+          }
+          else {
+            & $scriptBlock @argumentList
+          }
+        }
+        finally {
+          if ($onFinishedAction) {
+            Invoke-UiOperation -Callback $onFinishedAction > $null
+          }
+        }
+      }).AddParameters(@(
+        $operation.Module.Name,
+        $operation,
+        $argumentList,
+        $this.CancellationTokenSource.Token,
+        $dispatcher,
+        $onProgressAction,
+        $onFinishedAction,
+        $this.UiSync
+      ))
+  }
+
+  [void] Start() {
+    $this.Invocation = $this.Runner.BeginInvoke()
+  }
+
+  [object] WaitForResult() {
+    try {
+      $result = $this.Runner.EndInvoke($this.Invocation)
+      # Unwrapping an empty collection with `$()` returns `[AutomationNull]::Value`,
+      # which throws in PowerShell 5.1 class methods
+      if ($result.Count) { return $($result) }
+      return $null
+    }
+    catch {
+      # Unwrap the inner exception from `Exception calling "EndInvoke..."`
+      throw $PSItem.Exception.InnerException
+    }
+    finally {
+      $this.Runner.Runspace.CloseAsync()
+    }
+  }
+
+  [void] ForceStopAsync() {
+    $this.CancellationTokenSource.Cancel()
+    
+    [Threading.Monitor]::Enter($this.UiSync)
+    if ($this.UiSync.PendingOperation) {
+      $this.UiSync.PendingOperation.Abort() > $null
+      $this.UiSync.PendingOperation = $null
+    }
+    [Threading.Monitor]::Exit($this.UiSync)
+    
+    $this.Runner.Runspace.CloseAsync()
+  }
+}
+
+#endregion

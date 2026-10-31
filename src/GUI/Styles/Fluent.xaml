@@ -19,6 +19,7 @@
     <ResourceDictionary Source="Fluent/Grid.xaml" />
     <ResourceDictionary Source="Fluent/ListView.xaml" />
     <ResourceDictionary Source="Fluent/Menu.xaml" />
+    <ResourceDictionary Source="Fluent/ProgressBar.xaml" />
     <ResourceDictionary Source="Fluent/Scroll.xaml" />
     <ResourceDictionary Source="Fluent/Text.xaml" />
     <ResourceDictionary Source="Fluent/ToolTip.xaml" />

@@ -195,6 +195,7 @@ function Get-UninstalledPackages {
 
 function Uninstall-Packages {
   [CmdletBinding()]
+  [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
     [string[]]$Packages,
@@ -203,93 +204,143 @@ function Uninstall-Packages {
     [string]$DeviceId
   )
   process {
-    foreach ($package in $Packages) {
-      try {
-        try {
-          # Uninstall system app update, if installed
-          .$Env:adb -s $DeviceId shell pm uninstall $package
-        }
-        catch { }
-        # `pm uninstall --user 0` uninstalls the system package for the primary user
-        # when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
-        # `am force-stop' is used to ensure that all app processes are terminated
-        .$Env:adb -s $DeviceId shell "pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package"
-        Write-Host -Object "Uninstalled $package"
-      }
-      catch {
-        Write-Host -Object "Failed to uninstall $($package): $($PSItem.Exception.Message)"
-      }
-    }
+    $command = @(
+      # Uninstall system app update, if installed
+      'pm uninstall $package > /dev/null 2>&1;'
+      # `pm uninstall --user 0` uninstalls the system package for the primary user;
+      # when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
+      # `am force-stop' is used to ensure that all app processes are terminated
+      'pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package'
+    ) -join ' '
+
+    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
   }
 }
 
 function Disable-Packages {
   [CmdletBinding()]
+  [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
     [string[]]$Packages,
 
+    [Parameter(Mandatory)]
     [string]$DeviceId
   )
   process {
-    foreach ($package in $Packages) {
-      try {
-        try {
-          # Uninstall system app update, if installed
-          .$Env:adb -s $DeviceId shell pm uninstall $package
-        }
-        catch { }
-        # `pm disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
-        # `am force-stop' is used to ensure that all app processes are terminated
-        # `pm clear` clears all application data
-        .$Env:adb -s $DeviceId shell "pm disable-user $package && am force-stop $package && pm clear $package"
-        Write-Host -Object "Disabled $package"
-      }
-      catch {
-        Write-Host -Object "Failed to disable $($package): $($PSItem.Exception.Message)"
-      }
-    }
+    $command = @(
+      # Uninstall system app update, if installed
+      'pm uninstall $package > /dev/null 2>&1;'
+      # `pm disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
+      # `am force-stop' is used to ensure that all app processes are terminated
+      # `pm clear` clears all application data
+      'pm disable-user $package && am force-stop $package && pm clear $package'
+    ) -join ' '
+
+    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
   }
 }
 
 function Enable-Packages {
   [CmdletBinding()]
+  [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
     [string[]]$Packages,
 
+    [Parameter(Mandatory)]
     [string]$DeviceId
   )
   process {
-    foreach ($package in $Packages) {
-      try {
-        .$Env:adb -s $DeviceId shell pm enable $package
-        Write-Host -Object "Enabled $package"
-      }
-      catch {
-        Write-Host -Object "Failed to enable $($package): $($PSItem.Exception.Message)"
-      }
-    }
+    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command 'pm enable $package'
   }
 }
 
 function Reinstall-Packages {
   [CmdletBinding()]
+  [OutputType([hashtable])]
   param (
     [Parameter(Mandatory)]
     [string[]]$Packages,
 
+    [Parameter(Mandatory)]
     [string]$DeviceId
   )
   process {
-    foreach ($package in $Packages) {
-      try {
-        .$Env:adb -s $DeviceId shell "cmd package install-existing $package && pm enable $package"
-        Write-Host -Object "Reinstalled $package"
+    $command = 'cmd package install-existing $package && pm enable $package'
+    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
+  }
+}
+
+function Invoke-PackagesCommand {
+  [CmdletBinding()]
+  [OutputType([hashtable])]
+  param (
+    [Parameter(Mandatory)]
+    [string[]]$Packages,
+
+    [Parameter(Mandatory)]
+    [string]$DeviceId,
+
+    [Parameter(Mandatory)]
+    [string]$Command,
+
+    [Threading.CancellationToken]$CancellationToken
+  )
+  process {
+    $process = [Diagnostics.Process]@{
+      StartInfo = @{
+        FileName               = $Env:adb
+        Arguments              = "-s $DeviceId shell"
+        UseShellExecute        = $false
+        CreateNoWindow         = $true
+        RedirectStandardInput  = $true
+        RedirectStandardOutput = $true
       }
-      catch {
-        Write-Host -Object "Failed to reinstall $($package): $($PSItem.Exception.Message)"
+    }
+
+    try {
+      $process.Start() > $null
+      $registration = $CancellationToken.Register(
+        [Action[object]][scriptblock]::Create({
+            param($process)
+            if (-not $process.HasExited) { $process.Kill() }
+          }),
+        $process
+      )
+      $process.StandardInput.NewLine = "`n"
+
+      foreach ($package in $Packages) {
+        $shellCommand = @(
+          "package=$package;"
+          "if output=`$({ $Command; } < /dev/null 2>&1) && case `"`$output`" in *Failure*|*Failed*|*Exception*|*Error*) false ;; esac; then"
+          'echo "OK";'
+          'else'
+          'echo "ERR";'
+          'fi'
+        ) -join ' '
+
+        $output = if (-not $process.HasExited) {
+          $process.StandardInput.WriteLine($shellCommand)
+          $process.StandardOutput.ReadLine()
+        }
+
+        if ($CancellationToken.IsCancellationRequested) { break }
+
+        @{
+          Package = $package
+          Success = $output -eq 'OK'
+        }
       }
+    }
+    finally {
+      if ($registration) {
+        $registration.Dispose()
+      }
+      if (-not $process.HasExited) {
+        $process.Kill()
+      }
+      $process.Dispose()
     }
   }
 }

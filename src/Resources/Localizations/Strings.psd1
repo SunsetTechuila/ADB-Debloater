@@ -30,4 +30,14 @@ Uninstall = Uninstall
 Disable   = Disable
 Enable    = Enable
 Reinstall = Reinstall
+
+Uninstalling = Uninstalling
+Disabling    = Disabling
+Enabling     = Enabling
+Reinstalling = Reinstalling
+
+FailedToUninstall = Failed to uninstall
+FailedToDisable   = Failed to disable
+FailedToEnable    = Failed to enable
+FailedToReinstall = Failed to reinstall
 '@

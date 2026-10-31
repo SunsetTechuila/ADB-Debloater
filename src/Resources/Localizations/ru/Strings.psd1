@@ -30,4 +30,14 @@ Uninstall = Удалить
 Disable   = Отключить
 Enable    = Включить
 Reinstall = Переустановить
+
+Uninstalling = Удаление
+Disabling    = Отключение
+Enabling     = Включение
+Reinstalling = Переустановка
+
+FailedToUninstall = Не удалось удалить
+FailedToDisable   = Не удалось отключить
+FailedToEnable    = Не удалось включить
+FailedToReinstall = Не удалось переустановить
 '@
