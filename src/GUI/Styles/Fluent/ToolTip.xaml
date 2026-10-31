@@ -1,0 +1,28 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Style TargetType="ToolTip">
+    <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="Padding" Value="8" />
+
+    <Style.Resources>
+      <Style TargetType="Border">
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+      </Style>
+    </Style.Resources>
+
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}"
+        Value="">
+        <Setter Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}"
+        Value="{x:Null}">
+        <Setter Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+</ResourceDictionary>
