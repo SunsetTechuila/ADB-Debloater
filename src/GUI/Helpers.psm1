@@ -123,10 +123,10 @@ function Set-ColorStyles {
     [Windows.Window] $Window
   )
   process {
-    $systemTheme = Get-SystemTheme
-    $accentVariant = if ($systemTheme -eq 'dark') { 'light' } else { 'dark' }
+    $appTargetTheme = Get-AppTargetTheme
+    $accentVariant = if ($appTargetTheme -eq 'dark') { 'light' } else { 'dark' }
     $accentColor = Get-SystemAccentColor -Variant $accentVariant
-    $colorStylesPath = if ($systemTheme -eq 'dark') { $DarkStyles } else { $LightStyles }
+    $colorStylesPath = if ($appTargetTheme -eq 'dark') { $DarkStyles } else { $LightStyles }
 
     [xml]$colorStyles = Get-Content -Path $colorStylesPath -Raw
     $colorStyles.ResourceDictionary.SolidColorBrush[0].Color = $accentColor
@@ -242,7 +242,7 @@ function Set-ImmersiveDarkMode {
   )
   begin {
     $useImmersiveDarkMode = 20
-    $useDarkMode = if ((Get-SystemTheme) -eq 'dark') { 1 } else { 0 }
+    $useDarkMode = if ((Get-AppTargetTheme) -eq 'dark') { 1 } else { 0 }
   }
   process {
     Set-DwmWindowAttribute -Window $Window -Attribute $useImmersiveDarkMode -Value $useDarkMode
@@ -311,14 +311,14 @@ public class WinApi {
 
 #region System
 
-function Get-SystemTheme {
+function Get-AppTargetTheme {
   [CmdletBinding()]
   [OutputType([string])]
   param ()
   begin {
     $Parameters = @{
       Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize'
-      Name = 'SystemUsesLightTheme'
+      Name = 'AppsUseLightTheme'
     }
   }
   process {
