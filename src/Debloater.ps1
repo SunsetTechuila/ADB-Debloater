@@ -16,6 +16,7 @@ Add-Type -AssemblyName 'PresentationFramework'
   'Functions',
   'AppsDialog',
   'DevicesDialog',
+  'ProgressRingDialog',
   'MessageDialog',
   'ProcessPackagesDialog'
 ) | ForEach-Object -Process {
@@ -40,10 +41,52 @@ Import-LocalizedData @Parameters
 
 #endregion
 
-#region Main
+#region ADB
 
-Set-PlatformTools
-Start-Adb
+Set-Adb
+if (-not (Test-Adb)) {
+  $Parameters = @{
+    Message   = "$($Localization.SettingAdbUp)..."
+    Operation = ${function:Get-Adb}
+  }
+  try {
+    $result = Show-ProgressRingDialog @Parameters
+    if ($result.Cancelled) { exit }
+  }
+  catch {
+    $Parameters = @{
+      Title   = $Localization.FailedToSetAdbUp
+      Message = $PSItem.Exception.Message
+      Icon    = 'Error'
+    }
+    Show-MessageDialog @Parameters > $null
+    exit
+  }
+}
+
+if (-not (Test-AdbServer)) {
+  $Parameters = @{
+    Message   = "$($Localization.StartingAdbServer)..."
+    Operation = ${function:Start-AdbServer}
+  }
+  try {
+    $result = Show-ProgressRingDialog @Parameters
+    if ($result.Cancelled) { exit }
+  }
+  catch {
+    $Parameters = @{
+      Title   = $Localization.FailedToStartAdbServer
+      Message = $PSItem.Exception.Message
+      Icon    = 'Error'
+    }
+    Show-MessageDialog @Parameters > $null
+    exit
+  }
+}
+
+#endregion
+
+#region Main Loop
 
 do {
   $Parameters = @{
@@ -53,8 +96,9 @@ do {
   }
   $choice = Show-DevicesDialog @Parameters
   if (-not $choice) { break }
-  $actionName = $choice.ActionName
+
   $deviceId = $choice.DeviceId
+  $actionName = $choice.ActionName
 
   switch -Exact ($actionName) {
     'uninstall' {
@@ -76,9 +120,6 @@ do {
       $chosenAction = ${function:Reinstall-Packages}
       $packages = Get-UninstalledPackages -DeviceId $deviceId
       break
-    }
-    default {
-      throw "Unknown action: $($actionName)"
     }
   }
 
@@ -133,7 +174,7 @@ do {
 } while ($true)
 
 if (-not $Dev) {
-  Stop-Adb
+  Stop-AdbServer
 }
 
 #endregion

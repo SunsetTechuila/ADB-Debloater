@@ -1,0 +1,34 @@
+<Window
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  SizeToContent="WidthAndHeight"
+  MinWidth="250"
+  ResizeMode="NoResize">
+
+  <Window.InputBindings>
+    <KeyBinding Key="Escape" Command="{Binding ViewModel.CancelCommand}" />
+  </Window.InputBindings>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="12" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0"
+      Text="{Binding ViewModel.Message, Mode=OneTime}"
+      HorizontalAlignment="Center" />
+
+    <Control Grid.Row="2"
+      Style="{StaticResource ProgressRing}"
+      HorizontalAlignment="Center" />
+
+    <Button Grid.Row="4"
+      Content="{Binding Localization.Cancel}"
+      Command="{Binding ViewModel.CancelCommand}"
+      HorizontalAlignment="Stretch" />
+  </Grid>
+</Window>

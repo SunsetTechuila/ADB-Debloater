@@ -7,7 +7,13 @@ $ErrorActionPreference = 'Stop'
 ."$PSScriptRoot/../../Paths.ps1"
 ."$PSScriptRoot/../Paths.ps1"
 
-$modules = @('Helpers', 'ConnectDeviceDialog', 'PairDeviceDialog')
+$modules = @(
+  'Helpers',
+  'ConnectDeviceDialog',
+  'PairDeviceDialog',
+  'ProgressRingDialog',
+  'MessageDialog'
+)
 Import-Module -Name (Get-Variable -Name $modules -ValueOnly) -Force -DisableNameChecking
 
 $Parameters = @{
@@ -63,14 +69,48 @@ class ViewModel : ObservableObject {
 
   $PairCommand = [RelayCommand]::new({
       $data = Show-PairDeviceDialog
-      if ($data) { $PairDevice.Invoke($data.IpAddress, $data.PairingCode) }
+      if (-not $data) { return }
+
+      $Parameters = @{
+        Message      = $Localization.Pairing
+        Operation    = $PairDevice
+        ArgumentList = $data.IpAddress, $data.PairingCode
+      }
+      try {
+        $result = Show-ProgressRingDialog @Parameters
+        if (-not $result.Cancelled) { $ViewModel.RefreshDevices() }
+      }
+      catch {
+        $Parameters = @{
+          Title   = $Localization.FailedToPair
+          Message = $PSItem.Exception.Message
+          Icon    = 'Error'
+        }
+        Show-MessageDialog @Parameters > $null
+      }
     })
 
   $ConnectCommand = [RelayCommand]::new({
       $ipAddress = Show-ConnectDeviceDialog
       if (-not $ipAddress) { return }
-      $ConnectDevice.Invoke($ipAddress)
-      $ViewModel.RefreshDevices()
+
+      $Parameters = @{
+        Message      = $Localization.Connecting
+        Operation    = $ConnectDevice
+        ArgumentList = $ipAddress
+      }
+      try {
+        $result = Show-ProgressRingDialog @Parameters
+        if (-not $result.Cancelled) { $ViewModel.RefreshDevices() }
+      }
+      catch {
+        $Parameters = @{
+          Title   = $Localization.FailedToConnect
+          Message = $PSItem.Exception.Message
+          Icon    = 'Error'
+        }
+        Show-MessageDialog @Parameters > $null
+      }
     })
 
   $ChooseActionCommand = [RelayCommand]::new(

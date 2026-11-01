@@ -6,6 +6,7 @@ $DevicesDialog = "$GUI/DevicesDialog/DevicesDialog.psm1"
 $ConnectDeviceDialog = "$GUI/ConnectDeviceDialog/ConnectDeviceDialog.psm1"
 $PairDeviceDialog = "$GUI/PairDeviceDialog/PairDeviceDialog.psm1"
 $MessageDialog = "$GUI/MessageDialog/MessageDialog.psm1"
+$ProgressRingDialog = "$GUI/ProgressRingDialog/ProgressRingDialog.psm1"
 $ProgressBarDialog = "$GUI/ProgressBarDialog/ProgressBarDialog.psm1"
 $ProcessPackagesDialog = "$GUI/ProcessPackagesDialog/ProcessPackagesDialog.psm1"
 

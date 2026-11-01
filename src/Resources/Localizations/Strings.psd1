@@ -1,4 +1,10 @@
 ConvertFrom-StringData -StringData @'
+SettingAdbUp     = Setting ADB up
+FailedToSetAdbUp = Failed to set ADB up
+
+StartingAdbServer      = Starting ADB server
+FailedToStartAdbServer = Failed to start ADB server
+
 DeviceRebootInstruction    = Reboot your device into system
 DeviceReconnectInstruction = Reconnect your device
 DeviceAuthorizeInstruction = Select the checkbox "Always allow from this computer" and press "Allow"
@@ -21,6 +27,11 @@ EnterIpAddress   = Enter IP address and port
 EnterPairingCode = Enter six-digit pairing code
 OK               = OK
 Cancel           = Cancel
+
+Pairing         = Pairing
+FailedToPair    = Failed to pair
+Connecting      = Connecting
+FailedToConnect = Failed to connect
 
 NoPackagesFound = No packages found
 

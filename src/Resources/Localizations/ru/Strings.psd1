@@ -1,4 +1,10 @@
 ConvertFrom-StringData -StringData @'
+SettingAdbUp     = Установка ADB
+FailedToSetAdbUp = Не удалось установить ADB
+
+StartingAdbServer      = Запуск ADB сервера
+FailedToStartAdbServer = Не удалось запустить ADB сервер
+
 DeviceRebootInstruction    = Перезагрузитесь в систему
 DeviceReconnectInstruction = Переподключите устройство
 DeviceAuthorizeInstruction = Поставьте галочку напротив "Всегда разрешать отладку с этого компьютера" и нажмите "Разрешить"
@@ -21,6 +27,11 @@ EnterIpAddress   = Введите IP-адрес и порт
 EnterPairingCode = Введите шестизначный код сопряжения
 OK               = OK
 Cancel           = Отменить
+
+Pairing         = Сопряжение
+FailedToPair    = Не удалось установить сопряжение
+Connecting      = Подключение
+FailedToConnect = Не удалось подключиться
 
 NoPackagesFound = Пакеты не найдены
 

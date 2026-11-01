@@ -3,13 +3,13 @@ $ErrorActionPreference = 'Stop'
 
 ."$PSScriptRoot/Paths.ps1"
 
-#region Platform-Tools
+#region ADB Setup
 
-function Set-PlatformTools {
+function Set-Adb {
   [CmdletBinding()]
   param()
   begin {
-    $AdbFromResources = "$Resources/platform-tools/adb.exe"
+    $adbFromResources = "$Resources/ADB/adb.exe"
   }
   process {
     $Parameters = @{
@@ -18,33 +18,34 @@ function Set-PlatformTools {
       TotalCount  = 1
       ErrorAction = 'Ignore'
     }
-    $adbFromPATH = (Get-Command @Parameters).Source
-    if ($adbFromPATH) {
-      $Env:adb = $adbFromPATH
-      return
-    }
+    $adbFromPath = (Get-Command @Parameters).Source
 
-    $Env:adb = $AdbFromResources
-
-    $Parameters = @{
-      Path        = $AdbFromResources
-      PathType    = 'Leaf'
-      ErrorAction = 'SilentlyContinue'
-    }
-    if (-not (Test-Path @Parameters)) {
-      Get-PlatformTools
-    }
+    $Env:adb = if ($adbFromPath) { $adbFromPath } else { $adbFromResources }
   }
 }
 
-function Get-PlatformTools {
+function Test-Adb {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param()
+  process {
+    $Parameters = @{
+      Path        = $Env:adb
+      PathType    = 'Leaf'
+      ErrorAction = 'SilentlyContinue'
+    }
+    Test-Path @Parameters
+  }
+}
+
+function Get-Adb {
   [CmdletBinding()]
   param()
   begin {
     Add-Type -AssemblyName 'System.IO.Compression', 'System.IO.Compression.FileSystem'
-    $platformToolsDirectory = "$Resources/platform-tools"
+    $adbDirectory = "$Resources/ADB"
     $platformToolsDownloadUri = 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip'
-    $requiredFiles = @('adb.exe', 'AdbWinApi.dll', 'AdbWinUsbApi.dll')
+    $requiredFiles = @('AdbWinApi.dll', 'AdbWinUsbApi.dll', 'adb.exe')
   }
   process {
     $completed = $false
@@ -54,11 +55,11 @@ function Get-PlatformTools {
       $archiveStream = [IO.MemoryStream]::new([int]$response.ContentLength)
       $responseStream.CopyTo($archiveStream)
 
-      [IO.Directory]::CreateDirectory($platformToolsDirectory) > $null
+      [IO.Directory]::CreateDirectory($adbDirectory) > $null
       $archive = [IO.Compression.ZipArchive]::new($archiveStream)
       foreach ($file in $requiredFiles) {
         $entry = $archive.GetEntry("platform-tools/$file")
-        [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, "$platformToolsDirectory/$file", $true)
+        [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, "$adbDirectory/$file", $true)
       }
 
       $completed = $true
@@ -68,7 +69,7 @@ function Get-PlatformTools {
       if ($archiveStream) { $archiveStream.Dispose() }
       if ($response) { $response.Dispose() }
       if (-not $completed) {
-        Remove-Item -Path $platformToolsDirectory -Recurse -Force -ErrorAction 'SilentlyContinue'
+        Remove-Item -Path $adbDirectory -Recurse -Force -ErrorAction 'Ignore'
       }
     }
   }
@@ -78,19 +79,31 @@ function Get-PlatformTools {
 
 #region ADB
 
-function Start-Adb {
+function Start-AdbServer {
   [CmdletBinding()]
   param()
   process {
-    .$Env:adb start-server
+    # `adb start-server` writes status messages to stderr
+    $ErrorActionPreference = 'Continue'
+    $output = .$Env:adb start-server 2>&1
+    if ($LASTEXITCODE -ne 0) { throw ($output -join "`n") }
   }
 }
 
-function Stop-Adb {
+function Stop-AdbServer {
   [CmdletBinding()]
   param()
   process {
     .$Env:adb kill-server
+  }
+}
+
+function Test-AdbServer {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param()
+  process {
+    [bool](Get-Process -Name 'adb' -ErrorAction 'SilentlyContinue')
   }
 }
 
@@ -101,7 +114,9 @@ function Connect-DeviceOverWiFi {
     [string]$IpAddress
   )
   process {
-    .$Env:adb connect $IpAddress
+    $output = .$Env:adb connect $IpAddress
+    # `adb connect` writes error messages to stdout and exits with code 0 when connection fails
+    if ($output -notmatch '^(already )?connected to') { throw $output }
   }
 }
 
@@ -115,7 +130,11 @@ function Pair-DeviceOverWiFi {
     [string]$PairingCode
   )
   process {
-    .$Env:adb pair $IpAddress $PairingCode
+    # Manually throw to avoid the message being wrapped
+    # with "The running command stopped because the..." in PowerShell 5
+    $ErrorActionPreference = 'Continue'
+    $output = .$Env:adb pair $IpAddress $PairingCode 2>&1
+    if ($LASTEXITCODE -ne 0) { throw $output }
   }
 }
 
@@ -141,6 +160,8 @@ function Get-Devices {
     }
   }
 }
+
+#endregion
 
 #region Packages
 
@@ -344,8 +365,6 @@ function Invoke-PackagesCommand {
     }
   }
 }
-
-#endregion
 
 #endregion
 
