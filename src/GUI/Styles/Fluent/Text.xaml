@@ -2,10 +2,6 @@
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <Style TargetType="TextBlock">
-    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-  </Style>
-
   <Style TargetType="TextBox">
     <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />

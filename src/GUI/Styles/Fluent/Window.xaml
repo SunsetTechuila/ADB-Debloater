@@ -66,6 +66,7 @@
     <Setter Property="FontFamily" Value="Segoe UI Variable,SegoeUI" />
     <Setter Property="FontSize" Value="16" />
     <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
     <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
     <!-- 12 = 13 + (-1) from WindowChrome.GlassFrameThickness -->
     <Setter Property="Padding" Value="13" />

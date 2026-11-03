@@ -70,22 +70,16 @@
                 Background="Transparent"
                 CornerRadius="2">
                 <TextBlock
-                  Name="Icon"
                   Text="{TemplateBinding Icon}"
                   FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                  FontSize="{TemplateBinding FontSize}"
                   HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Foreground="{TemplateBinding Foreground}" />
+                  VerticalAlignment="Center" />
               </Border>
 
               <ContentPresenter
-                Name="HeaderPresenter"
                 Grid.Column="1"
                 ContentSource="Header"
-                VerticalAlignment="Center"
-                TextElement.Foreground="{TemplateBinding Foreground}"
-                TextBlock.FontSize="{TemplateBinding FontSize}" />
+                VerticalAlignment="Center" />
 
               <TextBlock
                 Name="InputGestureText"
@@ -116,10 +110,7 @@
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
-              <Setter TargetName="HeaderPresenter" Property="TextElement.Foreground"
-                Value="{DynamicResource DisabledTextBrush}" />
-              <Setter TargetName="Icon" Property="Foreground"
-                Value="{DynamicResource DisabledTextBrush}" />
+              <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}" />
               <Setter TargetName="InputGestureText" Property="Foreground"
                 Value="{DynamicResource DisabledTextBrush}" />
             </Trigger>
