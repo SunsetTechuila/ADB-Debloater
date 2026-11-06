@@ -17,15 +17,13 @@ function Show-MessageDialog {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)]
-    [string] $Message,
-
-    [System.Windows.Window] $ParentWindow
+    [string] $Message
   )
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCaptionButtons
+    $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCaptionButtons -AsModal
 
     $Window.OkButton.Content = $Localization.Ok
     $Window.OkButton.Add_Click({ $Window.Close() })
@@ -35,7 +33,6 @@ function Show-MessageDialog {
         if ($PSItem.Key -eq 'Enter') { $Window.Close() }
       })
 
-    if ($ParentWindow) { $Window.Owner = $ParentWindow }
     $Window.ShowDialog() | Out-Null
   }
 }

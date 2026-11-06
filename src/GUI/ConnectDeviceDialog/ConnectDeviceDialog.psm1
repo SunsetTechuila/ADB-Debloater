@@ -19,14 +19,12 @@ Import-LocalizedData @Parameters
 function Show-ConnectDeviceDialog {
   [CmdletBinding()]
   [OutputType([string])]
-  param(
-    [Windows.Window] $ParentWindow
-  )
+  param()
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/ConnectDeviceDialog.xaml" -HideCaptionButtons
+    $Window = Initialize-Window -Path "$PSScriptRoot/ConnectDeviceDialog.xaml" -HideCaptionButtons -AsModal
 
     $ViewModel = [ViewModel]::new()
 
@@ -37,8 +35,6 @@ function Show-ConnectDeviceDialog {
 
     $Window.IpAddressBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterIpAddress }
     $Window.IpAddressBox.Add_TextChanged({ $ViewModel.SetIpAddress($Window.IpAddressBox.Text) })
-
-    if ($ParentWindow) { $Window.Owner = $ParentWindow }
 
     if ($Window.ShowDialog()) {
       $ViewModel.IpAddress

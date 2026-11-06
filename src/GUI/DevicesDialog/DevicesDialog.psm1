@@ -62,12 +62,12 @@ class ViewModel : ObservableObject {
     })
 
   $PairCommand = [RelayCommand]::new({
-      $data = Show-PairDeviceDialog -ParentWindow $Window
+      $data = Show-PairDeviceDialog
       if ($data) { $PairDevice.Invoke($data.IpAddress, $data.PairingCode) }
     })
 
   $ConnectCommand = [RelayCommand]::new({
-      $ipAddress = Show-ConnectDeviceDialog -ParentWindow $Window
+      $ipAddress = Show-ConnectDeviceDialog
       if (-not $ipAddress) { return }
       $ConnectDevice.Invoke($ipAddress)
       $ViewModel.RefreshDevices()
