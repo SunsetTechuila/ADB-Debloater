@@ -14,7 +14,9 @@ function Initialize-Window {
 
     [switch]$SetWindowMaxHeight,
 
-    [switch]$HideCaptionButtons
+    [switch]$HideCaptionButtons,
+
+    [switch]$AsModal
   )
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
@@ -59,6 +61,19 @@ function Initialize-Window {
 
     if ($SetWindowMaxHeight) {
       Set-WindowMaxHeight -Window $Window
+    }
+
+    $Window.WindowStartupLocation = 'CenterScreen'
+    if ($AsModal) {
+      $owner = [Windows.Application]::Current.Windows |
+        Where-Object { $PSItem.IsVisible } |
+        Select-Object -Last 1
+      if ($owner) {
+        $Window.Owner  = $owner
+        $Window.WindowStartupLocation = 'CenterOwner'
+        $Window.ShowInTaskbar = $false
+        $Window.Topmost = $true
+      }
     }
 
     $Window

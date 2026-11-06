@@ -1,11 +1,8 @@
 <Window
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  WindowStartupLocation="CenterOwner"
   Width="350"
   SizeToContent="Height"
-  Topmost="True"
-  ShowInTaskbar="False"
   ResizeMode="NoResize">
 
   <Window.InputBindings>

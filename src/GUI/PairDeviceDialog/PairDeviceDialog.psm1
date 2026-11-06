@@ -19,14 +19,12 @@ Import-LocalizedData @Parameters
 function Show-PairDeviceDialog {
   [CmdletBinding()]
   [OutputType([hashtable])]
-  param(
-    [Windows.Window] $ParentWindow
-  )
+  param()
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/PairDeviceDialog.xaml" -HideCaptionButtons
+    $Window = Initialize-Window -Path "$PSScriptRoot/PairDeviceDialog.xaml" -HideCaptionButtons -AsModal
 
     $ViewModel = [ViewModel]::new()
 
@@ -40,8 +38,6 @@ function Show-PairDeviceDialog {
 
     $Window.PairingCodeBox.Tag = [PSCustomObject]@{ PlaceholderText = $Localization.EnterPairingCode }
     $Window.PairingCodeBox.Add_TextChanged({ $ViewModel.SetPairingCode($Window.PairingCodeBox.Text) })
-
-    if ($ParentWindow) { $Window.Owner = $ParentWindow }
 
     if ($Window.ShowDialog()) {
       @{
