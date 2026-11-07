@@ -82,7 +82,7 @@ do {
   }
 
   if (-not $packages) {
-    Show-MessageDialog -Message $Localization.NoPackagesFound
+    Show-MessageDialog -Message $Localization.NoPackagesFound -Icon 'Warning' > $null
     continue
   }
 
@@ -93,7 +93,7 @@ do {
   $appsToProcess = Get-AppsToProcess @Parameters
 
   if (-not $appsToProcess) {
-    Show-MessageDialog -Message $Localization.NoPackagesFound
+    Show-MessageDialog -Message $Localization.NoPackagesFound -Icon 'Warning' > $null
     continue
   }
 

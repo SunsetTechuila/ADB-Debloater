@@ -15,31 +15,54 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
-          <Border
-            Background="{TemplateBinding Background}"
-            BorderBrush="{TemplateBinding BorderBrush}"
-            BorderThickness="{TemplateBinding BorderThickness}"
-            Padding="{TemplateBinding Padding}"
-            CornerRadius="{DynamicResource ControlCornerRadius}">
+          <Grid>
+            <Border
+              Name="BackgroundBorder"
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              CornerRadius="{DynamicResource ControlCornerRadius}" />
             <ContentPresenter
+              Margin="{TemplateBinding Padding}"
               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-          </Border>
+          </Grid>
 
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
               <Setter Property="Background" Value="{DynamicResource ActiveButtonBackgroundBrush}" />
             </Trigger>
 
+            <Trigger Property="IsPressed" Value="True">
+              <Setter Property="Background"
+                Value="{DynamicResource DisabledButtonBackgroundBrush}" />
+            </Trigger>
+
+            <Trigger Property="IsDefault" Value="True">
+              <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+              <Setter Property="Foreground" Value="{DynamicResource BackgroundBrush}" />
+            </Trigger>
+
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsDefault" Value="True" />
+                <Condition Property="IsMouseOver" Value="True" />
+              </MultiTrigger.Conditions>
+              <Setter TargetName="BackgroundBorder" Property="Opacity" Value="0.9" />
+            </MultiTrigger>
+
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsDefault" Value="True" />
+                <Condition Property="IsPressed" Value="True" />
+              </MultiTrigger.Conditions>
+              <Setter TargetName="BackgroundBorder" Property="Opacity" Value="0.8" />
+            </MultiTrigger>
+
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Background"
                 Value="{DynamicResource DisabledButtonBackgroundBrush}" />
               <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}" />
-            </Trigger>
-
-            <Trigger Property="IsPressed" Value="True">
-              <Setter Property="Background"
-                Value="{DynamicResource DisabledButtonBackgroundBrush}" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>

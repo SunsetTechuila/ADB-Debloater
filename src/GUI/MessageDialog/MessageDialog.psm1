@@ -1,4 +1,7 @@
 #Requires -Version 5.1
+
+using module ../Helpers.psm1
+
 $ErrorActionPreference = 'Stop'
 
 ."$PSScriptRoot/../../Paths.ps1"
@@ -15,9 +18,18 @@ Import-LocalizedData @Parameters
 
 function Show-MessageDialog {
   [CmdletBinding()]
+  [OutputType([bool])]
   param(
     [Parameter(Mandatory)]
-    [string] $Message
+    [string]$Message,
+
+    [string]$Title,
+
+    [ValidateSet('Warning', 'Error')]
+    [string]$Icon,
+
+    [ValidateSet('Ok', 'OkCancel')]
+    [string]$Buttons = 'Ok'
   )
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
@@ -25,14 +37,43 @@ function Show-MessageDialog {
   process {
     $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCaptionButtons -AsModal
 
-    $Window.OkButton.Content = $Localization.Ok
-    $Window.OkButton.Add_Click({ $Window.Close() })
-    $Window.MessageBlock.Text = $Message
+    $ViewModel = [ViewModel]::new($Message, $Title, $Icon, $Buttons)
 
-    $Window.Add_KeyDown({
-        if ($PSItem.Key -eq 'Enter') { $Window.Close() }
-      })
+    $Window.DataContext = [PSCustomObject]@{
+      ViewModel    = $ViewModel
+      Localization = $Localization
+    }
 
-    $Window.ShowDialog() | Out-Null
+    $Window.ShowDialog()
+  }
+}
+
+class ViewModel {
+  $OkCommand = [RelayCommand]::new({
+      $Window.DialogResult = $true
+    })
+
+  $CancelCommand = [RelayCommand]::new({
+      $Window.Close()
+    })
+
+  [string] $Message
+
+  [string] $Title
+
+  [string] $Icon
+
+  [string] $Buttons
+
+  ViewModel(
+    [string] $message,
+    [string] $title,
+    [string] $icon,
+    [string] $buttons
+  ) {
+    $this.Message = $message
+    $this.Title = $title
+    $this.Icon = $icon
+    $this.Buttons = $buttons
   }
 }

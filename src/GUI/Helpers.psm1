@@ -70,7 +70,11 @@ function Initialize-Window {
       }
     }
 
-    if ($Window.SizeToContent -ne 'Manual') {
+    if (
+      $Window.SizeToContent -ne 'Manual' -and
+      ($Window.MaxWidth -eq [double]::PositiveInfinity -or
+      $Window.MaxHeight -eq [double]::PositiveInfinity)
+    ) {
       Set-WindowMaxSize -Window $Window
     }
 
@@ -101,8 +105,12 @@ function Set-WindowMaxSize {
         $activeScreen = [Windows.Forms.Screen]::FromHandle($windowHandle)
         $dpi = [Windows.Media.VisualTreeHelper]::GetDpi($Window)
 
-        $Window.MaxWidth = $activeScreen.WorkingArea.Width / $dpi.DpiScaleX
-        $Window.MaxHeight = $activeScreen.WorkingArea.Height / $dpi.DpiScaleY
+        if ($Window.MaxWidth -eq [double]::PositiveInfinity) {
+          $Window.MaxWidth = $activeScreen.WorkingArea.Width / $dpi.DpiScaleX
+        }
+        if ($Window.MaxHeight -eq [double]::PositiveInfinity) {
+          $Window.MaxHeight = $activeScreen.WorkingArea.Height / $dpi.DpiScaleY
+        }
       })
 
     $Window.Add_ContentRendered({
