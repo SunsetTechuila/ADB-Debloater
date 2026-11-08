@@ -12,8 +12,6 @@ function Initialize-Window {
     [Parameter(Mandatory)]
     [string]$Path,
 
-    [switch]$SetWindowMaxHeight,
-
     [switch]$HideCaptionButtons,
 
     [switch]$AsModal
@@ -59,10 +57,6 @@ function Initialize-Window {
       $Window.Add_SourceInitialized({ param($Window) Hide-CaptionButtons -Window $Window })
     }
 
-    if ($SetWindowMaxHeight) {
-      Set-WindowMaxHeight -Window $Window
-    }
-
     $Window.WindowStartupLocation = 'CenterScreen'
     if ($AsModal) {
       $owner = [Windows.Application]::Current.Windows |
@@ -76,29 +70,49 @@ function Initialize-Window {
       }
     }
 
+    if ($Window.SizeToContent -ne 'Manual') {
+      Set-WindowMaxSize -Window $Window
+    }
+
     $Window
   }
 }
 
-function Set-WindowMaxHeight {
+function Set-WindowMaxSize {
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
     [Windows.Window] $Window
   )
+  begin {
+    Add-Type -AssemblyName 'System.Windows.Forms'
+  }
   process {
-    $Window.Add_StateChanged({
-        param ($Window)
-        if ($Window.WindowState -eq 'Maximized') {
-          # makes the window content take the whole window space
-          $Window.MaxHeight = (Get-ActiveScreenWorkingAreaHeight -Window $Window) + 20
-        }
-        else {
-          # keeps the window within the screen borders when SizeToContent set to (WidthAnd)Height
-          $Window.MaxHeight = Get-ActiveScreenWorkingAreaHeight -Window $Window
-        }
+    # Run after the HWND is placed on the target monitor (giving the real screen and DPI), but before the first layout pass
+    # so SizeToContent measures with the clamped bounds, preventing virtualized controls from de-virtualizing
+    # and ensuring the window is centered using its clamped dimensions.
+    [Windows.PresentationSource]::AddSourceChangedHandler($Window, {
+        param($Window, $eventArguments)
+
+        $isTeardownEvent = -not $eventArguments.NewSource
+        if ($isTeardownEvent) { return }
+
+        $windowHandle = [Windows.Interop.WindowInteropHelper]::new($Window).Handle
+        $activeScreen = [Windows.Forms.Screen]::FromHandle($windowHandle)
+        $dpi = [Windows.Media.VisualTreeHelper]::GetDpi($Window)
+
+        $Window.MaxWidth = $activeScreen.WorkingArea.Width / $dpi.DpiScaleX
+        $Window.MaxHeight = $activeScreen.WorkingArea.Height / $dpi.DpiScaleY
       })
-    $Window.MaxHeight = Get-ActiveScreenWorkingAreaHeight -Window $Window
+
+    $Window.Add_ContentRendered({
+        param($Window)
+        # Prevent clearing MaxWidth/MaxHeight from causing the window to expand past the screen.
+        $Window.SizeToContent = 'Manual'
+        # Prevent the window from being clipped when maximized (+16px overhang) or when moved to a larger monitor.
+        $Window.MaxWidth = [double]::PositiveInfinity
+        $Window.MaxHeight = [double]::PositiveInfinity
+      })
   }
 }
 
@@ -193,24 +207,26 @@ function Set-WindowChrome {
   process {
     $Window.CommandBindings.AddRange($commandBindings)
 
-    $WindowChrome = [Windows.Shell.WindowChrome]::GetWindowChrome($Window)
-    if (-not $WindowChrome) {
-      $WindowChrome = [Windows.Shell.WindowChrome]::new()
-    }
+    $windowChrome = [Windows.Shell.WindowChrome]::new()
+    [Windows.Shell.WindowChrome]::SetWindowChrome($Window, $windowChrome)
 
-    $WindowChrome.GlassFrameThickness = '-1'
-    $WindowChrome.UseAeroCaptionButtons = $false
-    if ($Window.ResizeMode -eq 'NoResize') { $WindowChrome.ResizeBorderThickness = 0 }
+    $windowChrome.GlassFrameThickness = '-1'
+    $windowChrome.UseAeroCaptionButtons = $false
+    if ($Window.ResizeMode -eq 'NoResize') { $windowChrome.ResizeBorderThickness = 0 }
 
-    $Window.Add_Loaded(
-      {
-        if ($Window.TopBarElement) {
-          $WindowChrome.CaptionHeight = $Window.TopBarElement.ActualHeight + $Window.Padding.Top
-        }
+    $Window.Add_SourceInitialized({
+        param($Window)
         Hide-NativeCaptionButtons -Window $Window
-        [Windows.Shell.WindowChrome]::SetWindowChrome($Window, $WindowChrome)
-      }.GetNewClosure()
-    )
+        # WPF initially sizes the content smaller to leave room for the native title bar and resize borders.
+        # Re-measure after WindowChrome removes them so no empty space is left on the right and bottom.
+        $Window.InvalidateMeasure()
+      })
+
+    $Window.Add_Loaded({
+        if ($Window.TopBarElement) {
+          $windowChrome.CaptionHeight = $Window.TopBarElement.ActualHeight + $Window.Padding.Top
+        }
+      }.GetNewClosure())
   }
 }
 
@@ -313,22 +329,6 @@ function Get-SystemAccentColor {
         $accentPalette[16], $accentPalette[17], $accentPalette[18]
       }
     )
-  }
-}
-
-function Get-ActiveScreenWorkingAreaHeight {
-  [CmdletBinding()]
-  [OutputType([int])]
-  param (
-    [Parameter(Mandatory)]
-    [Windows.Window] $Window
-  )
-  begin {
-    Add-Type -AssemblyName 'System.Windows.Forms'
-  }
-  process {
-    $windowHandle = ([Windows.Interop.WindowInteropHelper]::new($Window)).Handle
-    [Windows.Forms.Screen]::FromHandle($windowHandle).WorkingArea.Height
   }
 }
 
