@@ -36,7 +36,7 @@ function Show-AppsDialog {
     Add-Type -AssemblyName 'PresentationFramework'
   }
   process {
-    $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml" -SetWindowMaxHeight
+    $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml"
 
     $appItems = New-AppItems -Apps $Apps
     $ViewModel = [ViewModel]::new($appItems)
@@ -72,13 +72,6 @@ function Show-AppsDialog {
       })
 
     $Window.Add_Closed({ $searchDebounceTimer.Stop() })
-
-    $Window.Add_ContentRendered({
-        # prevents the window from resizing on search
-        $Window.SizeToContent = 'Manual'
-        #removes scrollbar
-        $Window.Height = $Window.ActualHeight + 1
-      })
 
     $Window.ShowDialog() | Out-Null
   }
