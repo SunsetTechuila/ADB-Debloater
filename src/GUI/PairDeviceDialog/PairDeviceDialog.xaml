@@ -16,10 +16,10 @@
     </Grid.RowDefinitions>
 
     <TextBox Grid.Row="0" Name="IpAddressBox"
-      Height="32" Width="Auto" />
+      Height="32" />
 
     <TextBox Grid.Row="2" Name="PairingCodeBox"
-      Height="32" Width="Auto" />
+      Height="32" />
 
     <Grid Grid.Row="4">
       <Grid.ColumnDefinitions>

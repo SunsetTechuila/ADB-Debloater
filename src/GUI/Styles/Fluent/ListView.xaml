@@ -9,7 +9,6 @@
   </Style>
 
   <Style x:Key="FluentListViewItemStyle" TargetType="ListViewItem">
-    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
     <Setter Property="MinHeight" Value="40" />
@@ -27,8 +26,6 @@
         <ControlTemplate TargetType="ListBoxItem">
           <Border
             Name="Border"
-            Margin="0"
-            Padding="0"
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
@@ -42,7 +39,6 @@
                 Name="ActiveRectangle"
                 Width="3"
                 Height="16"
-                Margin="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Fill="{DynamicResource AccentBrush}"
@@ -52,7 +48,6 @@
               <!-- Tag Raises Binding.TargetUpdated on CheckBox after IsChecked updates when a virtualized ListViewItem container is recycled -->
               <CheckBox
                 Name="CheckBox"
-                Margin="0"
                 IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSelected, Mode=TwoWay}"
                 Tag="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DataContext, NotifyOnTargetUpdated=True}"
                 Focusable="False"
@@ -99,13 +94,9 @@
 
   <Style x:Key="FluentListViewItem" TargetType="ListViewItem">
     <Setter Property="Padding" Value="4,1" />
-    <Setter Property="HorizontalContentAlignment"
-      Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
     <Setter Property="VerticalContentAlignment"
       Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
     <Setter Property="Background" Value="Transparent" />
-    <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
     <Setter Property="OverridesDefaultStyle" Value="True" />
     <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultCollectionFocusVisualStyle}" />
@@ -114,8 +105,6 @@
       <Setter.Value>
         <ControlTemplate TargetType="ListViewItem">
           <Border x:Name="Bd"
-            BorderBrush="{TemplateBinding BorderBrush}"
-            BorderThickness="{TemplateBinding BorderThickness}"
             Background="{TemplateBinding Background}"
             Padding="{TemplateBinding Padding}"
             Border.CornerRadius="{TemplateBinding Border.CornerRadius}">

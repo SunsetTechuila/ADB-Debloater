@@ -8,7 +8,6 @@
     <Setter Property="BorderBrush" Value="{DynamicResource CheckBoxBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource ControlBorderThickness}" />
     <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
-    <Setter Property="Padding" Value="11,5,11,6" />
 
     <Setter Property="Template">
       <Setter.Value>
@@ -30,7 +29,6 @@
                   <Grid>
                     <TextBlock
                       Name="ControlIcon"
-                      Margin="0"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Center"
                       FontSize="14"
@@ -63,7 +61,6 @@
           <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
               <Setter TargetName="ControlIcon" Property="Visibility" Value="Visible" />
-              <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Collapsed" />
               <Setter TargetName="ControlBorderIconPresenter" Property="Background"
                 Value="{DynamicResource AccentBrush}" />
               <Setter TargetName="StrokeBorder" Property="BorderBrush"
@@ -94,7 +91,6 @@
             </EventTrigger>
 
             <Trigger Property="IsChecked" Value="{x:Null}">
-              <Setter TargetName="ControlIcon" Property="Visibility" Value="Collapsed" />
               <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Visible" />
               <Setter TargetName="ControlBorderIconPresenter" Property="Background"
                 Value="{DynamicResource AccentBrush}" />

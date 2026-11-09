@@ -69,9 +69,7 @@
                 Grid.Column="0"
                 Width="16"
                 Height="16"
-                Margin="0,0,8,0"
-                Background="Transparent"
-                CornerRadius="2">
+                Margin="0,0,8,0">
                 <TextBlock
                   Text="{TemplateBinding Icon}"
                   FontFamily="{DynamicResource SymbolThemeFontFamily}"
@@ -115,13 +113,6 @@
               <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}" />
               <Setter TargetName="InputGestureText" Property="Foreground"
                 Value="{DynamicResource DisabledTextBrush}" />
-            </Trigger>
-
-            <Trigger Property="Role" Value="TopLevelHeader">
-              <Setter Property="Padding" Value="8,4" />
-            </Trigger>
-            <Trigger Property="Role" Value="TopLevelItem">
-              <Setter Property="Padding" Value="8,4" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>

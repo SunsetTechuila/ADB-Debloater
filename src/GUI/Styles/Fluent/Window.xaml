@@ -89,7 +89,6 @@
                 <ContentPresenter Margin="{TemplateBinding Padding}" />
                 <Border
                   Name="CaptionButtons"
-                  Background="Transparent"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Top"
                   WindowChrome.IsHitTestVisibleInChrome="True">

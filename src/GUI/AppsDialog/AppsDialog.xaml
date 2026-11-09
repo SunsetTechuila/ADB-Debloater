@@ -28,7 +28,6 @@
                   Text="&#xE897;"
                   FontSize="10"
                   FontWeight="Bold"
-                  Foreground="{DynamicResource TextBrush}"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   FontFamily="{StaticResource SymbolThemeFontFamily}" />
@@ -100,10 +99,8 @@
         ItemsSource="{Binding ViewModel.FilteredAppItems}"
         ItemTemplate="{StaticResource AppItemTemplate}"
         SelectionMode="Multiple"
-        VirtualizingPanel.IsVirtualizing="True"
         VirtualizingPanel.VirtualizationMode="Recycling"
         VirtualizingPanel.ScrollUnit="Pixel"
-        ScrollViewer.VerticalScrollBarVisibility="Auto"
         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
         Padding="1">
         <ListView.ItemContainerStyle>

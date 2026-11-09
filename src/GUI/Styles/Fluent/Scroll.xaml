@@ -13,10 +13,8 @@
   </Style>
 
   <Style x:Key="ScrollBarThumb" TargetType="Thumb">
-    <Setter Property="Margin" Value="0" />
     <Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundBrush}" />
     <Setter Property="Border.CornerRadius" Value="3" />
-    <Setter Property="Focusable" Value="False" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Thumb">

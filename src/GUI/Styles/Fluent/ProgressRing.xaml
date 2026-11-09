@@ -22,7 +22,6 @@
                 Name="Indicator"
                 Width="32"
                 Height="32"
-                Fill="Transparent"
                 Stroke="{TemplateBinding Foreground}"
                 StrokeThickness="3"
                 StrokeStartLineCap="Round"

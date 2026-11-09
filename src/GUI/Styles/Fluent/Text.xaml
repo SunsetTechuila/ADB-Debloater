@@ -37,9 +37,7 @@
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}"
               CornerRadius="{TemplateBinding Border.CornerRadius}">
-              <ScrollViewer
-                Name="PART_ContentHost"
-                TextElement.Foreground="{TemplateBinding Foreground}" />
+              <ScrollViewer Name="PART_ContentHost" />
             </Border>
             <TextBlock
               Name="PlaceholderText"
