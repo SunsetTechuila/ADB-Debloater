@@ -28,7 +28,7 @@ function Show-DevicesDialog {
   [OutputType([hashtable])]
   param(
     [Parameter(Mandatory)]
-    [scriptblock]$GetDevices,
+    [scriptblock]$WatchDevices,
 
     [Parameter(Mandatory)]
     [scriptblock]$ConnectDevice,
@@ -42,7 +42,7 @@ function Show-DevicesDialog {
   process {
     $Window = Initialize-Window -Path "$PSScriptRoot/DevicesDialog.xaml"
 
-    $ViewModel = [ViewModel]::new($GetDevices)
+    $ViewModel = [ViewModel]::new()
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -53,7 +53,16 @@ function Show-DevicesDialog {
         $ViewModel.OnSelectionChanged()
       })
 
-    if ($Window.ShowDialog()) {
+    $watchDevicesTask = [BackgroundTask]@{
+      Operation  = $WatchDevices
+      OnProgress = { param($devices) $ViewModel.UpdateDevices($devices) }
+    }
+
+    $watchDevicesTask.Start()
+    $confirmed = $Window.ShowDialog()
+    $watchDevicesTask.ForceStopAsync()
+
+    if ($confirmed) {
       @{
         DeviceId   = $ViewModel.SelectedDevice.Id
         ActionName = $ViewModel.SelectedActionName
@@ -63,10 +72,6 @@ function Show-DevicesDialog {
 }
 
 class ViewModel : ObservableObject {
-  $RefreshCommand = [RelayCommand]::new({
-      $ViewModel.RefreshDevices()
-    })
-
   $PairCommand = [RelayCommand]::new({
       $data = Show-PairDeviceDialog
       if (-not $data) { return }
@@ -77,8 +82,7 @@ class ViewModel : ObservableObject {
         ArgumentList = $data.IpAddress, $data.PairingCode
       }
       try {
-        $result = Show-ProgressRingDialog @Parameters
-        if (-not $result.Cancelled) { $ViewModel.RefreshDevices() }
+        Show-ProgressRingDialog @Parameters > $null
       }
       catch {
         $Parameters = @{
@@ -100,8 +104,7 @@ class ViewModel : ObservableObject {
         ArgumentList = $ipAddress
       }
       try {
-        $result = Show-ProgressRingDialog @Parameters
-        if (-not $result.Cancelled) { $ViewModel.RefreshDevices() }
+        Show-ProgressRingDialog @Parameters > $null
       }
       catch {
         $Parameters = @{
@@ -125,9 +128,32 @@ class ViewModel : ObservableObject {
     }
   )
 
-  hidden [Device[]] $Devices
-  hidden [void] SetDevices($value) {
-    $this.SetProperty('Devices', $value)
+  hidden $Devices = [Collections.ObjectModel.ObservableCollection[Device]]::new()
+  [void] UpdateDevices([hashtable] $devices) {
+    foreach ($existingDevice in @($this.Devices)) {
+      $updatedDevice = $devices[$existingDevice.Id]
+      if ($updatedDevice) {
+        $existingDevice.SetModel($updatedDevice.Model)
+        $existingDevice.SetStatus($updatedDevice.Status)
+        $devices.Remove($existingDevice.Id)
+      }
+      else {
+        $this.Devices.Remove($existingDevice)
+      }
+    }
+
+    foreach ($device in $devices.GetEnumerator()) {
+      $this.Devices.Add([Device]::new(
+          $device.Key, $device.Value.Model, $device.Value.Status
+        ))
+    }
+
+    if (-not $this.SelectedDevice -and $this.Devices.Count) {
+      $this.SetSelectedDevice($this.Devices[0])
+    }
+    else {
+      $this.ChooseActionCommand.NotifyCanExecuteChanged()
+    }
   }
 
   hidden [Device] $SelectedDevice
@@ -137,47 +163,31 @@ class ViewModel : ObservableObject {
 
   hidden [string] $SelectedActionName
 
-  hidden [scriptblock] $GetDevices
-
-  ViewModel($getDevices) {
-    $this.GetDevices = $getDevices
-    $this.RefreshDevices()
-  }
-
-  [void] RefreshDevices() {
-    $this.SetDevices($(
-        foreach ($device in $this.GetDevices.Invoke()) {
-          [Device]::new($device.Id, $device.Model, $device.Status)
-        }
-      ))
-    $this.SetSelectedDevice(
-      $(if ($this.Devices.Count) { $this.Devices[0] })
-    )
-  }
-
   [void] OnSelectionChanged() {
     $this.ChooseActionCommand.NotifyCanExecuteChanged()
   }
 }
 
-class Device {
+class Device : ObservableObject {
   [string] $Id
 
   [string] $Model
+  # Model changes from unknown to a specific value when status changes from offline/unauthorized
+  [void] SetModel($value) {
+    $this.SetProperty('Model', $value)
+  }
 
   [string] $Status
+  [void] SetStatus($status) {
+    $formattedStatus = $status.Substring(0, 1).ToUpper() + $status.Substring(1).ToLower()
+    if ($this.SetProperty('Status', $formattedStatus)) {
+      $this.UpdateHint()
+    }
+  }
 
   [string] $Hint
-
-  Device(
-    [string] $id,
-    [string] $model,
-    [string] $status
-  ) {
-    $this.Id = $id
-    $this.Model = $model
-    $this.Status = $status.Substring(0, 1).ToUpper() + $status.Substring(1).ToLower()
-    $this.Hint = switch -Regex ($status) {
+  hidden [void] UpdateHint() {
+    $newHint = switch -Regex ($this.Status) {
       'Offline' {
         $script:Localization.DeviceReconnectInstruction
         break
@@ -194,5 +204,16 @@ class Device {
         $null
       }
     }
+    $this.SetProperty('Hint', $newHint)
+  }
+
+  Device(
+    [string] $id,
+    [string] $model,
+    [string] $status
+  ) {
+    $this.Id = $id
+    $this.Model = $model
+    $this.SetStatus($status)
   }
 }

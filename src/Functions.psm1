@@ -138,25 +138,71 @@ function Pair-DeviceOverWiFi {
   }
 }
 
-function Get-Devices {
+function Watch-Devices {
   [CmdletBinding()]
   [OutputType([hashtable])]
-  param()
+  param(
+    [Threading.CancellationToken]$CancellationToken
+  )
   process {
-    foreach ($line in .$Env:adb devices -l | Select-Object -Skip 1) {
-      if ($line.Length -eq 0) { continue }
-      $fields = -split $line
-
-      $status = ($fields -match '^(bootloader|device|recovery|sideload|offline|unauthorized)$')[0]
-      if ($status -eq 'device') { $status = 'connected' }
-      $model = ($fields -match '^model:\w+$')[0]
-      $model = if ($model) { $model.Replace('model:', '').Replace('_', ' ') } else { 'unknown' }
-
-      @{
-        Id     = $fields[0]
-        Status = if ($status) { $status } else { 'unknown' }
-        Model  = $model
+    $process = [Diagnostics.Process]@{
+      StartInfo = @{
+        FileName               = $Env:adb
+        Arguments              = 'track-devices -l'
+        UseShellExecute        = $false
+        CreateNoWindow         = $true
+        RedirectStandardOutput = $true
       }
+    }
+
+    try {
+      $process.Start() > $null
+      $registration = $CancellationToken.Register(
+        [Action[object]][scriptblock]::Create({
+            param($process)
+            if (-not $process.HasExited) { $process.Kill() }
+          }),
+        $process
+      )
+
+      $lengthBuffer = [char[]]::new(4)
+      while (-not $process.HasExited) {
+        $headerLength = $process.StandardOutput.ReadBlock($lengthBuffer, 0, 4)
+        if ($headerLength -lt 4) { break }
+
+        $payloadRemainingLength = [Convert]::ToInt32((-join $lengthBuffer), 16)
+        $devices = @{}
+        # Do not use ReadBlock here because the ADB server's payload length is based on `\n` characters,
+        # but on Windows adb.exe writes to stdout in text mode, expanding each `\n` to `\r\n`.
+        while ($payloadRemainingLength -gt 0) {
+          $line = $process.StandardOutput.ReadLine()
+          $lineLengthWithUnixNewline = $line.Length + 1
+          $payloadRemainingLength -= $lineLengthWithUnixNewline
+
+          $fields = -split $line
+          $id = $fields[0]
+          $status = $fields[1]
+          if ($status -eq 'device') { $status = 'connected' }
+          $model = ($fields -match '^model:\w+$')[0]
+          $model = if ($model) { $model.Replace('model:', '').Replace('_', ' ') } else { 'unknown' }
+
+          $devices[$id] = @{
+            Status = $status
+            Model  = $model
+          }
+        }
+
+        $devices
+      }
+    }
+    finally {
+      if ($registration) {
+        $registration.Dispose()
+      }
+      if (-not $process.HasExited) {
+        $process.Kill()
+      }
+      $process.Dispose()
     }
   }
 }

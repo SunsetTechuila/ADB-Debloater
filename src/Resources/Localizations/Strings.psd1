@@ -12,7 +12,6 @@ DeviceAuthorizeInstruction = Select the checkbox "Always allow from this compute
 Devices               = Devices
 ConnectDeviceOverWiFi = Connect device over Wi-Fi
 PairDeviceOverWiFi    = Pair device over Wi-Fi
-RefreshDevicesList    = Refresh devices list
 
 DeviceModel  = Model
 DeviceId     = Id

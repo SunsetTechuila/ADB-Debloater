@@ -12,7 +12,6 @@ DeviceAuthorizeInstruction = Поставьте галочку напротив 
 Devices               = Устройства
 ConnectDeviceOverWiFi = Подключить устройство по Wi-Fi
 PairDeviceOverWiFi    = Установить сопряжение с устройством по Wi-Fi
-RefreshDevicesList    = Обновить список устройств
 
 DeviceModel  = Модель
 DeviceStatus = Состояние

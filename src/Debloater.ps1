@@ -93,7 +93,7 @@ if (-not $wasAdbInstalled -or -not (Test-AdbServer)) {
 
 do {
   $Parameters = @{
-    GetDevices    = ${function:Get-Devices}
+    WatchDevices  = ${function:Watch-Devices}
     ConnectDevice = ${function:Connect-DeviceOverWiFi}
     PairDevice    = ${function:Pair-DeviceOverWiFi}
   }
