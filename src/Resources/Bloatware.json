@@ -1161,7 +1161,7 @@
     },
     "Description": {
       "en": "«Continue apps on other devices» option in Settings.",
-      "ru": "Опция «Продолжение работы приложений на других устройствах»‎ в Настройках."
+      "ru": "Опция «Продолжение работы приложений на других устройствах» в Настройках."
     },
     "Packages": [
       "com.samsung.android.galaxycontinuity",
@@ -1175,7 +1175,7 @@
     },
     "Description": {
       "en": "«Camera sharing» option in Settings. Works only in pair with Galaxy Tab.",
-      "ru": "Опция «Доступ к камере»‎ в Настройках. Работает только в связке планшетом Galaxy."
+      "ru": "Опция «Доступ к камере» в Настройках. Работает только в связке планшетом Galaxy."
     },
     "Packages": [
       "com.samsung.android.hwresourceshare"
@@ -1188,7 +1188,7 @@
     },
     "Description": {
       "en": "«Multi control» option in Settings. Works only in pair with Galaxy devices.",
-      "ru": "Опция «Несколько устройств»‎ в Настройках. Работает только в связке с устройствами Galaxy."
+      "ru": "Опция «Несколько устройств» в Настройках. Работает только в связке с устройствами Galaxy."
     },
     "Packages": [
       "com.samsung.android.inputshare"
