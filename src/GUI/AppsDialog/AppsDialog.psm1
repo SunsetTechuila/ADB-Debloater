@@ -64,7 +64,7 @@ function Show-AppsDialog {
       })
 
     $searchDebounceTimer = [Windows.Threading.DispatcherTimer]::new()
-    $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(150)
+    $searchDebounceTimer.Interval = [TimeSpan]::FromMilliseconds(75)
     $searchDebounceTimer.add_Tick({
         $searchDebounceTimer.Stop()
         $ViewModel.FilterApps($Window.SearchBox.Text)
