@@ -1518,5 +1518,35 @@
       "com.samsung.android.mdx",
       "com.microsoft.appmanager"
     ]
+  },
+  {
+    "Name": {
+      "en": "Essential Space"
+    },
+    "Description": {
+      "en": "Disabling or removing those packages frees the Essential Key for remapping.",
+      "ru": "Отключение или удаление этих пакетов освобождает Essential Key для переназначения."
+    },
+    "Packages": [
+      "com.nothing.ntessentialspace",
+      "com.nothing.ntessentialrecorder",
+      "com.essentialintelligence"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Nothing Recorder"
+    },
+    "Packages": [
+      "com.nothing.soundrecorder"
+    ]
+  },
+  {
+    "Name": {
+      "en": "Nothing Weather"
+    },
+    "Packages": [
+      "com.nothing.weather"
+    ]
   }
 ]
