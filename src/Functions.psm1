@@ -219,7 +219,7 @@ function Get-InstalledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell pm list packages) -replace '^package:'
+    (.$Env:adb -s $DeviceId shell cmd package list packages) -replace '^package:'
   }
 }
 
@@ -231,7 +231,7 @@ function Get-EnabledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell pm list packages -e) -replace '^package:'
+    (.$Env:adb -s $DeviceId shell cmd package list packages -e) -replace '^package:'
   }
 }
 
@@ -243,7 +243,7 @@ function Get-DisabledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell pm list packages -d) -replace '^package:'
+    (.$Env:adb -s $DeviceId shell cmd package list packages -d) -replace '^package:'
   }
 }
 
@@ -255,7 +255,7 @@ function Get-UninstalledPackages {
     [string]$DeviceId
   )
   process {
-    $command = '{ pm list packages -u; pm list packages; } | sort | uniq -u'
+    $command = '(cmd package list packages -u & installed=$(cmd package list packages); wait; IFS=; echo $installed) | sort | uniq -u'
     (.$Env:adb -s $DeviceId shell $command) -replace '^package:'
   }
 }
@@ -273,11 +273,10 @@ function Uninstall-Packages {
   process {
     $command = @(
       # Uninstall system app update, if installed
-      'pm uninstall $package > /dev/null 2>&1;'
-      # `pm uninstall --user 0` uninstalls the system package for the primary user;
-      # when the app is uninstalled, `pm disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
-      # `am force-stop' is used to ensure that all app processes are terminated
-      'pm uninstall --user 0 $package && pm disable-user $package && am force-stop $package'
+      'cmd package uninstall $package > /dev/null 2>&1;'
+      # `cmd package uninstall --user 0` uninstalls the system package for the primary user;
+      # when the app is uninstalled, `cmd package disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
+      'cmd package uninstall --user 0 $package && cmd package disable-user $package'
     ) -join ' '
 
     Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
@@ -297,11 +296,10 @@ function Disable-Packages {
   process {
     $command = @(
       # Uninstall system app update, if installed
-      'pm uninstall $package > /dev/null 2>&1;'
-      # `pm disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
-      # `am force-stop' is used to ensure that all app processes are terminated
-      # `pm clear` clears all application data
-      'pm disable-user $package && am force-stop $package && pm clear $package'
+      'cmd package uninstall $package > /dev/null 2>&1;'
+      # `cmd package disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
+      # `cmd package clear` clears all application data
+      'cmd package disable-user $package && cmd package clear $package'
     ) -join ' '
 
     Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
@@ -319,7 +317,7 @@ function Enable-Packages {
     [string]$DeviceId
   )
   process {
-    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command 'pm enable $package'
+    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command 'cmd package enable $package'
   }
 }
 
@@ -334,7 +332,7 @@ function Reinstall-Packages {
     [string]$DeviceId
   )
   process {
-    $command = 'cmd package install-existing $package && pm enable $package'
+    $command = 'cmd package install-existing $package && cmd package enable $package'
     Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
   }
 }
