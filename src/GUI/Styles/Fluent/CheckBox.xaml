@@ -35,10 +35,11 @@
                       FontWeight="Bold"
                       Foreground="{DynamicResource BackgroundBrush}"
                       FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                      Tag="{DynamicResource {x:Static SystemParameters.ClientAreaAnimationKey}}"
                       Visibility="Collapsed"
                       Text="&#xE73E;">
                       <TextBlock.Clip>
-                        <RectangleGeometry />
+                        <RectangleGeometry Rect="0,0,13,14" />
                       </TextBlock.Clip>
                     </TextBlock>
                     <Rectangle
@@ -65,7 +66,17 @@
                 Value="{DynamicResource AccentBrush}" />
               <Setter TargetName="StrokeBorder" Property="BorderBrush"
                 Value="{DynamicResource AccentBrush}" />
-              <Trigger.EnterActions>
+            </Trigger>
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition
+                  Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}"
+                  Value="True" />
+                <Condition
+                  Binding="{Binding ElementName=ControlIcon, Path=Tag}"
+                  Value="True" />
+              </MultiDataTrigger.Conditions>
+              <MultiDataTrigger.EnterActions>
                 <BeginStoryboard Name="RevealStoryboard">
                   <Storyboard>
                     <RectAnimationUsingKeyFrames
@@ -79,8 +90,8 @@
                     </RectAnimationUsingKeyFrames>
                   </Storyboard>
                 </BeginStoryboard>
-              </Trigger.EnterActions>
-            </Trigger>
+              </MultiDataTrigger.EnterActions>
+            </MultiDataTrigger>
             <!-- Skips the animation when a checked CheckBox is newly created -->
             <EventTrigger RoutedEvent="FrameworkElement.Loaded">
               <SkipStoryboardToFill BeginStoryboardName="RevealStoryboard" />
