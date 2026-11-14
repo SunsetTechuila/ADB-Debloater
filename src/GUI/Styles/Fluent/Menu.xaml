@@ -5,6 +5,7 @@
   <Style TargetType="ContextMenu">
     <Setter Property="SnapsToDevicePixels" Value="True" />
     <Setter Property="UseLayoutRounding" Value="True" />
+    <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
     <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource OverlayBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource ControlBorderThickness}" />

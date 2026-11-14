@@ -66,7 +66,7 @@
     <Setter Property="SnapsToDevicePixels" Value="True" />
     <Setter Property="UseLayoutRounding" Value="True" />
     <Setter Property="Title" Value="ADB Debloater" />
-    <Setter Property="FontFamily" Value="Segoe UI Variable,SegoeUI" />
+    <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
     <Setter Property="FontSize" Value="16" />
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
     <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
