@@ -34,7 +34,9 @@ function Show-DevicesDialog {
     [scriptblock]$ConnectDevice,
 
     [Parameter(Mandatory)]
-    [scriptblock]$PairDevice
+    [scriptblock]$PairDevice,
+
+    [string]$SelectedDeviceId
   )
   begin {
     Add-Type -AssemblyName 'PresentationFramework'
@@ -42,7 +44,7 @@ function Show-DevicesDialog {
   process {
     $Window = Initialize-Window -Path "$PSScriptRoot/DevicesDialog.xaml"
 
-    $ViewModel = [ViewModel]::new()
+    $ViewModel = [ViewModel]::new($SelectedDeviceId)
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -130,11 +132,20 @@ class ViewModel : ObservableObject {
 
   hidden $Devices = [Collections.ObjectModel.ObservableCollection[Device]]::new()
   [void] UpdateDevices([hashtable] $devices) {
+    $this.SyncDevices($devices)
+    $this.SortDevicesByStatus()
+    $this.UpdateSelection()
+  }
+
+  hidden [void] SyncDevices([hashtable] $devices) {
     foreach ($existingDevice in @($this.Devices)) {
       $updatedDevice = $devices[$existingDevice.Id]
       if ($updatedDevice) {
         $existingDevice.SetModel($updatedDevice.Model)
-        $existingDevice.SetStatus($updatedDevice.Status)
+        $didStatusChange = $existingDevice.SetStatus($updatedDevice.Status)
+        if ($didStatusChange -and ($this.SelectedDevice -eq $existingDevice)) {
+          $this.ChooseActionCommand.NotifyCanExecuteChanged()
+        }
         $devices.Remove($existingDevice.Id)
       }
       else {
@@ -147,14 +158,41 @@ class ViewModel : ObservableObject {
           $device.Key, $device.Value.Model, $device.Value.Status
         ))
     }
+  }
 
-    if (-not $this.SelectedDevice -and $this.Devices.Count) {
-      $this.SetSelectedDevice($this.Devices[0])
-    }
-    else {
-      $this.ChooseActionCommand.NotifyCanExecuteChanged()
+  hidden [void] SortDevicesByStatus() {
+    if ($this.Devices.Count -le 1) { return }
+
+    $sortedDevices = @(
+      $this.Devices | Sort-Object -Property { $PSItem.Status -ne 'Connected' }, Status, Id
+    )
+    for ($i = 0; $i -lt $sortedDevices.Count; $i++) {
+      $oldIndex = $this.Devices.IndexOf($sortedDevices[$i])
+      if ($oldIndex -ne $i) {
+        $this.Devices.Move($oldIndex, $i)
+      }
     }
   }
+
+  hidden [void] UpdateSelection() {
+    if ($this.SelectedDevice -or (-not $this.Devices.Count)) { return }
+
+    if ($this.InitialSelectedDeviceId) {
+      $targetDevice = $this.Devices | Where-Object -Property 'Id' -EQ $this.InitialSelectedDeviceId
+      $this.InitialSelectedDeviceId = $null
+      if ($targetDevice) {
+        $this.SetSelectedDevice($targetDevice)
+        return
+      }
+    }
+
+    $firstDevice = $this.Devices[0]
+    if ($firstDevice.Status -eq 'Connected') {
+      $this.SetSelectedDevice($firstDevice)
+    }
+  }
+
+  hidden [string] $InitialSelectedDeviceId
 
   hidden [Device] $SelectedDevice
   [void] SetSelectedDevice($value) {
@@ -162,6 +200,10 @@ class ViewModel : ObservableObject {
   }
 
   hidden [string] $SelectedActionName
+
+  ViewModel([string] $initialSelectedDeviceId) {
+    $this.InitialSelectedDeviceId = $initialSelectedDeviceId
+  }
 
   [void] OnSelectionChanged() {
     $this.ChooseActionCommand.NotifyCanExecuteChanged()
@@ -178,11 +220,13 @@ class Device : ObservableObject {
   }
 
   [string] $Status
-  [void] SetStatus($status) {
+  [bool] SetStatus($status) {
     $formattedStatus = $status.Substring(0, 1).ToUpper() + $status.Substring(1).ToLower()
-    if ($this.SetProperty('Status', $formattedStatus)) {
+    $statusChanged = $this.SetProperty('Status', $formattedStatus)
+    if ($statusChanged) {
       $this.UpdateHint()
     }
+    return $statusChanged
   }
 
   [string] $Hint
