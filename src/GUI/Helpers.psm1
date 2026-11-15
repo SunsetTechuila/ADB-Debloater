@@ -131,8 +131,39 @@ function Add-FluentStyles {
     $reader = [Xml.XmlReader]::Create($FluentStyles)
     $fluentResourceDictionary = [Windows.Markup.XamlReader]::Load($reader)
     $reader.Close()
-
     [Windows.Application]::Current.Resources.MergedDictionaries.Add($fluentResourceDictionary)
+    Register-ContextMenuAnimation
+  }
+}
+
+function Register-ContextMenuAnimation {
+  [CmdletBinding()]
+  param ()
+  begin {
+    $animateFromBottom = [Windows.Controls.Primitives.Popup].GetProperty(
+      'AnimateFromBottom',
+      [Reflection.BindingFlags]'NonPublic,Instance'
+    )
+  }
+  process {
+    [Windows.EventManager]::RegisterClassHandler(
+      [Windows.Controls.ContextMenu],
+      [Windows.Controls.ContextMenu]::OpenedEvent,
+      [Windows.RoutedEventHandler] {
+        param($ContextMenu)
+        $menuRoot = $ContextMenu.Template.FindName('MenuRoot', $ContextMenu)
+        $isAnimatingFromBottom = $animateFromBottom.GetValue($ContextMenu.Parent)
+        $menuRoot.VerticalAlignment = if ($isAnimatingFromBottom) { 'Bottom' } else { 'Top' }
+
+        if (
+          [Windows.SystemParameters]::ClientAreaAnimation -and
+          [Windows.SystemParameters]::MenuAnimation
+        ) {
+          $revealSizer = $ContextMenu.Template.FindName('RevealSizer', $ContextMenu)
+          $ContextMenu.FindResource('RevealStoryboard').Begin($revealSizer)
+        }
+      }.GetNewClosure()
+    )
   }
 }
 
