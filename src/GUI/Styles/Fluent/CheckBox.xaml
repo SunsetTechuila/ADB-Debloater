@@ -8,56 +8,67 @@
     <Setter Property="BorderBrush" Value="{DynamicResource CheckBoxBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource ControlBorderThickness}" />
     <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
 
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="CheckBox">
-          <BulletDecorator
-            Background="Transparent">
-            <BulletDecorator.Bullet>
+          <Grid Background="Transparent">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border
+              Name="ControlBorderIconPresenter"
+              Grid.Column="0"
+              Width="18"
+              Height="18"
+              VerticalAlignment="Center"
+              Background="{TemplateBinding Background}"
+              CornerRadius="{TemplateBinding Border.CornerRadius}">
               <Border
-                Name="ControlBorderIconPresenter"
-                Width="18"
-                Height="18"
-                Background="{TemplateBinding Background}"
+                Name="StrokeBorder"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="{TemplateBinding Border.CornerRadius}">
-                <Border
-                  Name="StrokeBorder"
-                  BorderBrush="{TemplateBinding BorderBrush}"
-                  BorderThickness="{TemplateBinding BorderThickness}"
-                  CornerRadius="{TemplateBinding Border.CornerRadius}">
-                  <Grid>
-                    <TextBlock
-                      Name="ControlIcon"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      FontSize="14"
-                      FontWeight="Bold"
-                      Foreground="{DynamicResource BackgroundBrush}"
-                      FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                      Tag="{DynamicResource {x:Static SystemParameters.ClientAreaAnimationKey}}"
-                      Visibility="Collapsed"
-                      Text="&#xE73E;">
-                      <TextBlock.Clip>
-                        <RectangleGeometry Rect="0,0,13,14" />
-                      </TextBlock.Clip>
-                    </TextBlock>
-                    <Rectangle
-                      Name="IndeterminateBar"
-                      Width="8"
-                      Height="2"
-                      RadiusX="1"
-                      RadiusY="1"
-                      Fill="{DynamicResource BackgroundBrush}"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      Visibility="Collapsed" />
-                  </Grid>
-                </Border>
+                <Grid>
+                  <TextBlock
+                    Name="ControlIcon"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource BackgroundBrush}"
+                    FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                    Tag="{DynamicResource {x:Static SystemParameters.ClientAreaAnimationKey}}"
+                    Visibility="Collapsed"
+                    Text="&#xE73E;">
+                    <TextBlock.Clip>
+                      <RectangleGeometry Rect="0,0,13,14" />
+                    </TextBlock.Clip>
+                  </TextBlock>
+                  <Rectangle
+                    Name="IndeterminateBar"
+                    Width="8"
+                    Height="2"
+                    RadiusX="1"
+                    RadiusY="1"
+                    Fill="{DynamicResource BackgroundBrush}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed" />
+                </Grid>
               </Border>
-            </BulletDecorator.Bullet>
-            <ContentPresenter Margin="8,-1.2,0,0" />
-          </BulletDecorator>
+            </Border>
+
+            <ContentPresenter
+              Grid.Column="1"
+              Margin="8,0,0,0"
+              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Grid>
 
           <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
