@@ -6,6 +6,7 @@
     <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
     <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource AccentBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource ControlBorderThickness}" />
     <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
