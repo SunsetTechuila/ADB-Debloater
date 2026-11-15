@@ -3,7 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-  <SolidColorBrush x:Key="AccentBrush" Color="PLACEHOLDER" />
+  <SolidColorBrush x:Key="AccentBrush" Color="#7ABEFF" />
   <SolidColorBrush x:Key="TextBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="InactiveTextBrush" Color="#D0D0D0" />
   <SolidColorBrush x:Key="DisabledTextBrush" Color="#6E6E6E" />

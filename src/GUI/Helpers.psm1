@@ -137,10 +137,10 @@ function Set-ColorStyles {
     $accentColor = Get-SystemAccentColor -Variant $accentVariant
     $colorStylesPath = if ($appTargetTheme -eq 'dark') { $DarkStyles } else { $LightStyles }
 
-    [xml]$colorStyles = Get-Content -Path $colorStylesPath -Raw
-    $colorStyles.ResourceDictionary.SolidColorBrush[0].Color = $accentColor
-    $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $colorStyles
+    $reader = [Xml.XmlReader]::Create($colorStylesPath)
     $colorResourceDictionary = [Windows.Markup.XamlReader]::Load($reader)
+    $reader.Close()
+    $colorResourceDictionary.AccentBrush.Color = $accentColor
 
     $application = [Windows.Application]::Current
     $mergedDictionaries = $application.Resources.MergedDictionaries
