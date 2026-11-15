@@ -5,10 +5,19 @@
 
 ## Screenshots
 
-| Dark theme, blue accent, blue wallpaper               | Light theme, green accent, green wallpaper             |
-| ----------------------------------------------------- | ------------------------------------------------------ |
-| ![screenshot1](/assets/screenshots/packages_dark.png) | ![screenshot2](/assets/screenshots/packages_light.png) |
-| ![screenshot3](/assets/screenshots/devices_dark.png)  | ![screenshot4](/assets/screenshots/devices_light.png)  |
+### Package select dialog
+
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="assets/screenshots/packages_light.png">
+    <img alt="Package select dialog" src="assets/screenshots/packages_dark.png">
+  </picture>
+
+### Device select dialog
+
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="assets/screenshots/devices_light.png">
+    <img alt="Device select dialog" src="assets/screenshots/devices_dark.png">
+  </picture>
 
 ## Features
 
