@@ -44,7 +44,8 @@ Import-LocalizedData @Parameters
 #region ADB
 
 Set-Adb
-if (-not (Test-Adb)) {
+$wasAdbInstalled = Test-Adb
+if (-not $wasAdbInstalled) {
   $Parameters = @{
     Message   = "$($Localization.SettingAdbUp)..."
     Operation = ${function:Get-Adb}
@@ -64,7 +65,8 @@ if (-not (Test-Adb)) {
   }
 }
 
-if (-not (Test-AdbServer)) {
+$hasStartedAdbServer = $false
+if (-not $wasAdbInstalled -or -not (Test-AdbServer)) {
   $Parameters = @{
     Message   = "$($Localization.StartingAdbServer)..."
     Operation = ${function:Start-AdbServer}
@@ -72,6 +74,7 @@ if (-not (Test-AdbServer)) {
   try {
     $result = Show-ProgressRingDialog @Parameters
     if ($result.Cancelled) { exit }
+    $hasStartedAdbServer = $true
   }
   catch {
     $Parameters = @{
@@ -173,7 +176,7 @@ do {
   }
 } while ($true)
 
-if (-not $Dev) {
+if (-not $Dev -and $hasStartedAdbServer) {
   Stop-AdbServer
 }
 
