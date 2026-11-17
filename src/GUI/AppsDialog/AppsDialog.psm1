@@ -78,6 +78,23 @@ function Show-AppsDialog {
 }
 
 class ViewModel : ObservableObject {
+  $FocusSearchCommand = [RelayCommand]::new(
+    {
+      $Window.SearchBox.Focus() > $null
+      $Window.SearchBox.SelectAll()
+    },
+    { -not $Window.SearchBox.IsFocused }
+  )
+
+  $ClearSearchCommand = [RelayCommand]::new(
+    {
+      $Window.SearchBox.Clear()
+    },
+    {
+      $Window.SearchBox.Text.Length -gt 0
+    }
+  )
+
   $ActionCommand = [RelayCommand]::new(
     {
       $selectedPackages = [Collections.Generic.HashSet[string]]::new()

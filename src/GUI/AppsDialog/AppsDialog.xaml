@@ -4,6 +4,11 @@
   SizeToContent="WidthAndHeight"
   MinWidth="450" MinHeight="350">
 
+  <Window.InputBindings>
+    <KeyBinding Key="F" Modifiers="Control"
+      Command="{Binding ViewModel.FocusSearchCommand}" />
+  </Window.InputBindings>
+
   <Window.Resources>
     <ResourceDictionary>
       <Style x:Key="HelpIcon" TargetType="ContentControl">
@@ -72,7 +77,11 @@
       <Grid.ColumnDefinitions>
         <ColumnDefinition MaxWidth="500" />
       </Grid.ColumnDefinitions>
-      <TextBox Name="SearchBox" Height="32" />
+      <TextBox Name="SearchBox" Height="32">
+        <TextBox.InputBindings>
+          <KeyBinding Key="Escape" Command="{Binding ViewModel.ClearSearchCommand}" />
+        </TextBox.InputBindings>
+      </TextBox>
     </Grid>
 
     <CheckBox Grid.Row="2"
