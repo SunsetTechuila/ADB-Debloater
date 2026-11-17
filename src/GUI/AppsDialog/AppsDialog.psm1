@@ -91,18 +91,12 @@ class ViewModel : ObservableObject {
   )
 
   $ClearSearchCommand = [RelayCommand]::new(
-    {
-      $Window.SearchBox.Clear()
-    },
-    {
-      $Window.SearchBox.Text.Length -gt 0
-    }
+    { $Window.SearchBox.Clear() },
+    { $Window.SearchBox.Text.Length -gt 0 }
   )
 
   $ActionCommand = [RelayCommand]::new(
-    {
-      $Window.DialogResult = $true
-    },
+    { $Window.DialogResult = $true },
     {
       foreach ($appItem in $ViewModel.AppItems) {
         if ($appItem.IsSelected) {

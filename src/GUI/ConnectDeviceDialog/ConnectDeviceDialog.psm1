@@ -44,12 +44,8 @@ function Show-ConnectDeviceDialog {
 
 class ViewModel : ObservableObject {
   $OkCommand = [RelayCommand]::new(
-    {
-      $Window.DialogResult = $true
-    },
-    {
-      $ViewModel.IsIpAddressValid()
-    }
+    { $Window.DialogResult = $true },
+    { $ViewModel.IsIpAddressValid() }
   )
 
   $CancelCommand = [RelayCommand]::new({

@@ -50,12 +50,8 @@ function Show-PairDeviceDialog {
 
 class ViewModel : ObservableObject {
   $OkCommand = [RelayCommand]::new(
-    {
-      $Window.DialogResult = $true
-    },
-    {
-      $ViewModel.AreInputsValid()
-    }
+    { $Window.DialogResult = $true},
+    { $ViewModel.AreInputsValid() }
   )
 
   $CancelCommand = [RelayCommand]::new({
