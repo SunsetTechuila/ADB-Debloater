@@ -110,7 +110,7 @@ do {
 
   $Parameters = @{
     Packages      = $packages
-    BloatwareList = Get-Content -Path $BloatwareList -Raw | ConvertFrom-Json
+    BloatwareList = [IO.File]::ReadAllText($BloatwareList) | ConvertFrom-Json
   }
   $appsToProcess = Get-AppsToProcess @Parameters
 

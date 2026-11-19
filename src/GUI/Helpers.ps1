@@ -19,15 +19,12 @@ function Initialize-Window {
       Set-ColorStyles
     }
 
-    [xml]$xaml = Get-Content -Path $Path -Raw
-    $reader = New-Object -TypeName 'System.Xml.XmlNodeReader' -ArgumentList $xaml
+    $reader = [Xml.XmlReader]::Create($Path)
     $Window = [Windows.Markup.XamlReader]::Load($reader)
+    $reader.Close()
 
-    $namedNodes = $xaml.SelectNodes('//*[@Name]')
-    foreach ($namedNode in $namedNodes) {
-      $control = $Window.FindName($namedNode.Name)
-      if ($null -eq $control) { continue }
-      Add-Member -InputObject $Window -NotePropertyName $namedNode.Name -NotePropertyValue $control
+    foreach ($entry in [Windows.NameScope]::GetNameScope($Window)) {
+      $Window.PSObject.Properties.Add([PSNoteProperty]::new($entry.Key, $entry.Value))
     }
 
     Set-WindowChrome -Window $Window
@@ -304,14 +301,13 @@ function Get-AppTargetTheme {
   [CmdletBinding()]
   [OutputType([string])]
   param ()
-  begin {
-    $Parameters = @{
-      Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize'
-      Name = 'AppsUseLightTheme'
-    }
-  }
   process {
-    switch (Get-ItemPropertyValue @Parameters) {
+    $appsUseLightTheme = [Microsoft.Win32.Registry]::GetValue(
+      'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize',
+      'AppsUseLightTheme',
+      $null
+    )
+    switch ($appsUseLightTheme) {
       0 { return 'dark' }
       1 { return 'light' }
     }
@@ -326,14 +322,12 @@ function Get-SystemAccentColor {
     [ValidateSet('light', 'dark')]
     [string]$Variant
   )
-  begin {
-    $Parameters = @{
-      Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
-      Name = 'AccentPalette'
-    }
-  }
   process {
-    $accentPalette = Get-ItemPropertyValue @Parameters
+    $accentPalette = [Microsoft.Win32.Registry]::GetValue(
+      'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent',
+      'AccentPalette',
+      $null
+    )
     '#{0:X2}{1:X2}{2:X2}' -f $(
       if ($Variant -eq 'light') {
         $accentPalette[4], $accentPalette[5], $accentPalette[6]
@@ -626,7 +620,7 @@ class BackgroundTask {
     $this.CancellationTokenSource = [Threading.CancellationTokenSource]::new()
     $this.UiSync = @{ PendingOperation = $null }
 
-    $initialSessionState = [Management.Automation.Runspaces.InitialSessionState]::CreateDefault()
+    $initialSessionState = [Management.Automation.Runspaces.InitialSessionState]::CreateDefault2()
     if ($operation.Module) {
       $initialSessionState.ImportPSModule($operation.Module.Path)
     }

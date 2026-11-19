@@ -29,12 +29,7 @@ function Test-Adb {
   [OutputType([bool])]
   param()
   process {
-    $Parameters = @{
-      Path        = $Env:adb
-      PathType    = 'Leaf'
-      ErrorAction = 'SilentlyContinue'
-    }
-    Test-Path @Parameters
+    [IO.File]::Exists($Env:adb)
   }
 }
 
@@ -103,7 +98,7 @@ function Test-AdbServer {
   [OutputType([bool])]
   param()
   process {
-    [bool](Get-Process -Name 'adb' -ErrorAction 'SilentlyContinue')
+    [bool][Diagnostics.Process]::GetProcessesByName('adb')
   }
 }
 
