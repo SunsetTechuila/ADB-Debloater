@@ -1,10 +1,7 @@
 @echo off
+setlocal
 
-where pwsh >nul 2>&1
-if %errorlevel% equ 0 (
-  set "powershell=pwsh"
-) else (
-  set "powershell=powershell"
-)
+set "powershell=powershell.exe"
+for %%I in (pwsh.exe) do if not "%%~$PATH:I"=="" set "powershell=%%~$PATH:I"
 
-%powershell% -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0src\Debloater.ps1"
+"%powershell%" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0src\Debloater.ps1"
