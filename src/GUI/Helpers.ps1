@@ -285,37 +285,14 @@ function Hide-NativeCaptionButtons {
     [Windows.Window]$Window
   )
   begin {
-    if ('WinApi' -as [type]) { return }
-    Add-Type -TypeDefinition @'
-using System;
-using System.Runtime.InteropServices;
-
-public class WinApi {
-  private const int GWL_STYLE = -16;
-  private const int WS_SYSMENU = 0x80000;
-
-  [DllImport("user32.dll", SetLastError = true)]
-  private static extern int GetWindowLong(
-    IntPtr hWnd,
-    int nIndex
-  );
-
-  [DllImport("user32.dll")]
-  private static extern int SetWindowLong(
-    IntPtr hWnd,
-    int nIndex,
-    int dwNewLong
-  );
-
-  public static void HideNativeCaptionButtons(IntPtr hWnd) {
-    SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & ~WS_SYSMENU);
-  }
-}
-'@
+    $gwlStyle = -16
+    $wsSysMenu = 0x80000
+    $winApi = Get-WinApi
   }
   process {
     $windowHandle = [Windows.Interop.WindowInteropHelper]::new($Window).Handle
-    [WinApi]::HideNativeCaptionButtons($windowHandle)
+    $style = $winApi::GetWindowLong($windowHandle, $gwlStyle)
+    $winApi::SetWindowLong($windowHandle, $gwlStyle, ($style -band (-bnot $wsSysMenu))) > $null
   }
 }
 
@@ -417,29 +394,12 @@ function Set-DwmWindowAttribute {
     [int] $Value
   )
   begin {
-    if ('DWM' -as [type]) { return }
-    Add-Type -TypeDefinition @'
-using System;
-using System.Runtime.InteropServices;
-
-public class DWM {
-  [DllImport("dwmapi.dll", SetLastError = true)]
-  private static extern int DwmSetWindowAttribute(
-    IntPtr hwnd,
-    uint dwAttribute,
-    ref int pvAttribute,
-    uint cbAttribute
-  );
-
-  public static void SetWindowAttribute(IntPtr hwnd, uint attribute, int value) {
-    DwmSetWindowAttribute(hwnd, attribute, ref value, sizeof(int));
-  }
-}
-'@
+    $winApi = Get-WinApi
+    $intSize = [uint32][Runtime.InteropServices.Marshal]::SizeOf([type][int])
   }
   process {
     $windowHandle = [Windows.Interop.WindowInteropHelper]::new($Window).Handle
-    [DWM]::SetWindowAttribute($windowHandle, $Attribute, $Value)
+    $winApi::DwmSetWindowAttribute($windowHandle, [uint32]$Attribute, [ref]$Value, $intSize) > $null
   }
 }
 
@@ -458,6 +418,62 @@ function Test-DwmImmersiveDarkModeApiAvailability {
   param()
   process {
     [Environment]::OSVersion.Version.Build -ge 19041
+  }
+}
+
+#endregion
+
+#region WinAPI
+
+$script:WinApi = $null
+
+function Get-WinApi {
+  [CmdletBinding()]
+  [OutputType([type])]
+  param()
+  process {
+    if ($script:WinApi) { return $script:WinApi }
+
+    $typeBuilder = [Reflection.Emit.AssemblyBuilder]::DefineDynamicAssembly(
+      'WinApi', 'Run'
+    ).DefineDynamicModule('WinApi').DefineType('WinApi', 'Public, Abstract, Sealed')
+
+    $methods = @(
+      @{
+        Name       = 'GetWindowLong'
+        Dll        = 'user32.dll'
+        ReturnType = [int]
+        Parameters = [IntPtr], [int]
+      }
+      @{
+        Name       = 'SetWindowLong'
+        Dll        = 'user32.dll'
+        ReturnType = [int]
+        Parameters = [IntPtr], [int], [int]
+      }
+      @{
+        Name       = 'DwmSetWindowAttribute'
+        Dll        = 'dwmapi.dll'
+        ReturnType = [int]
+        Parameters = [IntPtr], [uint32], [int].MakeByRefType(), [uint32]
+      }
+    )
+
+    foreach ($method in $methods) {
+      $typeBuilder.DefinePInvokeMethod(
+        $method.Name,
+        $method.Dll,
+        'Public, Static, PinvokeImpl',
+        'Standard',
+        $method.ReturnType,
+        [type[]]$method.Parameters,
+        'Winapi',
+        'Unicode'
+      ).SetImplementationFlags('PreserveSig')
+    }
+
+    $script:WinApi = $typeBuilder.CreateType()
+    $script:WinApi
   }
 }
 
