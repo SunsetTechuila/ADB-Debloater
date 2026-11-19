@@ -15,7 +15,10 @@ function Get-Localization {
         BaseDirectory   = "$PSScriptRoot/Resources/Localizations"
         FileName        = 'Strings'
       }
-      Import-LocalizedData @Parameters
+      Import-LocalizedData @Parameters -ErrorAction 'Ignore'
+      if (-not $localizedData) {
+        Import-LocalizedData @Parameters -UICulture 'en'
+      }
       $script:Localization = $localizedData
     }
 
