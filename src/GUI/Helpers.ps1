@@ -1,8 +1,3 @@
-#Requires -Version 5.1
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/Paths.ps1"
-
 #region Window
 
 function Initialize-Window {
@@ -16,9 +11,6 @@ function Initialize-Window {
 
     [switch]$AsModal
   )
-  begin {
-    Add-Type -AssemblyName 'PresentationFramework'
-  }
   process {
     if (-not [Windows.Application]::Current) {
       $application = [Windows.Application]::new()
@@ -128,7 +120,7 @@ function Add-FluentStyles {
   [CmdletBinding()]
   param ()
   process {
-    $reader = [Xml.XmlReader]::Create($FluentStyles)
+    $reader = [Xml.XmlReader]::Create("$PSScriptRoot/Styles/Fluent.xaml")
     $fluentResourceDictionary = [Windows.Markup.XamlReader]::Load($reader)
     $reader.Close()
     [Windows.Application]::Current.Resources.MergedDictionaries.Add($fluentResourceDictionary)
@@ -174,7 +166,12 @@ function Set-ColorStyles {
     $appTargetTheme = Get-AppTargetTheme
     $accentVariant = if ($appTargetTheme -eq 'dark') { 'light' } else { 'dark' }
     $accentColor = Get-SystemAccentColor -Variant $accentVariant
-    $colorStylesPath = if ($appTargetTheme -eq 'dark') { $DarkStyles } else { $LightStyles }
+    $colorStylesPath = if ($appTargetTheme -eq 'dark') {
+      "$PSScriptRoot/Styles/Dark.xaml"
+    }
+    else {
+      "$PSScriptRoot/Styles/Light.xaml"
+    }
 
     $reader = [Xml.XmlReader]::Create($colorStylesPath)
     $colorResourceDictionary = [Windows.Markup.XamlReader]::Load($reader)

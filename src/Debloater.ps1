@@ -8,36 +8,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-Add-Type -AssemblyName 'PresentationFramework'
+Import-Module -Name "$PSScriptRoot/Functions.psm1" -DisableNameChecking
+Import-Module -Name "$PSScriptRoot/Localization.psm1"
+Import-Module -Name "$PSScriptRoot/GUI/GUI.psm1"
 
-."$PSScriptRoot/Paths.ps1"
-
-@(
-  'Functions',
-  'AppsDialog',
-  'DevicesDialog',
-  'ProgressRingDialog',
-  'MessageDialog',
-  'ProcessPackagesDialog'
-) | ForEach-Object -Process {
-  $path = Get-Variable -Name $PSItem -ValueOnly
-  # PowerShell 5 resolves the dialogs' relative `using module ../Helpers.psm1` against the current directory,
-  # so the modules are parsed from a dialog folder rather than from wherever the script was launched
-  Push-Location (Split-Path -Path $path)
-  try {
-    Import-Module -Name $path -Force -DisableNameChecking
-  }
-  finally {
-    Pop-Location
-  }
-}
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
+$Localization = Get-Localization
+$BloatwareList = "$PSScriptRoot/Resources/Bloatware.json"
 
 #endregion
 

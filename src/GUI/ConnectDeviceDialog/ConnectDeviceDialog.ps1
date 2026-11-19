@@ -1,32 +1,12 @@
-#Requires -Version 5.1
-
-using module ../Helpers.psm1
-
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/../../Paths.ps1"
-."$PSScriptRoot/../Paths.ps1"
-
-Import-Module -Name $Helpers -Force -DisableNameChecking
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
-
 function Show-ConnectDeviceDialog {
   [CmdletBinding()]
   [OutputType([string])]
   param()
-  begin {
-    Add-Type -AssemblyName 'PresentationFramework'
-  }
   process {
+    $Localization = Get-Localization
     $Window = Initialize-Window -Path "$PSScriptRoot/ConnectDeviceDialog.xaml" -HideCaptionButtons -AsModal
 
-    $ViewModel = [ViewModel]::new()
+    $ViewModel = [ConnectDeviceDialogViewModel]::new()
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -42,7 +22,7 @@ function Show-ConnectDeviceDialog {
   }
 }
 
-class ViewModel : ObservableObject {
+class ConnectDeviceDialogViewModel : ObservableObject {
   $OkCommand = [RelayCommand]::new(
     { $Window.DialogResult = $true },
     { $ViewModel.IsIpAddressValid() }

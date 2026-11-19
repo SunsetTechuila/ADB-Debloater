@@ -1,21 +1,3 @@
-#Requires -Version 5.1
-
-using module ../Helpers.psm1
-
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/../../Paths.ps1"
-."$PSScriptRoot/../Paths.ps1"
-
-Import-Module -Name $Helpers -Force -DisableNameChecking
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
-
 function Show-ProgressBarDialog {
   [CmdletBinding()]
   param (
@@ -31,13 +13,11 @@ function Show-ProgressBarDialog {
 
     [int]$MaxProgress = 100
   )
-  begin {
-    Add-Type -AssemblyName 'PresentationFramework'
-  }
   process {
+    $Localization = Get-Localization
     $Window = Initialize-Window -Path "$PSScriptRoot/ProgressBarDialog.xaml" -HideCaptionButtons
 
-    $ViewModel = [ViewModel]::new($InitialMessage, $MaxProgress)
+    $ViewModel = [ProgressBarDialogViewModel]::new($InitialMessage, $MaxProgress)
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -84,7 +64,7 @@ function Update-Progress {
   }
 }
 
-class ViewModel : ObservableObject {
+class ProgressBarDialogViewModel : ObservableObject {
   $CancelCommand = [RelayCommand]::new({
       $Window.Close()
     })
@@ -101,7 +81,7 @@ class ViewModel : ObservableObject {
 
   hidden [int] $MaxProgress
 
-  ViewModel($message, $maxProgress) {
+  ProgressBarDialogViewModel($message, $maxProgress) {
     $this.Message = $message
     $this.MaxProgress = $maxProgress
   }

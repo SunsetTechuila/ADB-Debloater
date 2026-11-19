@@ -1,21 +1,3 @@
-#Requires -Version 5.1
-
-using module ../Helpers.psm1
-
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/../../Paths.ps1"
-."$PSScriptRoot/../Paths.ps1"
-
-Import-Module -Name $Helpers -Force -DisableNameChecking
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
-
 function Show-ProgressRingDialog {
   [CmdletBinding()]
   [OutputType([hashtable])]
@@ -27,13 +9,11 @@ function Show-ProgressRingDialog {
 
     [string]$Message
   )
-  begin {
-    Add-Type -AssemblyName 'PresentationFramework'
-  }
   process {
+    $Localization = Get-Localization
     $Window = Initialize-Window -Path "$PSScriptRoot/ProgressRingDialog.xaml" -HideCaptionButtons -AsModal
 
-    $ViewModel = [ViewModel]::new($Message)
+    $ViewModel = [ProgressRingDialogViewModel]::new($Message)
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -63,14 +43,14 @@ function Show-ProgressRingDialog {
   }
 }
 
-class ViewModel {
+class ProgressRingDialogViewModel {
   $CancelCommand = [RelayCommand]::new({
       $Window.Close()
     })
 
   [string] $Message
 
-  ViewModel($message) {
+  ProgressRingDialogViewModel($message) {
     $this.Message = $message
   }
 }

@@ -1,21 +1,3 @@
-#Requires -Version 5.1
-
-using module ../Helpers.psm1
-
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/../../Paths.ps1"
-."$PSScriptRoot/../Paths.ps1"
-
-Import-Module -Name $Helpers -Force -DisableNameChecking
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
-
 function Show-MessageDialog {
   [CmdletBinding()]
   [OutputType([bool])]
@@ -31,13 +13,11 @@ function Show-MessageDialog {
     [ValidateSet('Ok', 'OkCancel')]
     [string]$Buttons = 'Ok'
   )
-  begin {
-    Add-Type -AssemblyName 'PresentationFramework'
-  }
   process {
+    $Localization = Get-Localization
     $Window = Initialize-Window -Path "$PSScriptRoot/MessageDialog.xaml" -HideCaptionButtons -AsModal
 
-    $ViewModel = [ViewModel]::new($Message, $Title, $Icon, $Buttons)
+    $ViewModel = [MessageDialogViewModel]::new($Message, $Title, $Icon, $Buttons)
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -48,7 +28,7 @@ function Show-MessageDialog {
   }
 }
 
-class ViewModel {
+class MessageDialogViewModel {
   $OkCommand = [RelayCommand]::new({
       $Window.DialogResult = $true
     })
@@ -65,7 +45,7 @@ class ViewModel {
 
   [string] $Buttons
 
-  ViewModel(
+  MessageDialogViewModel(
     [string] $message,
     [string] $title,
     [string] $icon,

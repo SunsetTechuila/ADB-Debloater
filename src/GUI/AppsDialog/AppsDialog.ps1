@@ -1,21 +1,3 @@
-#Requires -Version 5.1
-
-using module ../Helpers.psm1
-
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/../../Paths.ps1"
-."$PSScriptRoot/../Paths.ps1"
-
-Import-Module -Name $Helpers -Force -DisableNameChecking
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
-
 function Show-AppsDialog {
   [CmdletBinding()]
   [OutputType([hashtable])]
@@ -27,14 +9,12 @@ function Show-AppsDialog {
     [Parameter(Mandatory)]
     [hashtable[]]$Apps
   )
-  begin {
-    Add-Type -AssemblyName 'PresentationFramework'
-  }
   process {
+    $Localization = Get-Localization
     $Window = Initialize-Window -Path "$PSScriptRoot/AppsDialog.xaml"
 
     $appItems = New-AppItems -Apps $Apps
-    $ViewModel = [ViewModel]::new($appItems)
+    $ViewModel = [AppsDialogViewModel]::new($appItems)
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -81,7 +61,7 @@ function Show-AppsDialog {
   }
 }
 
-class ViewModel : ObservableObject {
+class AppsDialogViewModel : ObservableObject {
   $FocusSearchCommand = [RelayCommand]::new(
     {
       $Window.SearchBox.Focus() > $null
@@ -145,7 +125,7 @@ class ViewModel : ObservableObject {
 
   hidden $IsTogglingSelection = $false
 
-  ViewModel([AppItem[]] $appItems) {
+  AppsDialogViewModel([AppItem[]] $appItems) {
     $this.AppItems = $appItems
     $this.FilteredAppItems = $appItems
   }

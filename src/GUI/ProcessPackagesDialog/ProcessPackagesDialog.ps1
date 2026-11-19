@@ -1,19 +1,3 @@
-#Requires -Version 5.1
-
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/../../Paths.ps1"
-."$PSScriptRoot/../Paths.ps1"
-
-Import-Module -Name $ProgressBarDialog -Force -DisableNameChecking
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
-
 function Show-ProcessPackagesDialog {
   [CmdletBinding()]
   [OutputType([hashtable])]
@@ -32,6 +16,7 @@ function Show-ProcessPackagesDialog {
     [string]$DeviceId
   )
   process {
+    $Localization = Get-Localization
     $operationName = switch -Exact ($ActionName) {
       'uninstall' { $Localization.Uninstalling; break }
       'disable' { $Localization.Disabling; break }

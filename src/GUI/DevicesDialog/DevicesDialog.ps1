@@ -1,28 +1,3 @@
-#Requires -Version 5.1
-
-using module ../Helpers.psm1
-
-$ErrorActionPreference = 'Stop'
-
-."$PSScriptRoot/../../Paths.ps1"
-."$PSScriptRoot/../Paths.ps1"
-
-$modules = @(
-  'Helpers',
-  'ConnectDeviceDialog',
-  'PairDeviceDialog',
-  'ProgressRingDialog',
-  'MessageDialog'
-)
-Import-Module -Name (Get-Variable -Name $modules -ValueOnly) -Force -DisableNameChecking
-
-$Parameters = @{
-  BindingVariable = 'Localization'
-  BaseDirectory   = $Localizations
-  FileName        = 'Strings'
-}
-Import-LocalizedData @Parameters
-
 function Show-DevicesDialog {
   [CmdletBinding()]
   [OutputType([hashtable])]
@@ -38,13 +13,11 @@ function Show-DevicesDialog {
 
     [string]$SelectedDeviceId
   )
-  begin {
-    Add-Type -AssemblyName 'PresentationFramework'
-  }
   process {
+    $Localization = Get-Localization
     $Window = Initialize-Window -Path "$PSScriptRoot/DevicesDialog.xaml"
 
-    $ViewModel = [ViewModel]::new($SelectedDeviceId)
+    $ViewModel = [DevicesDialogViewModel]::new($SelectedDeviceId)
 
     $Window.DataContext = [PSCustomObject]@{
       ViewModel    = $ViewModel
@@ -73,7 +46,7 @@ function Show-DevicesDialog {
   }
 }
 
-class ViewModel : ObservableObject {
+class DevicesDialogViewModel : ObservableObject {
   $PairCommand = [RelayCommand]::new({
       $data = Show-PairDeviceDialog
       if (-not $data) { return }
@@ -201,7 +174,7 @@ class ViewModel : ObservableObject {
 
   hidden [string] $SelectedActionName
 
-  ViewModel([string] $initialSelectedDeviceId) {
+  DevicesDialogViewModel([string] $initialSelectedDeviceId) {
     $this.InitialSelectedDeviceId = $initialSelectedDeviceId
   }
 
@@ -231,17 +204,18 @@ class Device : ObservableObject {
 
   [string] $Hint
   hidden [void] UpdateHint() {
+    $localization = Get-Localization
     $newHint = switch -Regex ($this.Status) {
       'Offline' {
-        $script:Localization.DeviceReconnectInstruction
+        $localization.DeviceReconnectInstruction
         break
       }
       'Bootloader|Recovery|Sideload' {
-        $script:Localization.DeviceRebootInstruction
+        $localization.DeviceRebootInstruction
         break
       }
       'Unauthorized' {
-        $script:Localization.DeviceAuthorizeInstruction
+        $localization.DeviceAuthorizeInstruction
         break
       }
       default {

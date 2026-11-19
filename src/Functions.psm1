@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 $ErrorActionPreference = 'Stop'
 
-."$PSScriptRoot/Paths.ps1"
+$Resources = "$PSScriptRoot/Resources"
 
 #region ADB Setup
 
@@ -455,3 +455,24 @@ function Get-AppsToProcess {
 }
 
 #endregion
+
+Export-ModuleMember -Function @(
+  'Set-Adb'
+  'Test-Adb'
+  'Get-Adb'
+  'Start-AdbServer'
+  'Stop-AdbServer'
+  'Test-AdbServer'
+  'Connect-DeviceOverWiFi'
+  'Pair-DeviceOverWiFi'
+  'Watch-Devices'
+  'Get-InstalledPackages'
+  'Get-EnabledPackages'
+  'Get-DisabledPackages'
+  'Get-UninstalledPackages'
+  'Uninstall-Packages'
+  'Disable-Packages'
+  'Enable-Packages'
+  'Reinstall-Packages'
+  'Get-AppsToProcess'
+)
