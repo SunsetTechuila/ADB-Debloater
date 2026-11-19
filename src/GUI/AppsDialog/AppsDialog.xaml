@@ -51,10 +51,7 @@
             ToolTip="{Binding HelpMessage, Mode=OneTime}" />
         </StackPanel>
         <DataTemplate.Triggers>
-          <DataTrigger Binding="{Binding HelpMessage, Mode=OneTime}" Value="">
-            <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
-          </DataTrigger>
-          <DataTrigger Binding="{Binding HelpMessage, Mode=OneTime}" Value="{x:Null}">
+          <DataTrigger Binding="{Binding HelpMessage, Mode=OneTime, TargetNullValue=''}" Value="">
             <Setter TargetName="HelpIcon" Property="Visibility" Value="Collapsed" />
           </DataTrigger>
         </DataTemplate.Triggers>

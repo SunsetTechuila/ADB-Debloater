@@ -17,12 +17,9 @@
     </Style.Resources>
 
     <Style.Triggers>
-      <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}"
+      <DataTrigger
+        Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content, TargetNullValue=''}"
         Value="">
-        <Setter Property="Visibility" Value="Collapsed" />
-      </DataTrigger>
-      <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}"
-        Value="{x:Null}">
         <Setter Property="Visibility" Value="Collapsed" />
       </DataTrigger>
     </Style.Triggers>

@@ -59,13 +59,8 @@
                       <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
                     <DataTrigger
-                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
+                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText, TargetNullValue='', FallbackValue=''}"
                       Value="">
-                      <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                    <DataTrigger
-                      Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag.PlaceholderText}"
-                      Value="{x:Null}">
                       <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                   </Style.Triggers>

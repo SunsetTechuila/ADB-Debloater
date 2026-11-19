@@ -100,12 +100,11 @@
               <Setter TargetName="IconBorder" Property="Visibility" Value="Hidden" />
             </Trigger>
 
-            <Trigger Property="InputGestureText" Value="">
+            <DataTrigger
+              Binding="{Binding RelativeSource={RelativeSource Self}, Path=InputGestureText, TargetNullValue=''}"
+              Value="">
               <Setter TargetName="InputGestureText" Property="Visibility" Value="Hidden" />
-            </Trigger>
-            <Trigger Property="InputGestureText" Value="{x:Null}">
-              <Setter TargetName="InputGestureText" Property="Visibility" Value="Hidden" />
-            </Trigger>
+            </DataTrigger>
 
             <Trigger Property="IsHighlighted" Value="True">
               <Setter TargetName="MenuItemBorder" Property="Background"
