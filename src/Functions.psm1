@@ -214,7 +214,7 @@ function Get-InstalledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell cmd package list packages) -replace '^package:'
+    (.$Env:adb -s $DeviceId shell cmd package list packages --user 0) -replace '^package:'
   }
 }
 
@@ -226,7 +226,7 @@ function Get-EnabledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell cmd package list packages -e) -replace '^package:'
+    (.$Env:adb -s $DeviceId shell cmd package list packages -e --user 0) -replace '^package:'
   }
 }
 
@@ -238,7 +238,7 @@ function Get-DisabledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell cmd package list packages -d) -replace '^package:'
+    (.$Env:adb -s $DeviceId shell cmd package list packages -d --user 0) -replace '^package:'
   }
 }
 
@@ -250,7 +250,15 @@ function Get-UninstalledPackages {
     [string]$DeviceId
   )
   process {
-    $command = '(cmd package list packages -u & installed=$(cmd package list packages); wait; IFS=; echo $installed) | sort | uniq -u'
+    $command = @(
+      '('
+      'cmd package list packages -u --user 0 &'
+      'installed=$(cmd package list packages --user 0);'
+      'wait;'
+      'IFS=;'
+      'echo $installed'
+      ') | sort | uniq -u'
+    ) -join ' '
     (.$Env:adb -s $DeviceId shell $command) -replace '^package:'
   }
 }
@@ -274,7 +282,7 @@ function Uninstall-Packages {
       'cmd package uninstall --user 0 $package &&'
       # Prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
       # May fail on OEM-restricted packages or already disabled packages
-      '{ cmd package disable-user $package > /dev/null 2>&1 || true; };'
+      '{ cmd package disable-user --user 0 $package > /dev/null 2>&1 || true; };'
       'else'
       'cmd package uninstall $package;'
       'fi'
@@ -299,9 +307,9 @@ function Disable-Packages {
       # Uninstall system app update, if installed
       'if $isSystem; then cmd package uninstall $package > /dev/null 2>&1; fi;'
       # Disable the package for the primary user, preventing it from running in the background or receiving updates
-      'cmd package disable-user $package &&'
+      'cmd package disable-user --user 0 $package &&'
       # Clear all application data
-      'cmd package clear $package'
+      'cmd package clear --user 0 $package'
     ) -join ' '
 
     Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
@@ -319,7 +327,7 @@ function Enable-Packages {
     [string]$DeviceId
   )
   process {
-    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command 'cmd package enable $package'
+    Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command 'cmd package enable --user 0 $package'
   }
 }
 
@@ -334,7 +342,7 @@ function Reinstall-Packages {
     [string]$DeviceId
   )
   process {
-    $command = 'cmd package install-existing $package && cmd package enable $package'
+    $command = 'cmd package install-existing --user 0 $package && cmd package enable --user 0 $package'
     Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
   }
 }
@@ -379,7 +387,9 @@ function Invoke-PackagesCommand {
 
       $usesIsSystem = $Command -cmatch '\$\{?isSystem\b'
       if ($usesIsSystem -and -not $process.HasExited) {
-        $process.StandardInput.WriteLine('systemPackages="$(cmd package list packages -s < /dev/null 2>/dev/null | tr "\n" " ")"')
+        $process.StandardInput.WriteLine(
+          'systemPackages="$(cmd package list packages -s --user 0 < /dev/null 2>/dev/null | tr "\n" " ")"'
+        )
       }
 
       foreach ($package in $Packages) {
