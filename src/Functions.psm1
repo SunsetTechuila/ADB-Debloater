@@ -267,11 +267,15 @@ function Uninstall-Packages {
   )
   process {
     $command = @(
+      'if $isSystem; then'
       # Uninstall system app update, if installed
       'cmd package uninstall $package > /dev/null 2>&1;'
       # `cmd package uninstall --user 0` uninstalls the system package for the primary user;
       # when the app is uninstalled, `cmd package disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
-      'cmd package uninstall --user 0 $package && cmd package disable-user $package'
+      'cmd package uninstall --user 0 $package && cmd package disable-user $package;'
+      'else'
+      'cmd package uninstall $package;'
+      'fi'
     ) -join ' '
 
     Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
@@ -291,8 +295,8 @@ function Disable-Packages {
   process {
     $command = @(
       # Uninstall system app update, if installed
-      'cmd package uninstall $package > /dev/null 2>&1;'
-      # `cmd package disable-user` disables the system package for the primary user, preventing it from running in the background or receiving updates
+      'if $isSystem; then cmd package uninstall $package > /dev/null 2>&1; fi;'
+      # `cmd package disable-user` disables the package for the primary user, preventing it from running in the background or receiving updates
       # `cmd package clear` clears all application data
       'cmd package disable-user $package && cmd package clear $package'
     ) -join ' '
@@ -370,9 +374,21 @@ function Invoke-PackagesCommand {
       )
       $process.StandardInput.NewLine = "`n"
 
+      $usesIsSystem = $Command -cmatch '\$\{?isSystem\b'
+      if ($usesIsSystem -and -not $process.HasExited) {
+        $process.StandardInput.WriteLine('systemPackages="$(cmd package list packages -s < /dev/null 2>/dev/null | tr "\n" " ")"')
+      }
+
       foreach ($package in $Packages) {
         $shellCommand = @(
           "package=$package;"
+          if ($usesIsSystem) {
+            'if [[ "$systemPackages" == *"package:$package "* ]]; then'
+            'isSystem=true;'
+            'else'
+            'isSystem=false;'
+            'fi;'
+          }
           "if output=`$({ $Command; } < /dev/null 2>&1) && case `"`$output`" in *Failure*|*Failed*|*Exception*|*Error*) false ;; esac; then"
           'echo "OK";'
           'else'
