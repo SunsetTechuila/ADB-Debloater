@@ -270,9 +270,11 @@ function Uninstall-Packages {
       'if $isSystem; then'
       # Uninstall system app update, if installed
       'cmd package uninstall $package > /dev/null 2>&1;'
-      # `cmd package uninstall --user 0` uninstalls the system package for the primary user;
-      # when the app is uninstalled, `cmd package disable-user` is used to prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
-      'cmd package uninstall --user 0 $package && cmd package disable-user $package;'
+      # Uninstall the system package for the primary user
+      'cmd package uninstall --user 0 $package &&'
+      # Prevent the Play Store or other OEM app stores from forced reinstalling the app or enabling it after an OTA software update
+      # May fail on OEM-restricted packages or already disabled packages
+      '{ cmd package disable-user $package > /dev/null 2>&1 || true; };'
       'else'
       'cmd package uninstall $package;'
       'fi'
@@ -296,9 +298,10 @@ function Disable-Packages {
     $command = @(
       # Uninstall system app update, if installed
       'if $isSystem; then cmd package uninstall $package > /dev/null 2>&1; fi;'
-      # `cmd package disable-user` disables the package for the primary user, preventing it from running in the background or receiving updates
-      # `cmd package clear` clears all application data
-      'cmd package disable-user $package && cmd package clear $package'
+      # Disable the package for the primary user, preventing it from running in the background or receiving updates
+      'cmd package disable-user $package &&'
+      # Clear all application data
+      'cmd package clear $package'
     ) -join ' '
 
     Invoke-PackagesCommand -Packages $Packages -DeviceId $DeviceId -Command $command
