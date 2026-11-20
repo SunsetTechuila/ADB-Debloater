@@ -80,7 +80,7 @@ function Start-AdbServer {
   process {
     # `adb start-server` writes status messages to stderr
     $ErrorActionPreference = 'Continue'
-    $output = .$Env:adb start-server 2>&1
+    $output = & $Env:adb start-server 2>&1
     if ($LASTEXITCODE -ne 0) { throw ($output -join "`n") }
   }
 }
@@ -89,7 +89,7 @@ function Stop-AdbServer {
   [CmdletBinding()]
   param()
   process {
-    .$Env:adb kill-server
+    & $Env:adb kill-server
   }
 }
 
@@ -109,7 +109,7 @@ function Connect-DeviceOverWiFi {
     [string]$IpAddress
   )
   process {
-    $output = .$Env:adb connect $IpAddress
+    $output = & $Env:adb connect $IpAddress
     # `adb connect` writes error messages to stdout and exits with code 0 when connection fails
     if ($output -notmatch '^(already )?connected to') { throw $output }
   }
@@ -128,7 +128,7 @@ function Pair-DeviceOverWiFi {
     # Manually throw to avoid the message being wrapped
     # with "The running command stopped because the..." in PowerShell 5
     $ErrorActionPreference = 'Continue'
-    $output = .$Env:adb pair $IpAddress $PairingCode 2>&1
+    $output = & $Env:adb pair $IpAddress $PairingCode 2>&1
     if ($LASTEXITCODE -ne 0) { throw $output }
   }
 }
@@ -214,7 +214,7 @@ function Get-InstalledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell cmd package list packages --user 0) -replace '^package:'
+    (& $Env:adb -s $DeviceId shell cmd package list packages --user 0) -replace '^package:'
   }
 }
 
@@ -226,7 +226,7 @@ function Get-EnabledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell cmd package list packages -e --user 0) -replace '^package:'
+    (& $Env:adb -s $DeviceId shell cmd package list packages -e --user 0) -replace '^package:'
   }
 }
 
@@ -238,7 +238,7 @@ function Get-DisabledPackages {
     [string]$DeviceId
   )
   process {
-    (.$Env:adb -s $DeviceId shell cmd package list packages -d --user 0) -replace '^package:'
+    (& $Env:adb -s $DeviceId shell cmd package list packages -d --user 0) -replace '^package:'
   }
 }
 
@@ -259,7 +259,7 @@ function Get-UninstalledPackages {
       'echo $installed'
       ') | sort | uniq -u'
     ) -join ' '
-    (.$Env:adb -s $DeviceId shell $command) -replace '^package:'
+    (& $Env:adb -s $DeviceId shell $command) -replace '^package:'
   }
 }
 
