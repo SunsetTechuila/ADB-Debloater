@@ -43,19 +43,61 @@
                   Width="8"
                   IsDirectionReversed="True">
                   <Track.DecreaseRepeatButton>
-                    <RepeatButton Command="ScrollBar.PageUpCommand" />
+                    <RepeatButton
+                      Command="ScrollBar.PageUpCommand"
+                      Focusable="False"
+                      IsTabStop="False" />
                   </Track.DecreaseRepeatButton>
                   <Track.Thumb>
                     <Thumb Name="PART_Thumb" Style="{StaticResource ScrollBarThumb}" />
                   </Track.Thumb>
                   <Track.IncreaseRepeatButton>
-                    <RepeatButton Command="ScrollBar.PageDownCommand" />
+                    <RepeatButton
+                      Command="ScrollBar.PageDownCommand"
+                      Focusable="False"
+                      IsTabStop="False" />
                   </Track.IncreaseRepeatButton>
                 </Track>
               </Grid>
               <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                   <Setter TargetName="PART_Track" Property="Width" Value="12" />
+                  <Setter TargetName="PART_Thumb" Property="Border.CornerRadius" Value="6" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Trigger>
+      <Trigger Property="Orientation" Value="Horizontal">
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="ScrollBar">
+              <Grid>
+                <Track
+                  Name="PART_Track"
+                  Height="8"
+                  Orientation="Horizontal">
+                  <Track.DecreaseRepeatButton>
+                    <RepeatButton
+                      Command="ScrollBar.PageLeftCommand"
+                      Focusable="False"
+                      IsTabStop="False" />
+                  </Track.DecreaseRepeatButton>
+                  <Track.Thumb>
+                    <Thumb Name="PART_Thumb" Style="{StaticResource ScrollBarThumb}" />
+                  </Track.Thumb>
+                  <Track.IncreaseRepeatButton>
+                    <RepeatButton
+                      Command="ScrollBar.PageRightCommand"
+                      Focusable="False"
+                      IsTabStop="False" />
+                  </Track.IncreaseRepeatButton>
+                </Track>
+              </Grid>
+              <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                  <Setter TargetName="PART_Track" Property="Height" Value="12" />
                   <Setter TargetName="PART_Thumb" Property="Border.CornerRadius" Value="6" />
                 </Trigger>
               </ControlTemplate.Triggers>
@@ -82,7 +124,6 @@
             </Grid.RowDefinitions>
             <Grid
               Grid.Row="0"
-              Grid.RowSpan="2"
               Grid.Column="0"
               Grid.ColumnSpan="2"
               Margin="{TemplateBinding Padding}">
@@ -96,6 +137,15 @@
               ViewportSize="{TemplateBinding ViewportHeight}"
               Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
               Value="{TemplateBinding VerticalOffset}" />
+            <ScrollBar
+              Name="PART_HorizontalScrollBar"
+              Grid.Row="1"
+              Grid.Column="0"
+              Orientation="Horizontal"
+              Maximum="{TemplateBinding ScrollableWidth}"
+              ViewportSize="{TemplateBinding ViewportWidth}"
+              Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+              Value="{TemplateBinding HorizontalOffset}" />
           </Grid>
         </ControlTemplate>
       </Setter.Value>
