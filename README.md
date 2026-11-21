@@ -5,14 +5,14 @@
 
 ## Screenshots
 
-### Package select dialog
+### App selection dialog
 
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="assets/screenshots/packages_light.png">
     <img alt="Package select dialog" src="assets/screenshots/packages_dark.png">
   </picture>
 
-### Device select dialog
+### Device selection dialog
 
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="assets/screenshots/devices_light.png">
