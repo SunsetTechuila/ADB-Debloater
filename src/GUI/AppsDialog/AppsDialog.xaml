@@ -101,7 +101,6 @@
         SelectionMode="Multiple"
         VirtualizingPanel.VirtualizationMode="Recycling"
         VirtualizingPanel.ScrollUnit="Pixel"
-        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
         Padding="1">
         <ListView.ItemContainerStyle>
           <Style TargetType="ListViewItem" BasedOn="{StaticResource FluentListViewItemStyle}">
